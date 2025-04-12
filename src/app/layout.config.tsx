@@ -1,4 +1,14 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
+import {
+  AlbumIcon,
+  Book,
+  ComponentIcon,
+  Heart,
+  Layout,
+  LayoutTemplate,
+  Pencil,
+  Server,
+} from "lucide-react";
 
 /**
  * Shared layout configurations
@@ -19,15 +29,29 @@ export const baseOptions: BaseLayoutProps = {
         >
           <circle cx={12} cy={12} r={12} fill="currentColor" />
         </svg>
-        My App
+        Forja Academy
       </>
     ),
   },
   links: [
     {
-      text: 'Documentation',
-      url: '/docs',
-      active: 'nested-url',
+      type: "menu",
+      text: "Cursos",
+      url: "/courses/starter",
+      items: [
+        {
+          icon: <ComponentIcon />,
+          text: "Starter",
+          description: "Comece com o básico.",
+          url: "/courses/starter",
+        },
+        {
+          icon: <Server />,
+          text: "Front-end Junior",
+          description: "Crie interfaces de usuário com HTML, CSS e JavaScript.",
+          url: "/courses/fe-junior",
+        },
+      ],
     },
   ],
 };

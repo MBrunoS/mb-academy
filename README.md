@@ -24,3 +24,10 @@ resources:
   features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 - [Fumadocs](https://fumadocs.vercel.app) - learn about Fumadocs
+
+## TODO
+
+- [ ] Adjust sidebar links (fe-junior)
+- [ ] Update home page (app/(home)/page.tsx)
+- [ ] Add courses page (app/(home)/courses/page.tsx)
+- [ ] Add content for starter course

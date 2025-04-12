@@ -1,0 +1,6 @@
+{
+  "title": "Starter",
+  "description": "Trilha para quem nunca programou antes",
+  "root": true,
+  "pages": ["index", "---Capítulo 1---", "why-programming"]
+}
