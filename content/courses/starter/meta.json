@@ -2,5 +2,20 @@
   "title": "Starter",
   "description": "Trilha para quem nunca programou antes",
   "root": true,
-  "pages": ["index", "---Capítulo 1---", "why-programming"]
+  "pages": [
+    "index",
+    "---CAPÍTULO 1---",
+    "why-programming",
+    "areas",
+    "trends",
+    "attitude",
+    "opportunities",
+    "seniority",
+    "---CAPÍTULO 2---",
+    "hardware-software-concepts",
+    "os-functionality",
+    "network-and-protocols",
+    "---CAPÍTULO 3---",
+    "programming-lang-intro"
+  ]
 }
