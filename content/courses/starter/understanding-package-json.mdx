@@ -1,0 +1,159 @@
+---
+title: Entendendo o package.json
+description: Aprenda como esse arquivo funciona e como ele é essencial para o seu projeto
+---
+
+Se você pretende criar projetos com JavaScript e usar bibliotecas modernas (como React, Express, Vite ou qualquer outra), vai se deparar constantemente com um arquivo chamado `package.json`. Ele é a **peça central de qualquer projeto Node.js** — e entender sua função vai te ajudar a dominar o fluxo de desenvolvimento com mais segurança.
+
+## O que é o `package.json`?
+
+O `package.json` é um arquivo no formato JSON que contém as **informações essenciais sobre um projeto Node.js**. Ele descreve:
+
+- O nome e a versão do seu projeto
+- As bibliotecas (ou *dependências*) que o projeto precisa para funcionar
+- Scripts personalizados que você pode rodar com `npm run`
+- Dependências de desenvolvimento
+- Licença, autor, repositório, palavras-chave e outros metadados
+
+Além disso, ele serve como um **guia técnico** que qualquer pessoa pode usar para instalar, rodar e colaborar no seu projeto.
+
+## Criando um `package.json`
+
+Você pode criar esse arquivo manualmente, mas o ideal é usar o próprio NPM para gerar automaticamente com base em perguntas:
+
+```bash
+npm init
+```
+
+O terminal vai te perguntar:
+
+- Nome do projeto
+- Versão inicial
+- Descrição
+- Arquivo de entrada (ex: `index.js`)
+- Comando de teste
+- Repositório
+- Palavras-chave
+- Autor
+- Licença
+
+Se você quiser pular essas perguntas e criar o arquivo com configurações padrão:
+
+```bash
+npm init -y
+```
+
+Isso gera um `package.json` com campos preenchidos automaticamente, que você pode editar depois.
+
+## Estrutura básica do `package.json`
+
+Aqui está um exemplo simples de como o arquivo pode parecer:
+
+```json
+{
+  "name": "meu-projeto",
+  "version": "1.0.0",
+  "description": "Projeto de exemplo com Node.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "Seu Nome",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
+```
+
+Alguns dos campos mais importantes:
+
+- `"name"`: nome do seu projeto
+- `"version"`: versão atual
+- `"main"`: ponto de entrada (arquivo principal)
+- `"scripts"`: comandos personalizados que você pode executar com `npm run`
+- `"dependencies"`: pacotes usados em tempo de execução
+- `"devDependencies"`: pacotes usados apenas no desenvolvimento
+
+## Adicionando dependências
+
+Quando você instala um pacote com:
+
+```bash
+npm install axios
+```
+
+Ele é adicionado automaticamente dentro de `"dependencies"`:
+
+```json
+"dependencies": {
+  "axios": "^1.6.0"
+}
+```
+
+Já pacotes usados apenas durante o desenvolvimento (como ferramentas de lint ou testes) devem ser instalados com:
+
+```bash
+npm install eslint --save-dev
+```
+
+E vão aparecer dentro de `"devDependencies"`:
+
+```json
+"devDependencies": {
+  "eslint": "^8.50.0"
+}
+```
+
+## Criando scripts personalizados
+
+Uma das funcionalidades mais úteis do `package.json` são os **scripts personalizados**. Eles permitem configurar comandos que você pode executar com:
+
+```bash
+npm run nome-do-script
+```
+
+Exemplo:
+
+```json
+"scripts": {
+  "start": "node index.js",
+  "dev": "nodemon index.js"
+}
+```
+
+Agora, você pode iniciar o projeto com:
+
+```bash
+npm start
+```
+
+Ou rodar o modo de desenvolvimento com recarregamento automático:
+
+```bash
+npm run dev
+```
+
+Isso é amplamente usado em projetos com Vite, React, Next.js, e qualquer outro framework moderno. Os scripts geralmente incluem tarefas como:
+
+- Iniciar o servidor (`dev`, `start`)
+- Criar uma versão de produção (`build`)
+- Rodar testes (`test`)
+- Verificar o estilo do código (`lint`)
+- Executar scripts de migração, deploy e muito mais
+
+## Instalando dependências de um projeto existente
+
+Quando você clona ou baixa um projeto que já tem um `package.json`, você não precisa instalar cada pacote manualmente. Basta rodar:
+
+```bash
+npm install
+```
+
+Esse comando lê o `package.json` e instala tudo automaticamente na pasta `node_modules`.
+
+---
+
+O `package.json` é muito mais que um simples arquivo de configuração. Ele é a **identidade técnica do seu projeto**, o **centro de automação e gerenciamento** de pacotes, e uma peça-chave para qualquer aplicação moderna com Node.js.
+
+A partir de agora, você vai usá-lo com frequência — seja para instalar bibliotecas, rodar scripts ou organizar o seu fluxo de trabalho como desenvolvedor.

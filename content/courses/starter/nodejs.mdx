@@ -1,0 +1,110 @@
+---
+title: Node.js
+description: "Executando JavaScript fora do navegador"
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+Até agora, você escreveu JavaScript em editores online ou direto no navegador. Mas para começar a criar projetos reais — mais estruturados, organizados em pastas e arquivos, com ferramentas modernas — você precisa conseguir **executar seus códigos JavaScript diretamente no seu computador**.
+
+É para isso que usamos o **Node.js**.
+
+## O que é o Node.js?
+
+O **Node.js** é um ambiente de execução para JavaScript que funciona **fora do navegador**. Ele permite que você rode seus arquivos `.js` no terminal, como faria com programas escritos em outras linguagens como Python ou Java.
+
+Em termos simples, o Node transforma o JavaScript em uma **linguagem de uso geral** — não limitada ao front-end — permitindo criar:
+
+- Scripts utilitários
+- Servidores web
+- Ferramentas de linha de comando
+- Aplicações completas no back-end
+
+Tudo isso usando a mesma linguagem que você já aprendeu.
+
+O Node é baseado no **motor V8 do Google Chrome**, o que garante excelente desempenho e compatibilidade com os recursos modernos do JavaScript.
+
+## Por que instalar o Node?
+
+Você vai precisar do Node para:
+
+- Rodar arquivos JavaScript localmente (`node arquivo.js`)
+- Criar pequenos scripts e automatizações
+- Usar ferramentas modernas que dependem dele (como bundlers, formatadores, testadores, frameworks)
+- Construir aplicações web completas com front e back-end em JavaScript
+
+Além disso, instalar o Node também prepara seu ambiente para usar o `npm` — o sistema de gerenciamento de pacotes que será abordado em mais detalhes no próximo capítulo.
+
+## Instalando o Node.js
+
+<Tabs items={['Windows', 'macOS', 'Linux']}>
+  <Tab value="Windows">
+    1. Acesse o site oficial do Node.js: [nodejs.org](https://nodejs.org/)
+    2. Baixe a versão LTS (Long Term Support)
+    3. Execute o instalador baixado
+    4. Siga as instruções do instalador (você pode manter as opções padrão)
+  </Tab>
+  <Tab value="macOS">
+    <Accordions type="single">
+      <Accordion title="Método 1: Usando o Homebrew (recomendado)">
+        1. Se você ainda não tem o Homebrew instalado, instale-o seguindo as instruções em [brew.sh](https://brew.sh)
+        2. No terminal, execute:
+           ```bash
+           brew install node
+           ```
+      </Accordion>
+      <Accordion title="Método 2: Usando o instalador">
+        1. Acesse o site oficial do Node.js: [nodejs.org](https://nodejs.org/)
+        2. Baixe a versão LTS (Long Term Support)
+        3. Execute o arquivo .pkg baixado
+        4. Siga as instruções do instalador
+      </Accordion>
+    </Accordions>
+  </Tab>
+  <Tab value="Linux">
+    Para Ubuntu/Debian, execute no terminal:
+    ```bash
+    sudo apt update
+    sudo apt install nodejs npm
+    ```
+  </Tab>
+</Tabs>
+
+<Callout>
+Recomendamos sempre usar a versão LTS (Long Term Support) do Node.js, que é mais estável e tem suporte de longo prazo.
+</Callout>
+
+### Verificando a instalação
+
+Independente do sistema operacional, você pode verificar se o Node.js e o NPM foram instalados corretamente executando:
+```bash
+node --version
+npm --version
+```
+
+Se tudo estiver correto, você verá as versões do Node.js e do NPM instalados.
+
+## Seu primeiro script com Node
+
+Para testar se tudo está funcionando, crie um novo arquivo chamado `teste.js` com o seguinte conteúdo:
+
+```jsx
+console.log("Executando com Node.js!");
+```
+
+Abra o terminal, vá até a pasta onde o arquivo está salvo, e rode o comando:
+
+```bash
+node teste.js
+```
+
+Você verá no terminal:
+
+```
+Executando com Node.js!
+```
+
+Isso confirma que o ambiente está funcionando corretamente, e que você já pode escrever, salvar e executar scripts JavaScript no seu computador — sem precisar de um navegador ou plataforma online.
+
+Com o Node instalado, seu ambiente de desenvolvimento está pronto para ganhar vida. Agora você pode rodar código local, criar projetos reais, explorar ferramentas modernas e evoluir como desenvolvedor.

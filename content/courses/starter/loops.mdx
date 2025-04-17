@@ -1,0 +1,180 @@
+---
+title: Estruturas de Repetição (WIP)
+description: "-"
+---
+
+Nas seções anteriores, aprendemos a **armazenar dados** com variáveis, a identificar seus **tipos**, e a usar **condições** para **tomar decisões**. Com isso, conseguimos executar diferentes blocos de código conforme as situações que surgem. Agora, vamos aprender como **repetir blocos de código automaticamente**, de maneira controlada e eficiente. É aqui que entram as **estruturas de repetição** — também chamadas de **loops**.
+
+Imagine que você precise exibir a mesma mensagem várias vezes, contar de 1 até 10, somar os elementos de uma lista, ou verificar uma série de respostas de um formulário. Seria muito cansativo escrever manualmente o mesmo comando várias vezes. Com os loops, podemos **automatizar repetições**, economizar código e evitar erros.
+
+## O que são estruturas de repetição?
+
+Estruturas de repetição são instruções que permitem executar **um mesmo bloco de código várias vezes**, de acordo com uma condição que pode ser controlada pelo programador. O loop continua enquanto a condição for verdadeira. Quando ela se torna falsa, o loop é encerrado.
+
+Essa é uma ferramenta fundamental para resolver problemas em que precisamos:
+
+- Processar listas de dados
+- Executar ações em sequência
+- Repetir algo até que determinada situação seja atingida
+
+Em JavaScript, temos três principais estruturas de repetição:
+
+- `for`
+- `while`
+- `do...while`
+
+Além delas, veremos também como usar `break` e `continue` para controlar a execução dentro dos loops, e discutiremos os **riscos de loops infinitos**.
+
+## Loop `for`
+
+O loop `for` é ideal quando sabemos **quantas vezes** queremos que algo seja repetido. Ele possui três partes: uma inicialização (executada uma vez), uma condição (avaliada a cada repetição), e uma atualização (executada após cada repetição).
+
+Sintaxe básica:
+
+```js
+for (inicialização; condição; atualização) {
+  // bloco de código a ser repetido
+}
+```
+
+Exemplo prático — contar de 1 a 5:
+
+```js
+for (let i = 1; i <= 5; i++) {
+  console.log("Contador:", i);
+}
+```
+
+Explicando o que acontece:
+
+1. `let i = 1` → a variável de controle `i` começa em 1.
+2. `i <= 5` → enquanto essa condição for verdadeira, o loop continua.
+3. `i++` → ao final de cada repetição, `i` é incrementado em 1.
+
+Assim, o código imprime:
+
+```
+Contador: 1
+Contador: 2
+Contador: 3
+Contador: 4
+Contador: 5
+```
+
+O `for` é muito usado com arrays, como veremos mais adiante no curso, quando estudarmos estruturas de dados.
+
+## Loop `while`
+
+O `while` é uma estrutura mais flexível, usada quando **não sabemos de antemão quantas vezes o código deverá ser repetido**. Ele verifica a condição **antes de executar o bloco**.
+
+Sintaxe:
+
+```js
+while (condição) {
+  // código executado enquanto a condição for verdadeira
+}
+```
+
+Exemplo — contar até atingir um limite:
+
+```js
+let contador = 1;
+
+while (contador <= 3) {
+  console.log("Executando:", contador);
+  contador++;
+}
+```
+
+Esse código tem o mesmo efeito do `for`, mas com mais controle sobre as etapas.
+
+<Callout type="warn">
+Se esquecermos de atualizar a variável (contador++), o loop nunca termina, gerando um loop infinito — algo que devemos evitar.
+</Callout>
+
+## Loop `do...while`
+
+Essa estrutura funciona de forma semelhante ao `while`, mas com uma diferença importante: **a condição é verificada só depois da primeira execução**. Isso garante que o bloco de código será executado **pelo menos uma vez**, independentemente da condição.
+
+Sintaxe:
+
+```js
+do {
+  // bloco a ser executado
+} while (condição);
+```
+
+Exemplo — simular uma tentativa de login:
+
+```js
+let senha;
+
+do {
+  senha = prompt("Digite sua senha:");
+} while (senha !== "1234");
+
+console.log("Acesso liberado!");
+```
+
+Nesse caso, mesmo que a variável `senha` já tivesse o valor correto, o código **sempre** pede ao menos uma tentativa.
+
+## Palavras-chave especiais: `break` e `continue`
+
+Dentro de loops, podemos usar duas palavras-chave importantes para controlar o comportamento:
+
+### `break`
+
+Interrompe imediatamente a repetição, mesmo que a condição ainda seja verdadeira.
+
+```js
+for (let i = 1; i <= 10; i++) {
+  if (i === 4) {
+    break;
+  }
+  console.log(i);
+}
+// Saída: 1, 2, 3
+```
+
+### `continue`
+
+Pula a **iteração atual** e vai direto para a próxima repetição.
+
+```js
+for (let i = 1; i <= 5; i++) {
+  if (i === 3) {
+    continue;
+  }
+  console.log(i);
+}
+// Saída: 1, 2, 4, 5
+```
+
+Esses comandos devem ser usados com moderação, sempre com objetivo claro, para não prejudicar a legibilidade do código.
+
+## Loops infinitos
+
+Um loop infinito ocorre quando a condição **nunca se torna falsa**, e o código fica preso repetindo para sempre.
+
+Exemplo perigoso:
+
+```js
+while (true) {
+  console.log("Loop eterno...");
+}
+```
+
+Esse tipo de código **trava o navegador** (ou terminal) e consome recursos da máquina. Em casos controlados, loops infinitos podem ser úteis, como em servidores ou jogos, mas para iniciantes, é fundamental evitá-los.
+
+Sempre verifique:
+
+- Sua **condição** de saída
+- Se a variável que controla o loop está sendo **atualizada corretamente**
+
+---
+
+As estruturas de repetição ampliam significativamente o poder dos nossos programas. Agora, conseguimos **automatizar tarefas**, **percorrer conjuntos de dados**, e **realizar ações diversas de forma eficiente**. Com os loops `for`, `while` e `do...while`, e com as palavras-chave `break` e `continue`, temos um conjunto sólido para criar códigos reutilizáveis e dinâmicos.
+
+Agora que você domina variáveis, tipos de dados, condições e repetições, está pronto para um novo passo: **modularizar o seu código com funções**.
+
+Funções nos permitem **organizar trechos de lógica em blocos reutilizáveis**, facilitando a leitura, manutenção e expansão dos nossos programas. E é sobre isso que vamos falar na próxima seção.

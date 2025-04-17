@@ -1,0 +1,178 @@
+---
+title: Recursão
+description: "-"
+---
+
+Quando estamos escrevendo funções, normalmente pensamos em resolver um problema **com passos diretos**: fazemos um cálculo, chamamos outra função, repetimos algo com um `for` ou `while`, e seguimos em frente. Mas existe um outro jeito, muitas vezes mais elegante e natural, de resolver certos tipos de problemas: é quando uma função **chama a si mesma**. Essa técnica tem nome — **recursão** — e embora pareça estranha à primeira vista, ela é uma ferramenta poderosa, especialmente útil quando lidamos com **problemas que possuem estrutura repetitiva ou hierárquica**.
+
+Vamos começar com a definição: **recursão é quando uma função chama a si mesma como parte de sua execução**, geralmente com uma entrada ligeiramente diferente da anterior. Esse processo continua até que a função atinja uma **condição de parada**, que é o momento em que ela **não se chama mais**.
+
+Um bom jeito de entender a recursão é com um exemplo cotidiano: **abrir uma gaveta dentro de uma gaveta**. Imagine uma caixa que contém outra caixa, que contém outra caixa, e assim por diante. Como você abriria todas elas? Uma maneira natural seria: "Abra a caixa atual, veja se há outra dentro. Se houver, abra a próxima da mesma forma." Isso é recursão.
+
+Outro exemplo bem conhecido é o **cálculo do fatorial** de um número, que pode ser definido de forma recursiva:
+
+- `fatorial(1)` é `1` (caso base)
+- `fatorial(n)` é `n * fatorial(n - 1)` (caso recursivo)
+
+Vamos transformar isso em código:
+
+```jsx
+function fatorial(n) {
+  if (n === 1) {
+    return 1; // caso base
+  }
+  return n * fatorial(n - 1); // chamada recursiva
+}
+
+console.log(fatorial(5)); // 120
+```
+
+Esse exemplo é simples, mas mostra muito bem o funcionamento da recursão. A função vai chamando a si mesma com `n - 1`, até que `n` seja igual a `1`. Nesse ponto, ela para de se chamar, e o retorno começa a “subir” por toda a cadeia de chamadas anteriores.
+
+Para deixar ainda mais claro, veja como as chamadas acontecem, uma por uma:
+
+```
+fatorial(5) → 5 * fatorial(4)
+fatorial(4) → 4 * fatorial(3)
+fatorial(3) → 3 * fatorial(2)
+fatorial(2) → 2 * fatorial(1)
+fatorial(1) → 1
+```
+
+Substituindo de trás para frente:
+
+```
+fatorial(2) → 2 * 1 = 2
+fatorial(3) → 3 * 2 = 6
+fatorial(4) → 4 * 6 = 24
+fatorial(5) → 5 * 24 = 120
+```
+
+Esse tipo de funcionamento é chamado de **pilha de chamadas**. Cada vez que uma função é chamada, o JavaScript **coloca essa chamada em uma pilha (stack)**, e só sai de lá quando o resultado está pronto. É por isso que a **recursão precisa sempre ter um ponto de parada**, ou seja, um **caso base** bem definido — senão, o programa entra em **loop infinito** e trava.
+
+## Estrutura de uma função recursiva
+
+Toda função recursiva deve conter dois elementos principais:
+
+1. **Caso base (ou condição de parada)**
+    
+    É a situação em que a função **não se chama novamente**, encerrando o ciclo.
+    
+2. **Chamada recursiva**
+    
+    É o ponto onde a função **chama a si mesma**, modificando a entrada de alguma forma.
+    
+
+Se faltar o caso base, ou se ele nunca for alcançado, o resultado será uma **recursão infinita** — e como a memória é limitada, isso costuma gerar um erro de **estouro de pilha** (stack overflow).
+
+Vamos ver um exemplo errado, que **não tem condição de parada**:
+
+```jsx
+function contar(n) {
+  console.log(n);
+  contar(n + 1);
+}
+
+contar(1); // ⚠ Isso vai rodar para sempre (ou até dar erro)
+```
+
+O número só aumenta e a função nunca para de se chamar. Por isso, sempre comece planejando **quando a função deve parar** antes mesmo de escrever a chamada recursiva.
+
+## Comparando recursão e laços
+
+Qualquer coisa que possa ser feita com recursão pode ser feita com um `loop` — e vice-versa. Mas a recursão **brilha em problemas com estrutura naturalmente recursiva**, como:
+
+- Processamento de **estruturas de dados aninhadas** (listas dentro de listas, árvores, etc.)
+- **Busca em profundidade** (como labirintos ou navegação de menus)
+- Problemas matemáticos com definição recursiva (como fatorial, sequência de Fibonacci, etc.)
+
+Vamos comparar dois exemplos que fazem exatamente a mesma coisa: contar de 1 até um número qualquer.
+
+Com `for`:
+
+```jsx
+function contarAte(n) {
+  for (let i = 1; i <= n; i++) {
+    console.log(i);
+  }
+}
+```
+
+Com recursão:
+
+```jsx
+function contarAte(n, atual = 1) {
+  if (atual > n) return;
+  console.log(atual);
+  contarAte(n, atual + 1);
+}
+```
+
+Note que a versão recursiva é um pouco mais difícil de entender à primeira vista, mas ela segue o mesmo princípio: imprime um número, e chama a si mesma com o próximo.
+
+## Recursão com retorno acumulado
+
+Além de imprimir coisas ou executar ações, funções recursivas também podem **acumular valores** e retornar um resultado composto. Isso é muito comum em problemas que envolvem soma, multiplicação, contagem ou construção de textos e estruturas.
+
+Exemplo: somar todos os números de 1 até `n`.
+
+```jsx
+function somar(n) {
+  if (n === 1) {
+    return 1;
+  }
+  return n + somar(n - 1);
+}
+
+console.log(somar(4)); // 10 → 4 + 3 + 2 + 1
+```
+
+Esse padrão é muito parecido com o do fatorial, mas usamos soma em vez de multiplicação. O raciocínio é sempre o mesmo: **reduzir o problema a uma versão menor dele mesmo** e confiar que a função sabe resolver essa versão menor.
+
+## Recursão e estruturas aninhadas
+
+Recursão é extremamente útil para navegar em **estruturas de dados aninhadas**, como arrays dentro de arrays, objetos dentro de objetos, ou sistemas de pastas e subpastas.
+
+Veja um exemplo com um array aninhado:
+
+```jsx
+function percorrer(lista) {
+  for (let item of lista) {
+    if (Array.isArray(item)) {
+      percorrer(item); // chamada recursiva
+    } else {
+      console.log(item);
+    }
+  }
+}
+
+let dados = [1, 2, [3, 4, [5, 6]], 7];
+percorrer(dados);
+// Saída: 1 2 3 4 5 6 7
+```
+
+Cada vez que encontramos um array dentro de outro array, usamos a mesma função para percorrê-lo. Isso evita que precisemos criar múltiplos laços para cada profundidade.
+
+## Quando (não) usar recursão
+
+Apesar de suas vantagens, a recursão não é a melhor escolha para todos os casos. Ela pode ser mais elegante em alguns contextos, mas **usa mais memória** que um loop tradicional, já que cada chamada fica armazenada na pilha de execução.
+
+Use recursão quando:
+
+- O problema tem uma **estrutura naturalmente recursiva**
+- A solução com loop seria extremamente complexa ou feia
+- Você precisa **navegar em profundidade** por dados aninhados
+
+Evite recursão quando:
+
+- A profundidade das chamadas for muito grande (pode estourar a pilha)
+- A lógica puder ser feita de forma simples com um loop
+- O desempenho for crítico e você quiser economizar memória
+
+---
+
+Recursão é um conceito elegante e extremamente poderoso. Ao aprender a usá-la, você amplia sua capacidade de resolver problemas de forma mais expressiva e concisa. No início, pode parecer confuso ver uma função se chamando “do nada”, mas com prática, o raciocínio se torna natural: **você resolve o problema atual pensando que já sabe resolver o problema menor**.
+
+E essa é justamente a beleza da recursão: confiar que a função sabe se virar com menos trabalho, e focar em resolver apenas o pedaço que está nas suas mãos.
+
+Na próxima seção, vamos começar a trabalhar com **estruturas de dados** em JavaScript — começando com **arrays**, que são listas ordenadas de valores. Eles vão nos permitir agrupar informações, navegar por coleções, e realizar operações em série — algo essencial para qualquer tipo de aplicação.

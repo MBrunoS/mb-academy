@@ -1,0 +1,283 @@
+---
+title: Arrays
+description: "-"
+---
+
+Depois de entender a importância das estruturas de dados na organização e manipulação de informações, está na hora de conhecermos a mais simples e também uma das mais usadas delas: os **arrays**.
+
+Arrays são estruturas que nos permitem **armazenar múltiplos valores em uma única variável**. Eles funcionam como **listas ordenadas**, onde cada item ocupa uma posição específica. Imagine uma estante de livros com várias prateleiras: cada prateleira tem um número (posição) e guarda um livro (valor). Você pode acessar o conteúdo de qualquer prateleira informando o número dela. Com arrays, a lógica é a mesma.
+
+Sem arrays, teríamos que criar uma variável para cada dado individual. Para representar as idades de cinco pessoas, por exemplo, precisaríamos fazer algo como:
+
+```js
+let idade1 = 25;
+let idade2 = 32;
+let idade3 = 29;
+let idade4 = 41;
+let idade5 = 19;
+```
+
+Esse código é repetitivo, difícil de manter, e não funciona bem se quisermos somar todas as idades ou percorrê-las com um loop. Com arrays, podemos resolver isso de forma muito mais eficiente:
+
+```js
+let idades = [25, 32, 29, 41, 19];
+```
+
+Agora temos todas as informações agrupadas, com acesso fácil a cada item, podendo iterar, buscar, filtrar, modificar e muito mais — tudo com métodos e estruturas próprias para lidar com arrays.
+
+No JavaScript, arrays são extremamente versáteis. Podemos usá-los para representar listas de produtos, coleções de nomes, sequências numéricas, resultados de buscas, componentes visuais e praticamente qualquer conjunto de dados que precise ser tratado em grupo.
+
+## Criando arrays
+
+A forma mais comum de declarar um array em JavaScript é usando colchetes `[]`, com os elementos separados por vírgulas:
+
+```js
+let frutas = ["maçã", "banana", "laranja"];
+```
+
+Neste exemplo, o array `frutas` contém três elementos do tipo string. Cada item pode ser acessado individualmente usando seu índice:
+
+```js
+console.log(frutas[0]); // "maçã"
+console.log(frutas[1]); // "banana"
+console.log(frutas[2]); // "laranja"
+```
+
+Podemos também criar arrays de números, booleanos, misturar tipos (embora isso seja desaconselhado para iniciantes), ou até deixar ele vazio e ir preenchendo depois:
+
+```js
+let numeros = [1, 2, 3, 4, 5];
+let misto = [42, "texto", true];
+let vazio = [];
+```
+
+## Acessando e modificando elementos
+
+Para acessar um item, usamos o nome do array seguido do índice entre colchetes. Para alterar o valor de um item, o processo é o mesmo:
+
+```js
+let cores = ["vermelho", "verde", "azul"];
+cores[1] = "amarelo";
+
+console.log(cores); // ["vermelho", "amarelo", "azul"]
+```
+
+Se tentarmos acessar um índice que não existe, o retorno será `undefined`, pois o valor não foi definido:
+
+```js
+console.log(cores[10]); // undefined
+```
+
+Podemos também adicionar novos elementos “pulando” índices, embora isso crie **buracos** no array:
+
+```js
+let lista = [];
+lista[3] = "teste";
+
+console.log(lista); // [empty × 3, "teste"]
+```
+
+O mais recomendado é **usar métodos apropriados** para adicionar itens — falaremos disso em breve.
+
+## Tamanho do array
+
+O tamanho de um array é representado pela propriedade `length`, que mostra quantos elementos ele possui:
+
+```js
+let nomes = ["Alice", "Bruno", "Carlos"];
+console.log(nomes.length); // 3
+```
+
+Lembre-se de que o índice **vai de 0 até length - 1**. No exemplo acima, os índices válidos são 0, 1 e 2.
+
+Essa informação é especialmente útil quando usamos **laços de repetição** para percorrer arrays:
+
+```js
+for (let i = 0; i < nomes.length; i++) {
+  console.log(nomes[i]);
+}
+```
+
+Esse é um padrão clássico: usar `i` como índice para percorrer os elementos do início ao fim, sem ultrapassar o tamanho do array.
+
+## Métodos úteis de arrays
+
+Arrays em JavaScript vêm com vários métodos prontos que facilitam tarefas do dia a dia, como adicionar, remover, procurar e transformar elementos.
+
+Veja os mais comuns:
+
+- `push(valor)` – adiciona um item **no final** do array.
+- `unshift(valor)` – adiciona um item **no início** do array.
+- `pop()` – remove o **último** item.
+- `shift()` – remove o **primeiro** item.
+- `includes(valor)` – verifica se o valor existe no array.
+- `indexOf(valor)` – retorna o índice do valor (ou -1 se não existir).
+- `join(separador)` – transforma o array em uma string, separando os itens por algo.
+- `slice(início, fim)` – copia uma parte do array.
+- `splice(início, qtd)` – remove (ou substitui) elementos dentro do array.
+
+Alguns exemplos práticos:
+
+```js
+let numeros = [1, 2, 3];
+
+numeros.push(4);           // [1, 2, 3, 4]
+numeros.pop();             // [1, 2, 3]
+numeros.unshift(0);        // [0, 1, 2, 3]
+numeros.shift();           // [1, 2, 3]
+console.log(numeros.join("-")); // "1-2-3"
+```
+
+Esses métodos são extremamente úteis, e saber quando e como usá-los vai te poupar muito tempo e código.
+
+## Iterando sobre arrays
+
+Além do `for` tradicional, o JavaScript oferece métodos específicos para **iterar** (percorrer) arrays, como `forEach`, `map`, `filter`, `reduce` e outros. Vamos ver o mais básico:
+
+```js
+let nomes = ["Ana", "Lucas", "Bruna"];
+
+nomes.forEach(function(nome) {
+  console.log("Olá, " + nome);
+});
+```
+
+Ou, com arrow function:
+
+```js
+nomes.forEach(nome => console.log("Olá, " + nome));
+```
+
+Esse tipo de escrita é muito comum no JavaScript moderno e deixa o código mais conciso, principalmente quando usamos arrays como base para exibir listas na interface, manipular dados de formulários ou aplicar filtros em coleções.
+
+## Arrays multidimensionais
+
+Um array também pode conter **outros arrays dentro de si** — isso é chamado de **array multidimensional**. Funciona como uma tabela com linhas e colunas:
+
+```js
+let matriz = [
+  [1, 2],
+  [3, 4],
+  [5, 6]
+];
+
+console.log(matriz[0][0]); // 1
+console.log(matriz[2][1]); // 6
+```
+
+Esse tipo de estrutura é útil para representar dados organizados em grades, como um tabuleiro de jogo, um calendário, ou a estrutura de uma planilha.
+
+## Spread e Rest: trabalhando com múltiplos valores
+
+À medida que você começar a trabalhar com arrays com mais frequência, vai perceber que em alguns momentos será necessário **espalhar** os valores de um array em outro local — ou, no caminho inverso, **agrupar múltiplos valores** em um único array. Para isso, o JavaScript oferece duas ferramentas poderosas que compartilham a mesma sintaxe: os **operadores spread** e **rest**. Ambos usam `...`, mas têm comportamentos diferentes dependendo do contexto.
+
+### Spread (`...`) — espalhando valores
+
+O operador spread permite **desempacotar** os valores de um array (ou objeto) para que eles sejam passados um a um para outro local: outro array ou uma função.
+
+Por exemplo, digamos que temos um array com alguns números e queremos criar outro array com os mesmos números, mas adicionando mais alguns:
+
+```js
+let numeros = [1, 2, 3];
+let novosNumeros = [...numeros, 4, 5];
+
+console.log(novosNumeros); // [1, 2, 3, 4, 5]
+```
+
+O `...numeros` pegou os itens 1, 2 e 3 e os “espalhou” dentro do novo array.
+
+O spread também é útil para **copiar arrays** (sem criar referência):
+
+```js
+let original = ["a", "b", "c"];
+let copia = [...original];
+
+copia.push("d");
+
+console.log(original); // ["a", "b", "c"]
+console.log(copia);    // ["a", "b", "c", "d"]
+```
+
+Se tivéssemos feito `let copia = original`, os dois apontariam para o mesmo array. Com spread, criamos uma **cópia real**.
+
+Outra aplicação comum é passar os elementos de um array como argumentos individuais de uma função:
+
+```js
+function somar(a, b, c) {
+  return a + b + c;
+}
+
+let valores = [2, 4, 6];
+console.log(somar(...valores)); // 12
+```
+
+### Rest (`...`) — agrupando valores
+
+Enquanto o spread serve para espalhar elementos, o **rest** faz o oposto: **agrupa múltiplos valores em um array**. Ele é usado geralmente na **declaração de funções**, quando você não sabe quantos argumentos vai receber.
+
+```js
+function listar(...itens) {
+  console.log("Itens recebidos:", itens);
+}
+
+listar("banana", "maçã", "laranja");
+// Itens recebidos: ["banana", "maçã", "laranja"]
+```
+
+Note que `...itens` capturou **todos os argumentos** passados e agrupou em um array.
+
+Você também pode usar o rest com desestruturação de arrays, para capturar os "restantes":
+
+```js
+let [primeiro, ...outros] = [10, 20, 30, 40];
+
+console.log(primeiro); // 10
+console.log(outros);   // [20, 30, 40]
+```
+
+Essa técnica é especialmente útil quando queremos separar os primeiros itens de uma lista, ou tratar o “resto” de maneira separada.
+
+Em resumo:
+
+| Símbolo | Nome | O que faz | Onde é usado |
+| --- | --- | --- | --- |
+| `...x` | Spread | Espalha elementos individuais | Chamadas de função, arrays, objetos (veremos isso na próxima seção) |
+| `...x` | Rest | Agrupa vários elementos em um array | Parâmetros de função, desestruturação |
+
+Apesar de usarem a mesma sintaxe (`...`), o comportamento do operador depende do **contexto**. Com o tempo, você vai perceber o quanto essas ferramentas tornam seu código mais limpo, expressivo e moderno.
+
+## Desestruturação de arrays
+
+Desestruturar um array significa extrair seus valores de forma prática para variáveis. Isso é feito usando colchetes:
+
+```js
+let numeros = [10, 20, 30];
+let [a, b, c] = numeros;
+
+console.log(a); // 10
+console.log(b); // 20
+```
+
+Você pode ignorar valores usando vírgulas vazias:
+
+```js
+let [primeiro, , terceiro] = numeros;
+```
+
+E também pode usar **rest operator** para capturar os “restantes”:
+
+```js
+let [head, ...resto] = [1, 2, 3, 4];
+console.log(head);  // 1
+console.log(resto); // [2, 3, 4]
+```
+
+Essas técnicas tornam o código mais limpo e moderno, e são muito úteis na hora de receber arrays de dados de uma API ou dividir partes de uma lista para tratar separadamente.
+
+---
+
+Arrays são uma das estruturas mais utilizadas na programação — e por um bom motivo. Eles nos permitem **organizar coleções de dados**, realizar operações em lote, aplicar filtros, gerar relatórios e construir interfaces dinâmicas.
+
+Ao entender arrays, você está pronto para lidar com praticamente qualquer conjunto de informações que surgir no desenvolvimento de aplicações web. Saber navegar, manipular e transformar listas é essencial para lidar com **repetições**, **eventos**, **dados de APIs** e **componentes interativos**.
+
+Na próxima seção, vamos explorar uma outra estrutura de dados tão importante quanto os arrays: os **objetos**. Eles nos permitem representar **entidades com múltiplas propriedades**, sendo fundamentais para modelar o mundo real dentro do nosso código.

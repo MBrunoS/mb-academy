@@ -1,0 +1,103 @@
+---
+title: GitHub
+description: "-"
+---
+
+Depois de aprender a versionar seus projetos localmente com Git, é hora de dar um passo além e conhecer o **GitHub**, a plataforma mais popular do mundo para hospedagem e colaboração de código.
+
+O GitHub funciona como uma **rede social para desenvolvedores**, mas também é muito mais que isso: é uma **ferramenta de trabalho real**, usada por empresas e profissionais do mundo inteiro para manter código, documentar projetos, revisar alterações e construir software em equipe.
+
+## O que é o GitHub?
+
+O **GitHub** é uma plataforma online que permite armazenar e gerenciar **repositórios Git na nuvem**. Com ele, você pode:
+
+- Salvar seus projetos de forma segura e acessível de qualquer lugar
+- Compartilhar seu código com outras pessoas
+- Trabalhar de forma colaborativa com times (ou com a comunidade)
+- Criar e organizar tarefas (*issues*)
+- Revisar alterações com segurança (via *pull requests*)
+- Montar um portfólio público que mostra sua evolução
+
+É comum que empresas consultem o GitHub de um candidato para avaliar seus projetos, organização, histórico de commits, qualidade do código e até como ele interage com outros desenvolvedores.
+
+## Git + GitHub: como funciona essa dupla
+
+O Git trabalha **localmente**, na sua máquina, versionando os arquivos do seu projeto. O GitHub funciona como um **espelho remoto** desses arquivos.
+
+Você pode pensar assim:
+
+| Local (Git) | Nuvem (GitHub) |
+| --- | --- |
+| `git init` | `git clone` |
+| `git add`, `commit` | `git push` / `git pull` |
+| Trabalha no seu PC | Compartilha com o mundo |
+
+Ou seja, você desenvolve e salva as versões localmente, e depois usa comandos como `git push` para enviar essas versões ao GitHub — onde o repositório pode ser visualizado, compartilhado ou colaborado por outras pessoas.
+
+## Criando uma conta no GitHub
+
+Se você ainda não tem uma conta:
+
+1. Acesse: 🔗 [https://github.com](https://github.com/)
+2. Clique em **Sign up**
+3. Escolha um nome de usuário, e-mail e senha
+4. Complete as etapas e confirme seu e-mail
+
+Pronto! Você já pode criar repositórios e começar a publicar seus projetos.
+
+## Criando um repositório no GitHub
+
+1. Após fazer login, clique no botão **+** (canto superior direito) > **New repository**
+2. Escolha um **nome para o repositório** (ex: `meu-projeto`)
+3. (Opcional) Adicione uma descrição
+4. Escolha entre **público** ou **privado**
+5. **Desmarque todas as opções extras** por enquanto (como README automático)
+6. Clique em **Create repository**
+
+Você verá uma tela com instruções para conectar esse repositório remoto ao seu projeto local. Usaremos os comandos a seguir.
+
+## Conectando um repositório local ao GitHub
+
+Suponha que você já tenha um projeto versionado com Git localmente. Para conectar esse repositório ao GitHub, siga os passos:
+
+1. No terminal, dentro da pasta do projeto:
+
+```bash
+git remote add origin https://github.com/seu-usuario/meu-projeto.git
+```
+
+2. Depois envie seu projeto com:
+
+```bash
+git push -u origin main
+```
+
+<Callout type="warn">
+Se a branch principal do seu repositório local tiver o nome master (em vez de main), substitua no comando acima.
+</Callout>
+
+3. Ao acessar seu repositório no GitHub, você verá os arquivos disponíveis publicamente.
+
+A partir daí, sempre que fizer alterações no seu projeto, basta rodar:
+
+```bash
+git add .
+git commit -m "minha alteração"
+git push
+```
+
+E suas mudanças estarão sincronizadas com a versão online.
+
+## GitHub como portfólio
+
+Um dos maiores benefícios do GitHub é que **ele mostra seu código para o mundo**. É comum que recrutadores acessem o perfil de desenvolvedores para:
+
+- Ver projetos pessoais ou de estudo
+- Avaliar organização de arquivos e clareza de código
+- Ver frequência de commits e evolução ao longo do tempo
+- Observar documentação (`README.md`)
+- Analisar histórico de colaboração em equipe (pull requests, forks, etc.)
+
+Mesmo que você esteja começando agora, crie o hábito de **subir seus projetos pessoais, estudos e experimentos**. Isso vai mostrando sua evolução e construindo autoridade como dev.
+
+Na próxima seção, vamos finalmente explorar o Node.js, que é essencial para criar projetos reais de front-end e back-end, e também para executar seus próprios scripts localmente.

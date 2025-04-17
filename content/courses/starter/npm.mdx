@@ -1,0 +1,165 @@
+---
+title: NPM
+description: "-"
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+Antes de começar a usar o NPM, você precisa ter o Node.js instalado no seu computador. O Node.js é o ambiente de execução JavaScript que inclui o NPM por padrão.
+
+## Instalando o Node.js
+
+<Tabs items={['Windows', 'macOS', 'Linux']}>
+  <Tab value="Windows">
+    1. Acesse o site oficial do Node.js: [nodejs.org](https://nodejs.org/)
+    2. Baixe a versão LTS (Long Term Support)
+    3. Execute o instalador baixado
+    4. Siga as instruções do instalador (você pode manter as opções padrão)
+    5. Para verificar se a instalação foi bem-sucedida, abra o terminal e digite:
+       ```bash
+       node --version
+       npm --version
+       ```
+  </Tab>
+  <Tab value="macOS">
+    <Accordions type="single">
+      <Accordion title="Método 1: Usando o Homebrew (recomendado)">
+        1. Se você ainda não tem o Homebrew instalado, instale-o seguindo as instruções em [brew.sh](https://brew.sh)
+        2. No terminal, execute:
+           ```bash
+           brew install node
+           ```
+      </Accordion>
+      <Accordion title="Método 2: Usando o instalador">
+        1. Acesse o site oficial do Node.js: [nodejs.org](https://nodejs.org/)
+        2. Baixe a versão LTS (Long Term Support)
+        3. Execute o arquivo .pkg baixado
+        4. Siga as instruções do instalador
+      </Accordion>
+    </Accordions>
+  </Tab>
+  <Tab value="Linux">
+    Para Ubuntu/Debian, execute no terminal:
+    ```bash
+    sudo apt update
+    sudo apt install nodejs npm
+    ```
+  </Tab>
+</Tabs>
+
+### Verificando a instalação
+
+Independente do sistema operacional, você pode verificar se o Node.js e o NPM foram instalados corretamente executando:
+```bash
+node --version
+npm --version
+```
+
+Se tudo estiver correto, você verá as versões do Node.js e do NPM instalados.
+
+<Callout>
+Recomendamos sempre usar a versão LTS (Long Term Support) do Node.js, que é mais estável e tem suporte de longo prazo.
+</Callout>
+
+Se o Git e o GitHub ajudam você a **organizar e compartilhar seus projetos**, o **NPM** é o que permite **potencializar seus projetos com ferramentas externas**.
+
+O **NPM (Node Package Manager)** é o **gerenciador de pacotes do Node.js**. Ele é uma ferramenta que permite:
+
+- Instalar bibliotecas e ferramentas prontas
+- Gerenciar dependências (softwares que seu projeto precisa para funcionar)
+- Executar scripts de automação (como rodar um servidor local ou testes)
+- Compartilhar pacotes criados por você com o mundo (ou só com seu time)
+
+Na prática, o NPM permite que você use milhares de pacotes desenvolvidos pela comunidade para **acelerar seu trabalho** e **evitar reinventar a roda**.
+
+## O que são pacotes?
+
+Um **pacote** no contexto do NPM é basicamente **um conjunto de arquivos JavaScript agrupados e distribuídos com um nome e uma versão**. Pode ser uma biblioteca, um framework, uma ferramenta de build, um estilo CSS, ou qualquer outro recurso que seu projeto possa usar.
+
+Exemplos populares de pacotes:
+
+- `react` - biblioteca para construir interfaces
+- `express` - framework para criar APIs e servidores
+- `axios` - cliente HTTP para buscar dados
+- `eslint` - ferramenta para encontrar erros no código
+- `vite`, `webpack` - empacotadores de projetos
+
+Cada pacote está registrado no repositório central do NPM, que você pode explorar aqui:
+
+🔗 [https://www.npmjs.com](https://www.npmjs.com/)
+
+## Como instalar um pacote
+
+Após ter o Node.js instalado, você pode usar o NPM diretamente no terminal. Para instalar um pacote localmente no seu projeto, use:
+
+```bash
+npm install nome-do-pacote
+```
+
+Por exemplo:
+
+```bash
+npm install axios
+```
+
+Isso cria uma pasta chamada `node_modules` (com os arquivos da dependência) e atualiza ou cria o arquivo `package.json` com a lista de dependências.
+
+## O que é o `package.json`?
+
+O `package.json` é o **coração de um projeto Node.js**. Ele contém as informações básicas do projeto:
+
+- Nome, versão e descrição
+- Lista de dependências
+- Scripts customizados
+- Licença, autor e outras configurações
+
+Você pode criar um `package.json` do zero com:
+
+```bash
+npm init
+```
+
+O NPM vai fazer algumas perguntas (nome do projeto, versão, etc.) e gerar o arquivo para você. Se quiser pular as perguntas e aceitar os padrões:
+
+```bash
+npm init -y
+```
+
+## Instalando dependências de desenvolvimento
+
+Nem todos os pacotes são usados em tempo de execução. Alguns são usados apenas no processo de desenvolvimento — como ferramentas de teste, linting, formatação, etc.
+
+Para instalar um pacote como **dependência de desenvolvimento**, use:
+
+```bash
+npm install nome-do-pacote --save-dev
+```
+
+Exemplo:
+
+```bash
+npm install eslint --save-dev
+```
+
+No `package.json`, essas dependências aparecem separadas em `"devDependencies"`.
+
+## Scripts personalizados
+
+No `package.json`, você pode definir **scripts personalizados** para rodar comandos com atalhos simples. Por exemplo:
+
+```json
+"scripts": {
+  "start": "node index.js",
+  "dev": "nodemon index.js"
+}
+```
+
+Agora, no terminal, você pode executar:
+
+```bash
+npm start
+npm run dev
+```
+
+Isso é amplamente usado em projetos modernos. Frameworks como React, Vite e Next.js já vêm com scripts como `dev`, `

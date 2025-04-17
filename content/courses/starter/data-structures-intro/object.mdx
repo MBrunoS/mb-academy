@@ -1,0 +1,327 @@
+---
+title: Objetos
+description: "-"
+---
+
+Depois de aprender a trabalhar com arrays — estruturas ideais para lidar com **listas ordenadas** de valores — é hora de conhecer outra estrutura fundamental do JavaScript: os **objetos**. Eles são a ferramenta mais poderosa da linguagem para **organizar dados complexos**, especialmente quando queremos representar **entidades com várias características**.
+
+Se arrays servem para organizar informações como uma sequência (índices numéricos), objetos funcionam como uma **coleção de propriedades nomeadas**. Em vez de acessar os valores por posição, como `array[0]`, você os acessa por **nome**, como `objeto.nome`. Isso faz com que objetos sejam perfeitos para representar **dados do mundo real**, como um usuário, um produto, um livro, um endereço — qualquer coisa com atributos.
+
+## O que é um objeto?
+
+Um objeto no JavaScript é uma **estrutura composta por pares de chave e valor**, também chamados de **propriedades**. Cada chave (ou propriedade) é uma **string** que descreve o nome do dado, e o valor pode ser qualquer tipo: número, texto, booleano, função, outro objeto, ou até mesmo um array.
+
+Podemos criar objetos usando chaves `{}`. Veja um exemplo de um objeto que representa uma pessoa:
+
+```js
+let pessoa = {
+  nome: "Marina",
+  idade: 30,
+  profissao: "Designer"
+};
+```
+
+Esse objeto tem três propriedades: `nome`, `idade` e `profissao`. Para acessar os valores, usamos a **notação de ponto**, que é a forma mais comum:
+
+```js
+console.log(pessoa.nome);      // "Marina"
+console.log(pessoa.idade);     // 30
+console.log(pessoa.profissao); // "Designer"
+```
+
+Também é possível acessar usando colchetes:
+
+```js
+console.log(pessoa["nome"]); // "Marina"
+```
+
+Essa notação com colchetes é útil quando o nome da propriedade está dentro de uma variável:
+
+```js
+let prop = "idade";
+console.log(pessoa[prop]); // 30
+```
+
+A notação de colchetes também permite acessar propriedades com nomes compostos ou caracteres especiais, como veremos adiante.
+
+Ambas as notações funcionam, mas a **notação de ponto é preferível** sempre que possível, por ser mais legível e fácil de usar.
+
+## Adicionando e modificando propriedades
+
+Objetos em JavaScript são **dinâmicos**, ou seja, podem ser **modificados a qualquer momento**. Você pode adicionar novas propriedades ou atualizar propriedades existentes com facilidade, usando tanto a notação de ponto quanto a notação de colchetes:
+
+```js
+// Atualizando uma propriedade existente
+pessoa.idade = 26;
+
+// Adicionando uma nova propriedade
+pessoa.email = "joao@email.com";
+```
+
+As alterações são imediatas e persistem enquanto o objeto estiver na memória. Você também pode usar colchetes para o mesmo efeito:
+
+```js
+pessoa["cidade"] = "Belo Horizonte";
+```
+
+Também podemos remover propriedades com o operador `delete`:
+
+```js
+delete pessoa.profissao;
+```
+
+Em sistemas reais, essa flexibilidade é extremamente útil, pois muitas vezes os dados são montados dinamicamente com base em informações externas — como o preenchimento de um formulário, o retorno de uma API, ou a resposta de um servidor.
+
+Mas com grande flexibilidade, vem a responsabilidade: adicionar ou modificar propriedades arbitrariamente, sem controle, pode gerar objetos confusos e difíceis de manter. Por isso, é importante manter **nomes coerentes, padronizados e organizados** dentro dos objetos.
+
+## Propriedades com nomes compostos
+
+Em alguns casos, pode ser necessário criar chaves com **espaços, números iniciais ou caracteres especiais** — por exemplo, se estiver lidando com dados importados de outra fonte, formulários com nomes de campo compostos, ou gerando objetos dinamicamente.
+
+Para isso, usamos **aspas** ao definir a chave:
+
+```js
+let produto = {
+  "nome completo": "Notebook Dell",
+  "preço (R$)": 3500
+};
+```
+
+Essas propriedades **não podem ser acessadas com a notação de ponto**, pois `produto.nome completo` geraria erro de sintaxe. Para acessar esses nomes compostos, usamos a **notação de colchetes**:
+
+```js
+console.log(produto["nome completo"]); // "Notebook Dell"
+console.log(produto["preço (R$)"]);    // 3500
+```
+
+Esse recurso permite grande flexibilidade na construção de objetos, mas **deve ser usado com cautela**, pois dificulta o uso da notação de ponto, que é mais legível.
+
+Uma dica prática: **evite espaços** ou caracteres especiais em nomes de propriedade sempre que puder. Use convenções como camelCase (`nomeCompleto`) ou snake_case (`nome_completo`) para manter a clareza e facilitar o acesso.
+
+## Estruturas internas: tudo pode estar dentro de um objeto
+
+Uma das coisas mais poderosas (e mais comuns) em objetos JavaScript é que **os valores das propriedades podem ser outros tipos complexos**, não apenas strings ou números. Isso nos permite criar **objetos aninhados**, **arrays dentro de objetos**, **funções como propriedades** e combinações dessas estruturas.
+
+Esse recurso é essencial para modelar entidades completas, como:
+
+```js
+let usuario = {
+  nome: "Camila",
+  idade: 28,
+  endereco: {
+    rua: "Rua das Flores",
+    numero: 123,
+    cidade: "Curitiba"
+  },
+  telefones: ["11999999999", "11988888888"],
+  saudacao: function () {
+    console.log(`Olá, meu nome é ${this.nome}`);
+  }
+};
+```
+
+Nesse exemplo temos:
+
+- Uma propriedade `endereco` que é **outro objeto**, com suas próprias propriedades;
+- Uma propriedade `telefones` que é um **array de strings**;
+- Uma propriedade `saudacao` que é uma **função**, chamada de **método** do objeto.
+
+<Callout type="warn">
+Note o uso de `this` para acessar outras propriedades do objeto dentro do próprio método. `this` se refere ao objeto onde o método está sendo executado, e será abordado em outros cursos posteriores.
+</Callout>
+
+Você pode acessar cada item normalmente:
+
+```js
+console.log(usuario.endereco.cidade);     // "Curitiba"
+console.log(usuario.telefones[0]);        // "11999999999"
+usuario.saudacao();                       // "Olá, meu nome é Camila"
+```
+
+<Callout type="warn">
+Para objetos aninhados, podemos ir encadeando acessos com ponto (`.`) conforme a profundidade do dado.
+</Callout>
+
+Essa combinação de estruturas dentro de objetos é **muito comum no mundo real**, especialmente ao trabalhar com dados de APIs, bancos de dados e componentes de interface. Você vai se deparar com esse padrão o tempo todo, e quanto mais cedo se familiarizar com ele, melhor.
+
+## Iterando sobre objetos
+
+Enquanto arrays são estruturas ordenadas, que podemos percorrer com `for` tradicionais e métodos como `forEach`, os objetos funcionam de forma diferente. Como eles não têm uma ordem garantida entre suas propriedades e não usam índices numéricos, precisamos de outras abordagens para **iterar** (ou seja, **percorrer cada propriedade** de um objeto).
+
+A forma mais direta de fazer isso é usando o **laço `for...in`**, que itera sobre todas as chaves (ou nomes de propriedades) do objeto:
+
+```js
+let pessoa = {
+  nome: "Mariana",
+  idade: 34,
+  cidade: "Fortaleza"
+};
+
+for (let chave in pessoa) {
+  console.log(chave + ": " + pessoa[chave]);
+}
+```
+
+Esse código exibe:
+
+```
+nome: Mariana
+idade: 34
+cidade: Fortaleza
+```
+
+É importante entender que `for...in` percorre as **chaves**, e não os valores diretamente. Para acessar o valor de cada propriedade, usamos colchetes: `pessoa[chave]`. Isso é necessário porque, durante o loop, `chave` é uma variável, e não um nome fixo.
+
+<Callout>
+Dica: não use for...in em arrays — ele pode percorrer também propriedades herdadas ou índices não numéricos. Para arrays, prefira for, forEach, ou for...of.
+</Callout>
+
+Outra forma moderna de iterar sobre um objeto é usando os métodos do objeto global `Object`, que transformam as propriedades em arrays:
+
+### `Object.keys(objeto)`
+
+Retorna um array com as **chaves** do objeto.
+
+```js
+let props = Object.keys(pessoa);
+console.log(props); // ["nome", "idade", "cidade"]
+```
+
+### `Object.values(objeto)`
+
+Retorna um array com os **valores**.
+
+```js
+console.log(Object.values(pessoa)); // ["Mariana", 34, "Fortaleza"]
+```
+
+### `Object.entries(objeto)`
+
+Retorna um array de pares `[chave, valor]`.
+
+```js
+console.log(Object.entries(pessoa));
+// [["nome", "Mariana"], ["idade", 34], ["cidade", "Fortaleza"]]
+```
+
+Isso nos permite usar `forEach`, `map` e outras funções de array para manipular objetos indiretamente:
+
+```js
+Object.entries(pessoa).forEach(([chave, valor]) => {
+  console.log(`${chave}: ${valor}`);
+});
+```
+
+Essa abordagem é muito útil para transformar, filtrar ou exibir propriedades de objetos de forma dinâmica — como em formulários, tabelas ou componentes de interface.
+
+## Desestruturação de objetos
+
+A desestruturação de objetos é uma funcionalidade do JavaScript moderno que permite **extrair valores diretamente de um objeto e atribuí-los a variáveis**, de forma concisa e expressiva. Ela é uma alternativa ao acesso tradicional (`objeto.propriedade`) e pode deixar o código mais limpo, especialmente quando precisamos trabalhar com várias propriedades ao mesmo tempo.
+
+Veja a diferença:
+
+```js
+// Forma tradicional
+let nome = usuario.nome;
+let idade = usuario.idade;
+
+// Com desestruturação
+let { nome, idade } = usuario;
+```
+
+Se o nome da propriedade no objeto for o mesmo nome da variável que você deseja criar, essa forma é perfeita. Mas se quiser criar um nome diferente, pode **renomear** durante a desestruturação:
+
+```js
+let { nome: nomeCompleto } = usuario;
+console.log(nomeCompleto); // A variável se chama "nomeCompleto", mas pega o valor de "nome"
+```
+
+Também é possível fazer **desestruturação aninhada**, acessando objetos dentro de objetos:
+
+```js
+let usuario = {
+  nome: "Luan",
+  endereco: {
+    cidade: "Salvador",
+    estado: "BA"
+  }
+};
+
+let { endereco: { cidade, estado } } = usuario;
+console.log(cidade); // "Salvador"
+```
+
+Você pode **usar valores padrão** durante a desestruturação, o que é útil quando uma propriedade pode estar ausente:
+
+```js
+let { telefone = "sem telefone" } = usuario;
+console.log(telefone); // "sem telefone"
+```
+
+E, com o operador **rest (`...`)**, é possível capturar todas as outras propriedades que não foram extraídas explicitamente:
+
+```js
+let { nome, ...resto } = usuario;
+console.log(resto);
+// { endereco: { cidade: "Salvador", estado: "BA" } }
+```
+
+A desestruturação também pode ser usada diretamente em parâmetros de função, tornando a leitura mais clara e direta:
+
+```js
+function exibir({ nome, idade }) {
+  console.log(`${nome} tem ${idade} anos.`);
+}
+
+exibir({ nome: "Lucas", idade: 22 });
+```
+
+Essa técnica é muito comum em bibliotecas como React, especialmente na manipulação de **props**, **state** e dados de **hooks**. Dominar desestruturação é fundamental para trabalhar com JavaScript moderno de forma fluente.
+
+## Propriedades computadas
+
+Às vezes, você pode precisar que o **nome de uma propriedade** seja determinado dinamicamente — ou seja, baseado no valor de uma variável ou expressão no momento em que o objeto é criado. Para isso, usamos o recurso das **propriedades computadas** (computed properties).
+
+A sintaxe consiste em usar **colchetes** em volta da expressão que determina o nome da chave, dentro da criação do objeto:
+
+```js
+let campo = "email";
+
+let usuario = {
+  nome: "Beatriz",
+  [campo]: "beatriz@email.com"
+};
+
+console.log(usuario.email); // "beatriz@email.com"
+```
+
+Aqui, a variável `campo` foi usada como o nome da propriedade. Isso é muito útil quando:
+
+- Você está criando objetos de forma programática (ex: a partir de campos de um formulário);
+- Os nomes das propriedades são dinâmicos, baseados em alguma lógica;
+- Você precisa criar múltiplas propriedades com base em um loop ou em dados externos.
+
+Você também pode usar **expressões mais complexas** como chave:
+
+```js
+let prefixo = "dados_";
+let usuario = {
+  [prefixo + "cpf"]: "123.456.789-00"
+};
+
+console.log(usuario["dados_cpf"]); // "123.456.789-00"
+```
+
+Esse recurso aparece com frequência em aplicações que precisam montar objetos a partir de variáveis ou responder a interações do usuário de forma flexível.
+
+<Callout type="warn">
+Importante: chaves computadas só funcionam na criação do objeto com notação literal ({}). Não funcionam com objeto.chave = valor.
+</Callout>
+
+---
+
+Objetos são o coração da manipulação de dados em JavaScript. Eles nos permitem **agrupar informações relacionadas**, nomear essas informações de forma significativa e manipular dados com mais clareza e organização. Praticamente tudo em JavaScript envolve objetos — inclusive arrays, funções e elementos da própria linguagem.
+
+Ao aprender a construir, acessar e modificar objetos, você estará dando um passo importante para lidar com dados reais: usuários, produtos, configurações, mensagens, eventos, formulários e tudo mais que envolve estrutura, nome e valor.
+
+Na próxima etapa, vamos unir os conhecimentos adquiridos sobre funções, estruturas de dados e lógica para criar **códigos mais estruturados, reutilizáveis e robustos**, iniciando o mergulho em **Programação Orientada a Objetos** no JavaScript.

@@ -1,0 +1,427 @@
+---
+title: Funções
+description: "-"
+---
+
+À medida que um programa cresce, torna-se cada vez mais difícil controlar tudo o que está acontecendo. Quando você começa a repetir o mesmo trecho de código em vários lugares, percebe que algo precisa mudar. Seria muito mais prático se pudéssemos guardar uma parte da lógica em um bloco separado, dar um nome para ele e simplesmente chamá-lo quando quisermos que aquilo aconteça. É exatamente isso que as funções fazem.
+
+Funções são **blocos de código nomeados** que executam uma tarefa específica. Elas são como ferramentas reutilizáveis. Você as define uma vez, e pode usá-las quantas vezes quiser. Isso não apenas evita repetição de código, mas também melhora a organização, facilita testes, torna a manutenção mais simples e permite que você escreva programas mais claros e eficientes.
+
+Se pensarmos em uma função como uma **pequena máquina**, o funcionamento é bem intuitivo: ela pode receber algo (entrada), fazer alguma coisa com aquilo (processamento) e, se necessário, devolver um resultado (saída). Essa é a base da programação estruturada, e entender bem esse conceito é essencial para evoluir como desenvolvedor.
+
+## Criando uma função
+
+Para criar uma função em JavaScript, usamos a palavra-chave `function`, seguida por um nome (o identificador da função), parênteses (que podem ou não conter parâmetros), e um bloco de código entre chaves que representa o que será executado sempre que a função for chamada.
+
+```js
+function mostrarMensagem() {
+  console.log("Olá! Essa mensagem foi gerada por uma função.");
+}
+```
+
+No exemplo acima, definimos uma função chamada `mostrarMensagem`. Dentro do corpo da função, usamos `console.log` para exibir um texto. A função não faz nada até que ela seja chamada em algum ponto do programa. A chamada é feita escrevendo o nome da função seguido de parênteses:
+
+```js
+mostrarMensagem();
+```
+
+Toda vez que `mostrarMensagem()` for executada, o código dentro da função será executado.
+
+Esse simples mecanismo já nos permite **reutilizar comportamentos** sem reescrever as instruções. Imagine que você queira exibir essa mensagem em cinco lugares diferentes do seu código. Basta chamar a função cinco vezes, sem precisar duplicar nenhuma linha.
+
+## Passando informações para uma função
+
+Funções se tornam mais úteis quando **recebem dados como entrada**. Isso é feito por meio dos **parâmetros**, que são variáveis locais declaradas entre os parênteses da função. No momento em que a função é chamada, podemos passar os **argumentos**, que são os valores reais que serão usados nos parâmetros.
+
+É importante entender a diferença entre **parâmetro** e **argumento** — dois termos que são parecidos, mas representam coisas distintas.
+
+- **Parâmetro** é o nome que damos ao valor **esperado** pela função, definido entre os parênteses na declaração.
+- **Argumento** é o valor **real** que passamos quando chamamos a função.
+
+Por exemplo:
+
+```js
+function cumprimentar(nome) {
+  console.log("Olá, " + nome + "!");
+}
+
+cumprimentar("Lívia");    // Olá, Lívia!
+cumprimentar("Fernando"); // Olá, Fernando!
+```
+
+Aqui, `nome` é o **parâmetro**, enquanto `"Lívia"` é o **argumento** passado à função.
+
+As funções podem ter **quantos parâmetros forem necessários**, separados por vírgulas. A ordem importa — o primeiro argumento será atribuído ao primeiro parâmetro, o segundo ao segundo, e assim por diante. Veja um exemplo:
+
+```js
+function apresentar(nome, idade, cidade) {
+  console.log(`${nome} tem ${idade} anos e mora em ${cidade}.`);
+}
+
+apresentar("Júlio", 28, "Recife");  // Júlio tem 28 anos e mora em Recife.
+```
+
+A ordem dos parâmetros importa. Os argumentos passados devem seguir a mesma ordem definida na função, ou os dados podem ser usados de forma incorreta.
+
+Se a função for chamada com **menos argumentos do que parâmetros**, os valores que faltarem serão `undefined`. Isso pode gerar comportamentos inesperados, por isso é bom garantir que os dados estejam sempre completos — ou então usar **valores padrão** para os parâmetros, como vimos anteriormente.
+
+Também é possível passar **valores que vêm de variáveis**:
+
+```js
+let usuario = "Mariana";
+let idade = 25;
+
+cumprimentar(usuario); // Olá, Mariana!
+```
+
+Esse padrão será muito comum em programas reais, onde os dados não estão fixos no código, mas são digitados por um usuário, recebidos de um servidor ou lidos de uma estrutura de dados.
+
+## Retornando valores com `return`
+
+Em muitas situações, queremos que uma função **nos dê de volta um resultado**, em vez de apenas executar um código. Isso é feito usando o comando `return`, que **encerra a função** e **devolve um valor para quem a chamou**.
+
+Esse valor pode ser um número, uma string, um booleano, um array, um objeto, ou até mesmo outra função. Qualquer tipo de dado pode ser retornado.
+
+Vamos começar com um exemplo simples: calcular a média entre dois números e retornar o resultado.
+
+```js
+function calcularMedia(a, b) {
+  return (a + b) / 2;
+}
+
+let resultado = calcularMedia(8, 6);
+console.log("A média é:", resultado); // A média é: 7
+
+```
+
+Neste exemplo, o valor que `calcularMedia` retorna é armazenado na variável `resultado`. Depois disso, podemos usar esse valor como quisermos: exibir na tela, fazer outro cálculo, comparar com outra coisa, etc.
+
+É importante entender que **o `return` termina imediatamente a execução da função**. Nenhuma linha abaixo dele será executada:
+
+```js
+function teste() {
+  return "Função terminou aqui.";
+  console.log("Isso nunca será executado.");
+}
+```
+
+Se a função **não tiver um `return` explícito**, ela retorna `undefined` por padrão:
+
+```js
+function semRetorno() {
+  console.log("Executando...");
+}
+
+let resultado = semRetorno();
+console.log(resultado); // undefined
+```
+
+Por isso, sempre que você quiser que uma função **gere uma informação utilizável**, é fundamental usar o `return`. Isso torna a função **mais reaproveitável e modular**, porque o que ela faz não depende de onde ela está — apenas dos valores que ela recebe e do que ela devolve.
+
+Você também pode usar `return` para **encerrar a execução antecipadamente**, caso alguma condição não seja satisfeita:
+
+```js
+function dividir(a, b) {
+  if (b === 0) {
+    return "Erro: divisão por zero!";
+  }
+
+  return a / b;
+}
+
+console.log(dividir(10, 2)); // 5
+console.log(dividir(10, 0)); // Erro: divisão por zero!
+```
+
+Esse tipo de abordagem torna o código **mais defensivo e confiável**, antecipando erros e evitando que o programa continue com dados inválidos.
+
+## Escopo: o universo interno de uma função
+
+Uma das características mais importantes das funções é que elas **criam um escopo próprio**. Isso significa que **as variáveis declaradas dentro da função só existem durante a execução dela.** Ou seja, todo código que você escreve dentro de uma função **fica isolado** do restante do programa. Esse conceito é conhecido como **escopo local**.
+
+```js
+function teste() {
+  let mensagem = "Olá!";
+  console.log(mensagem);
+}
+
+teste();               // Olá!
+console.log(mensagem); // Erro: mensagem is not defined
+```
+
+Esse comportamento é importante para evitar conflitos entre variáveis com nomes iguais em diferentes partes do código. Ele também ajuda a tornar as funções mais previsíveis e confiáveis, já que elas não dependem de variáveis externas (a menos que isso seja intencional).
+
+Dentro da função, porém, é possível **acessar variáveis que estão no escopo mais externo**, como variáveis globais ou variáveis declaradas fora da função, mas dentro de um mesmo bloco maior. Essa característica é chamada de **escopo léxico**.
+
+```js
+let idioma = "pt-BR";
+
+function mostrarIdioma() {
+  console.log("Idioma atual:", idioma);
+}
+
+mostrarIdioma(); // Idioma atual: pt-BR
+```
+
+O contrário, no entanto, não é verdadeiro: o escopo externo **não enxerga** variáveis internas da função.
+
+Se uma função interna **declarar uma variável com o mesmo nome** de uma variável externa, a variável mais interna "sombreia" a externa — ou seja, ela passa a ser usada dentro daquele escopo:
+
+```js
+let cor = "azul";
+
+function mostrarCor() {
+  let cor = "vermelho";
+  console.log("Cor dentro da função:", cor);
+}
+
+mostrarCor();                            // vermelho
+console.log("Cor fora da função:", cor); // azul
+```
+
+Saber navegar entre os escopos é essencial para escrever código organizado e seguro, principalmente quando você estiver trabalhando com funções aninhadas, closures e objetos.
+
+## Parâmetros com valores padrão
+
+Ao criar uma função, podemos definir **valores padrão** para seus parâmetros. Isso significa que, caso o argumento correspondente **não seja fornecido na chamada**, o JavaScript usará automaticamente o valor especificado.
+
+Isso torna nossas funções **mais robustas**, evitando que erros aconteçam por falta de argumentos.
+
+Vamos a um exemplo:
+
+```js
+function saudar(nome = "visitante") {
+  console.log(`Olá, ${nome}!`);
+}
+
+saudar("Clara");  // Olá, Clara!
+saudar();         // Olá, visitante!
+```
+
+No primeiro caso, a função usa o valor `"Clara"` que foi passado como argumento. No segundo, como nenhum argumento foi fornecido, o parâmetro `nome` assume o valor `"visitante"`.
+
+Você pode combinar vários parâmetros com valores padrão:
+
+```js
+function apresentar(nome = "alguém", idade = 0) {
+  console.log(`${nome} tem ${idade} anos.`);
+}
+
+apresentar();                     // alguém tem 0 anos.
+apresentar("João");               // João tem 0 anos.
+apresentar("Laura", 25);          // Laura tem 25 anos.
+```
+
+Valores padrão são avaliados **somente quando o argumento está ausente ou é `undefined`**. Isso significa que se você passar `null`, ele será considerado como valor válido:
+
+```js
+function saudacao(nome = "anônimo") {
+  console.log("Olá, " + nome + "!");
+}
+
+saudacao(null); // Olá, null!
+```
+
+Esse detalhe é importante para evitar confusões. Se você quiser tratar `null` como ausência de valor, terá que verificar isso manualmente dentro da função.
+
+Outro ponto interessante é que valores padrão podem **ser calculados dinamicamente**, inclusive com base em outros parâmetros:
+
+```js
+function exibirMensagem(mensagem, remetente = "Sistema") {
+  console.log(`[${remetente}] ${mensagem}`);
+}
+
+exibirMensagem("Atualização concluída."); // [Sistema] Atualização concluída.
+exibirMensagem("Erro detectado.", "App"); // [App] Erro detectado.
+```
+
+Isso permite que as funções se adaptem melhor a diferentes cenários, sem que você precise passar todos os dados toda vez.
+
+## Guardando funções em variáveis
+
+No JavaScript, funções podem ser tratadas como valores. Isso significa que podemos **armazenar uma função em uma variável**, da mesma forma que armazenamos números, textos ou objetos.
+
+```js
+const exibirMensagem = function () {
+  console.log("Essa é uma função armazenada em uma variável.");
+};
+
+exibirMensagem(); // Chamando a função
+```
+
+Quando fazemos isso, estamos criando uma **função anônima** — ou seja, uma função **sem nome próprio** — e atribuindo ela a uma variável, que passa a ser usada como identificador da função. A função ainda pode ser chamada normalmente usando o nome da variável.
+
+Esse tipo de construção é extremamente útil em situações onde queremos:
+
+- Passar funções como argumentos para outras funções (callbacks);
+- Armazenar funções dentro de objetos (como métodos);
+- Substituir funções dinamicamente durante a execução do programa.
+
+Por exemplo:
+
+```js
+const mostrar = function () {
+  console.log("Sou uma função anônima!");
+};
+
+function executar(funcao) {
+  funcao(); // Executa a função recebida como argumento
+}
+
+executar(mostrar);
+```
+
+Também é comum criar a função diretamente dentro do argumento:
+
+```js
+executar(function () {
+  console.log("Executando diretamente um comportamento!");
+});
+```
+
+Esse estilo abre portas para a **programação funcional**, que é um dos paradigmas mais importantes no JavaScript moderno.
+
+## Arrow functions: uma nova forma de declarar funções
+
+As **arrow functions**, introduzidas no ES6, são uma forma mais enxuta de escrever funções em JavaScript. Elas são especialmente úteis para **funções simples e rápidas**, como callbacks ou cálculos diretos. A ideia é usar uma seta `=>` para ligar os parâmetros ao corpo da função, evitando a palavra `function`.
+
+A forma mais completa é esta:
+
+```js
+const saudacao = (nome) => {
+  return "Olá, " + nome + "!";
+};
+```
+
+Mas quando a função tem **apenas uma instrução de retorno**, podemos simplificar ainda mais:
+
+```js
+const saudacao = nome => "Olá, " + nome + "!";
+```
+
+Se houver **mais de um parâmetro**, usamos parênteses normalmente:
+
+```js
+const somar = (a, b) => a + b;
+```
+
+Se **não houver nenhum parâmetro**, os parênteses são obrigatórios:
+
+```js
+const mostrar = () => console.log("Sem parâmetros aqui.");
+```
+
+Apesar da sintaxe curta, arrow functions têm algumas **diferenças de comportamento** importantes em relação às funções tradicionais:
+
+- Elas **não criam um novo escopo de `this`**, o que afeta o comportamento quando usadas dentro de objetos e classes (falaremos sobre isso mais adiante);
+- Elas **não podem ser usadas como construtores** (não funcionam com `new`);
+- Não têm acesso às palavras-chave `arguments`, `super` e `new.target`.
+
+Essas diferenças fazem com que, embora muito úteis, as arrow functions **não sejam substitutas diretas para todas as situações**. Quando você precisar de um comportamento mais tradicional (como acessar `this` dinamicamente), é melhor usar a declaração `function`.
+
+Exemplo com `setTimeout`:
+
+```js
+setTimeout(() => {
+  console.log("Executado após 2 segundos.");
+}, 2000);
+```
+
+Ou com arrays:
+
+```js
+let numeros = [1, 2, 3];
+let dobrados = numeros.map(n => n * 2);
+console.log(dobrados); // [2, 4, 6]
+```
+
+Ao usar corretamente arrow functions, você escreve código mais expressivo, moderno e conciso.
+
+## Funções como argumentos: callbacks
+
+Um dos conceitos mais poderosos e fundamentais no JavaScript moderno é o uso de **funções como argumentos**. Isso é possível porque, como vimos, **funções são valores como qualquer outro** — e podem ser passadas como parâmetro, armazenadas em variáveis, ou retornadas por outras funções.
+
+Uma função que é passada como argumento para outra função é chamada de **callback**. Ela será **executada dentro da função principal**, geralmente em resposta a algum evento, ação ou condição.
+
+Veja um exemplo simples:
+
+```js
+function executar(funcao) {
+  console.log("Iniciando execução...");
+  funcao(); // Executa a função recebida
+  console.log("Execução finalizada.");
+}
+
+executar(function () {
+  console.log("Olá do callback!");
+});
+```
+
+Neste caso, a função `executar` recebe outra função como argumento e a chama no meio do seu próprio processo. O trecho passado como callback é uma **função anônima** — ou seja, sem nome, criada diretamente como valor.
+
+Callbacks são muito usados para lidar com situações **assíncronas**, como:
+
+- Executar algo depois de um tempo (`setTimeout`)
+- Reagir a eventos do navegador (como cliques de botão)
+- Processar dados recebidos de uma requisição
+- Aplicar transformações em listas com `map`, `filter`, `forEach`
+
+Veja mais exemplos práticos:
+
+```js
+// Executa algo após 2 segundos
+setTimeout(() => {
+  console.log("Tempo esgotado!");
+}, 2000);
+
+// Processa todos os itens de uma lista
+let nomes = ["Ana", "Pedro", "Lucas"];
+
+nomes.forEach(function (nome) {
+  console.log("Olá, " + nome);
+});
+```
+
+Ou usando arrow function:
+
+```js
+nomes.forEach(nome => console.log("Olá, " + nome));
+```
+
+Uma função também pode **aceitar um callback como forma de configurar seu comportamento**, tornando-se mais genérica e reutilizável:
+
+```js
+function processarUsuario(nome, callback) {
+  console.log("Iniciando processamento...");
+  callback(nome);
+  console.log("Processamento concluído.");
+}
+
+function mostrarSaudacao(usuario) {
+  console.log("Bem-vindo, " + usuario + "!");
+}
+
+processarUsuario("Marina", mostrarSaudacao);
+```
+
+Esse tipo de padrão é amplamente utilizado em bibliotecas, APIs e frameworks JavaScript. Dominar callbacks abre caminho para entender conceitos mais avançados, como **promises**, **async/await**, **eventos personalizados** e **programação reativa**.
+
+## Boas práticas ao trabalhar com funções
+
+Funções são ferramentas poderosas, mas seu uso desorganizado pode tornar o código ainda mais difícil de entender. Algumas boas práticas fazem toda a diferença:
+
+- Use **nomes descritivos**. A função deve dizer claramente o que faz: `calcularMedia`, `validarEmail`, `gerarIdAleatorio`.
+- **Evite fazer tudo em uma única função**. Divida responsabilidades. Se sua função está ficando muito longa, provavelmente ela precisa ser dividida.
+- Sempre que possível, prefira **funções puras** — que recebem dados e retornam um resultado, sem depender de variáveis externas nem alterar o que está fora.
+- Não confie cegamente em `console.log`. Retornar valores dá mais controle e permite usar o resultado de forma flexível.
+- Pense nas funções como **peças de LEGO**: pequenas, bem definidas, e que se encaixam para formar estruturas maiores.
+
+---
+
+Funções são a alma da organização em um programa. Com elas, saímos do código linear e passamos a **pensar em módulos reutilizáveis**, que encapsulam lógica, simplificam a leitura e permitem que nosso programa cresça de forma sustentável.
+
+Elas são o primeiro passo em direção a um estilo de programação mais profissional e arquitetado. Aprender a usá-las com clareza e propósito fará com que seus projetos sejam mais fáceis de manter, evoluir e compartilhar com outras pessoas.
+
+Na próxima seção, vamos explorar um tipo especial de função: aquela que **chama a si mesma para resolver problemas recursivos**. Esse conceito, chamado **recursão**, pode parecer estranho à primeira vista, mas é uma ferramenta poderosa para solucionar determinados tipos de desafios de forma elegante e eficiente.
+
+Se quiser, posso começar agora a seção **Recursão**, no mesmo ritmo e estilo. Deseja que eu continue?

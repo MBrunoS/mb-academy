@@ -1,0 +1,217 @@
+---
+title: Git
+description: Instalação e comandos básicos
+---
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+Antes de começar a usar o Git, você precisa instalá-lo no seu computador. O processo de instalação varia dependendo do seu sistema operacional.
+
+## Instalando o Git
+
+
+<Tabs items={['Windows', 'macOS', 'Linux']}>
+  <Tab value="Windows">
+    1. Baixe o instalador do Git em [git-scm.com/downloads](https://git-scm.com/downloads)
+    2. Execute o instalador baixado
+    3. Siga as instruções do instalador (você pode manter as opções padrão)
+    4. Acesse o menu iniciar e procure por "Git Bash"
+        - A partir daí, você pode usar o Git Bash como seu terminal padrão
+  </Tab>
+  <Tab value="macOS">
+    <Accordions type="single">
+      <Accordion title="Método 1:Usando o Homebrew (recomendado)">
+        1. Se você ainda não tem o Homebrew instalado, instale-o seguindo as instruções em [brew.sh](https://brew.sh)
+        2. No terminal, execute:
+          ```bash
+          brew install git
+          ```
+      </Accordion>
+      <Accordion title="Método 2: Usando o instalador">
+        1. Baixe o instalador do Git em [git-scm.com/downloads](https://git-scm.com/downloads)
+        2. Execute o arquivo .dmg baixado
+        3. Siga as instruções do instalador
+      </Accordion>
+    </Accordions>
+  </Tab>
+  <Tab value="Linux">
+    No terminal, execute:
+    ```bash
+    sudo apt update
+    sudo apt install git
+    ```
+  </Tab>
+</Tabs>
+
+### Verificando a instalação
+
+Independente do sistema operacional, você pode verificar se o Git foi instalado corretamente executando o seguinte comando no seu terminal:
+```bash
+git --version
+```
+
+Se tudo estiver correto, você verá a versão do Git instalada.
+
+### Configuração inicial
+
+Depois de instalar, é importante configurar seu nome e email para que seus commits sejam identificados corretamente:
+
+```bash
+git config --global user.name "Seu Nome"
+git config --global user.email "seu.email@exemplo.com"
+```
+
+<Callout>
+Essas configurações são globais e serão usadas em todos os seus projetos Git. Você só precisa fazer isso uma vez.
+</Callout>
+
+Agora que você já sabe o que é versionamento de código e por que ele é tão importante no desenvolvimento profissional, é hora de começar a usar o Git de verdade. Nesta seção, você vai aprender os **comandos mais essenciais** do Git, entender quando usá-los e começar a versionar seus próprios projetos.
+
+<Callout>
+Todos os comandos abaixo são executados no terminal. Você pode usar o terminal do seu sistema ou o terminal integrado do VS Code (Ctrl + aspas ou Ctrl + `).
+</Callout>
+
+## Iniciando um repositório com `git init`
+
+O primeiro passo para começar a usar o Git em um projeto é inicializar o controle de versão. Isso é feito com:
+
+```bash
+git init
+```
+
+Esse comando deve ser executado dentro da pasta do seu projeto. Ele cria um repositório Git local, ou seja, começa a rastrear tudo o que acontece ali.
+
+Você saberá que deu certo se aparecer uma pasta oculta chamada `.git` (não mexa nela!) e o VS Code mostrar o nome da branch (`main` ou `master`) no canto inferior esquerdo da tela.
+
+## Verificando o status do projeto com `git status`
+
+Depois de fazer modificações nos arquivos do seu projeto, você pode ver quais arquivos foram alterados usando:
+
+```bash
+git status
+```
+
+Esse comando mostra:
+
+- Quais arquivos estão sendo rastreados ou não
+- Quais arquivos foram modificados
+- O que está pronto para ser salvo (ou seja, para ser *commitado*)
+
+É o seu **painel de controle do Git**, e você vai usá-lo o tempo todo para saber o que está acontecendo no repositório.
+
+## Adicionando arquivos com `git add`
+
+O Git funciona em duas etapas: primeiro você **seleciona os arquivos que deseja versionar**, depois você **salva um snapshot desses arquivos**.
+
+Para dizer ao Git quais arquivos devem ser incluídos no próximo commit, usamos:
+
+```bash
+git add nome-do-arquivo.js
+```
+
+Ou, para adicionar todos os arquivos modificados:
+
+```bash
+git add .
+```
+
+Esse comando coloca os arquivos na chamada **staging area**, ou "área de preparação".
+
+## Salvando uma versão com `git commit`
+
+Depois de adicionar os arquivos, é hora de salvar uma nova versão (ou *commit*). Um commit é como uma **foto do estado atual do projeto**, com uma mensagem descritiva:
+
+```bash
+git commit -m "Adiciona função de login"
+```
+
+A mensagem deve ser curta e clara, explicando **o que foi feito** naquela versão. Com o tempo, esse histórico se torna uma documentação viva do projeto.
+
+## Histórico de versões com `git log`
+
+Se quiser ver os commits já feitos, use:
+
+```bash
+git log
+```
+
+Esse comando mostra:
+
+- O código hash único de cada commit
+- O autor
+- A data
+- A mensagem
+
+Para uma versão mais compacta e visual:
+
+```bash
+git log --oneline
+```
+
+## Voltando no tempo com `git checkout`
+
+Você pode voltar temporariamente para o estado de um commit antigo com:
+
+```bash
+git checkout código-do-commit
+```
+
+Ou voltar para a versão mais recente com:
+
+```bash
+git checkout main
+```
+
+<Callout type="warn">
+Em breve, vamos aprender formas mais seguras de desfazer alterações. Por enquanto, use checkout apenas para navegação.
+</Callout>
+
+## Trabalhando com múltiplas versões com `git branch`
+
+O Git permite criar **ramificações** (*branches*) para desenvolver novas funcionalidades separadamente da versão principal (`main`).
+
+Para criar uma nova branch:
+
+```bash
+git branch nova-funcionalidade
+```
+
+Para mudar para ela:
+
+```bash
+git checkout nova-funcionalidade
+```
+
+Ou combine os dois com:
+
+```bash
+git checkout -b nova-funcionalidade
+```
+
+Mais à frente, você verá como usar branches em conjunto com o GitHub para criar fluxos colaborativos.
+
+## Mesclando mudanças com `git merge`
+
+Depois de desenvolver em uma branch secundária, você pode **unir as alterações** à branch principal com:
+
+```bash
+git checkout main
+git merge nova-funcionalidade
+```
+
+Se não houver conflitos, o Git unifica as mudanças automaticamente.
+
+## Resumo do fluxo básico
+
+O ciclo mais comum que você vai repetir ao versionar seus projetos é:
+
+```bash
+git init                # inicia o versionamento
+git status              # verifica alterações
+git add .               # adiciona tudo
+git commit -m "mensagem" # salva uma nova versão
+```
+
+Com isso, você já consegue versionar seus arquivos com segurança, organizar melhor seu projeto, e começar a usar ferramentas como o GitHub com mais tranquilidade.
+
+Na próxima seção, vamos conhecer o **GitHub** — a plataforma onde você poderá armazenar seus projetos online, compartilhar seu código com o mundo, colaborar com outras pessoas e até criar um portfólio público.

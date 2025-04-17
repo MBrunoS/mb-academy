@@ -1,0 +1,84 @@
+---
+title: IDEs e Editores de Código
+description: "-"
+---
+
+Uma das ferramentas mais importantes para qualquer pessoa desenvolvendo software é o **editor de código**. É nele que você passa a maior parte do tempo, escrevendo, organizando e revisando o seu código-fonte.
+
+Existem muitos editores e IDEs (do inglês *Integrated Development Environment*, ou Ambiente de Desenvolvimento Integrado), cada um com suas características, pontos fortes e preferências da comunidade. Alguns focam em velocidade, outros em recursos avançados, alguns são pagos, outros gratuitos.
+
+Mas entre os iniciantes e os profissionais da área de desenvolvimento web, **um editor se destacou nos últimos anos como o mais popular e recomendado: o Visual Studio Code (VS Code)**.
+
+## VS Code: leve, poderoso e extensível
+
+O **VS Code**, criado pela Microsoft, é um editor gratuito, open source, multiplataforma (funciona no Windows, Linux e macOS), e que combina **leveza, praticidade e poder**. Ele oferece o que você precisa para começar agora, e ao mesmo tempo cresce com você conforme sua experiência aumenta.
+
+Entre os motivos pelos quais o VS Code é tão bem aceito estão:
+
+- Interface limpa e fácil de entender
+- Suporte a centenas de linguagens (incluindo JavaScript, HTML, CSS, TypeScript)
+- Integração com Git e terminal embutido
+- Extensões para tudo: temas, snippets, formatação automática, depuração, inteligência artificial, entre outros
+- Atualizações frequentes, com foco em desempenho e usabilidade
+- Funciona muito bem com WSL (no Windows) e com projetos Node.js
+
+Além disso, ele possui recursos como:
+
+- **Autocompletar inteligente** (IntelliSense)
+- **Sugestões de código e correções**
+- **Realce de sintaxe e formatação automática**
+- **Atalhos poderosos**
+- **Minimapa do código**, pesquisa rápida, múltiplos cursores, e muito mais
+
+## Como instalar o VS Code
+
+Você pode baixar o VS Code gratuitamente em:
+
+🔗 https://code.visualstudio.com/
+
+Escolha a versão adequada para o seu sistema operacional (Windows, macOS ou Linux), baixe o instalador e siga o processo de instalação normalmente.
+
+Durante a instalação no **Windows**, recomendamos ativar a opção **“Add to PATH”** e também **“Open with Code” no menu de contexto do Explorer** — isso facilita abrir pastas ou arquivos diretamente no VS Code via terminal ou com clique direito.
+
+## Explorando o VS Code pela primeira vez
+
+Ao abrir o VS Code pela primeira vez, você verá uma interface dividida em seções:
+
+- **Barra lateral esquerda**: contém os ícones principais — Explorer (arquivos), Pesquisa, Controle de versão (Git), Extensões, Terminal, etc.
+- **Editor principal**: onde você escreve e lê o código.
+- **Terminal integrado**: acessível com `Ctrl + aspas` (`Ctrl + ``) ou pelo menu `Terminal > Novo terminal`.
+- **Barra de status inferior**: mostra informações sobre a linguagem do arquivo, formato, status do Git, entre outros.
+
+Você pode criar um novo arquivo (`File > New File`) ou abrir uma pasta de projeto existente (`File > Open Folder`). Para quem usa o terminal, pode abrir o VS Code na pasta atual com:
+
+```bash
+code .
+```
+
+(O comando `code` precisa estar no PATH — no Windows, isso é ativado na instalação; no Linux/macOS, você pode ativar manualmente.)
+
+## Algumas extensões úteis para começar
+
+O VS Code funciona como um editor minimalista por padrão, mas seu grande poder está na **instalação de extensões**. Algumas que recomendamos para quem está começando com JavaScript e desenvolvimento web:
+
+- **ESLint** - para padronização e detecção de erros no código.
+- **Prettier** - para formatação automática.
+- **Live Server** - para abrir HTML no navegador com recarregamento automático.
+- **JavaScript (ES6) Code Snippets** - para acelerar sua digitação com atalhos.
+- **Color Highlight** - exibe cores reais em códigos CSS.
+- **Material Icon Theme** - adiciona ícones nas pastas e arquivos, facilitando a navegação.
+- **GitLens** - para explorar históricos e autoria de código usando Git.
+
+Essas extensões podem ser instaladas pela aba de extensões (ícone de quadrado na barra lateral esquerda) ou digitando o nome na barra de comandos `Ctrl+Shift+P`.
+
+## Dica: atalhos que ajudam desde o início
+
+Alguns atalhos que valem a pena decorar desde o começo:
+
+- `Ctrl + B`: mostrar ou ocultar a barra lateral de arquivos
+- `Ctrl + P`: buscar rapidamente arquivos no projeto
+- `Ctrl + /`: comentar/descomentar uma linha
+- `Alt + Shift + ↓ ou ↑`: duplicar linha ou mover bloco
+- `Ctrl + Space`: mostrar sugestões de código (IntelliSense)
+
+Na próxima seção, vamos entender o que é versionamento de código e como ele ajuda a gerenciar projetos.

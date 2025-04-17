@@ -1,0 +1,249 @@
+---
+title: Programação Orientada a Objetos
+description: "-"
+---
+
+A essa altura, você já conhece variáveis, funções, arrays, objetos e estruturas de controle. Com isso, já consegue construir programas úteis e funcionais. Mas conforme os programas crescem, a organização do código se torna cada vez mais importante. Chega um ponto em que não basta só "fazer funcionar" — é preciso manter o código legível, modular, reutilizável e fácil de manter.
+
+É nesse contexto que entra a **Programação Orientada a Objetos (POO)** — um paradigma de programação focado em **modelar o mundo real através de entidades chamadas objetos**, cada um com seus próprios dados (atributos) e comportamentos (métodos).
+
+## O que é POO?
+
+A Programação Orientada a Objetos é um **estilo de programação** que organiza o código com base em **entidades autônomas**, chamadas de **objetos**, que interagem entre si.
+
+Esses objetos são inspirados no mundo real. Por exemplo, um objeto `Carro` pode ter características como `cor`, `marca`, `velocidade` e comportamentos como `acelerar()` ou `frear()`. Um objeto `Pessoa` pode ter um `nome`, uma `idade` e ações como `falar()` ou `andar()`.
+
+A ideia é **encapsular dados e comportamentos** relacionados em um único "pacote" lógico, o objeto. Isso melhora a organização, reduz repetições e facilita a manutenção e a evolução dos sistemas.
+
+## Classes e objetos: o molde e a instância
+
+Até agora, vimos como criar objetos manualmente usando a notação literal `{}`. Isso funciona bem quando precisamos de poucos objetos com estrutura simples e pontual. Por exemplo:
+
+```js
+let aluno1 = {
+  nome: "Ana",
+  idade: 22,
+  apresentar: function () {
+    console.log(`Oi, sou a ${this.nome} e tenho ${this.idade} anos.`);
+  }
+};
+
+let aluno2 = {
+  nome: "Bruno",
+  idade: 24,
+  apresentar: function () {
+    console.log(`Oi, sou o ${this.nome} e tenho ${this.idade} anos.`);
+  }
+};
+```
+
+Apesar de funcionar, essa abordagem **repete código desnecessariamente**. Imagine criar 30 alunos assim — seria um caos. Além disso, se quisermos mudar o comportamento do método `apresentar`, teríamos que alterar manualmente em todos os objetos.
+
+Para evitar esse problema, usamos **classes**: um molde (ou modelo) que define a estrutura e o comportamento comum a todos os objetos daquele tipo. A partir da classe, podemos criar múltiplos objetos reais, chamados **instâncias**. Cada instância tem seus próprios valores, mas todos compartilham a mesma estrutura definida pela classe.
+
+Veja um exemplo simples:
+
+```js
+class Pessoa {
+  constructor(nome, idade) {
+    this.nome = nome;
+    this.idade = idade;
+  }
+
+  apresentar() {
+    console.log(`Olá, meu nome é ${this.nome} e tenho ${this.idade} anos.`);
+  }
+}
+```
+
+Neste exemplo:
+
+- `Pessoa` é a classe.
+- O método `constructor` define o que deve acontecer quando criamos uma nova pessoa.
+- `this.nome` e `this.idade` são as **propriedades** de cada instância.
+- `apresentar()` é um **método**, ou seja, um comportamento da pessoa.
+
+Para criar objetos com base na classe, usamos a palavra-chave `new`:
+
+```js
+let pessoa1 = new Pessoa("Lúcia", 30);
+let pessoa2 = new Pessoa("Carlos", 45);
+
+pessoa1.apresentar(); // Olá, meu nome é Lúcia e tenho 30 anos.
+pessoa2.apresentar(); // Olá, meu nome é Carlos e tenho 45 anos.
+```
+
+Cada pessoa criada tem seus próprios dados, mas compartilha os mesmos métodos e estrutura.
+
+Agora veja o mesmo exemplo inicial usando uma classe:
+
+```js
+class Aluno {
+  constructor(nome, idade) {
+    this.nome = nome;
+    this.idade = idade;
+  }
+
+  apresentar() {
+    console.log(`Oi, sou ${this.nome} e tenho ${this.idade} anos.`);
+  }
+}
+
+let aluno1 = new Aluno("Ana", 22);
+let aluno2 = new Aluno("Bruno", 24);
+
+aluno1.apresentar(); // Oi, sou Ana e tenho 22 anos.
+aluno2.apresentar(); // Oi, sou Bruno e tenho 24 anos.
+```
+
+Com isso, temos um código mais **organizado, reaproveitável e escalável**. Basta criar novas instâncias da classe `Aluno`, e todas terão os mesmos comportamentos definidos pela classe.
+
+## Os pilares da Programação Orientada a Objetos
+
+A POO se sustenta sobre três pilares principais, que definem sua forma de organizar código:
+
+1. **Encapsulamento**
+2. **Herança**
+3. **Polimorfismo**
+
+Vamos entender cada um com calma, com exemplos simples e práticos.
+
+### Encapsulamento: protegendo os dados
+
+O encapsulamento, consiste em **esconder os detalhes internos de implementação** e permitir acesso apenas ao que for realmente necessário.
+
+Isso é feito criando uma **interface pública**, com métodos específicos para leitura ou alteração, e mantendo a lógica interna separada. Isso evita que o usuário (ou outro programador) use o objeto de forma incorreta ou inesperada.
+
+A ideia é: **quanto menos o código externo souber sobre o funcionamento interno de um objeto, melhor**. Isso ajuda a evitar efeitos colaterais e torna o código mais seguro e fácil de refatorar.
+
+No JavaScript moderno, podemos usar o símbolo `#` para declarar propriedades **privadas**, acessíveis apenas dentro da própria classe:
+
+```js
+class Conta {
+  #saldo = 0;
+
+  depositar(valor) {
+    this.#saldo += valor;
+  }
+
+  verSaldo() {
+    console.log(`Saldo atual: R$ ${this.#saldo}`);
+  }
+}
+
+let conta = new Conta();
+conta.depositar(100);
+conta.verSaldo(); // Saldo atual: R$ 100
+// conta.#saldo = 1000; // Erro: propriedade privada
+```
+
+Esse controle evita que o saldo seja alterado diretamente, forçando o uso do método `depositar`, onde podemos aplicar validações e proteger a integridade dos dados.
+
+Além de segurança, o encapsulamento favorece o **princípio da responsabilidade única**, pois cada classe cuida apenas do que é seu e se comunica com o exterior por meio de métodos específicos.
+
+### Herança: especializando comportamentos
+
+Herança é o processo de **criar uma nova classe baseada em outra já existente**, herdando seus atributos e comportamentos. Isso permite **reutilizar código** e criar uma hierarquia lógica entre classes.
+
+A classe que serve de base é chamada de **superclasse** (ou classe pai), e a classe que herda dela é chamada de **subclasse** (ou classe filha).
+
+Por exemplo, podemos criar uma classe genérica `Animal`, e a partir dela criar subclasses `Cachorro` e `Gato` que herdam suas características, mas também definem comportamentos próprios:
+
+```js
+class Animal {
+  constructor(nome) {
+    this.nome = nome;
+  }
+
+  emitirSom() {
+    console.log("Som genérico");
+  }
+}
+
+class Cachorro extends Animal {
+  emitirSom() {
+    console.log("Au au!");
+  }
+}
+
+let dog = new Cachorro("Bolt");
+dog.emitirSom(); // "Au au!"
+```
+
+Note que a subclasse `Cachorro` **sobrescreveu** (`override`) o método `emitirSom`, mas manteve o resto da estrutura herdada de `Animal`.
+
+A herança também permite o uso da palavra-chave `super` para acessar o comportamento da superclasse:
+
+```js
+class Cavalo extends Animal {
+  emitirSom() {
+    super.emitirSom(); // Chama a versão da classe pai
+    console.log(`${this.nome} relincha: Hiiiiii!`);
+  }
+}
+```
+
+A herança facilita a criação de hierarquias lógicas no código e reduz repetição, mas deve ser usada com cuidado para manter o design simples e compreensível.
+
+### Polimorfismo: diferentes formas de agir
+
+Polimorfismo é a capacidade de usar o **mesmo método** com objetos diferentes, obtendo **resultados específicos de cada um**. Isso torna o código mais genérico e adaptável, pois podemos trabalhar com diversas classes como se fossem uma só — desde que compartilhem a mesma interface (ou seja, os mesmos métodos).
+
+Continuando o exemplo dos animais:
+
+```js
+let animais = [
+  new Cachorro("Rex"),
+  new Gato("Felix"),
+  new Cavalo("Spirit")
+];
+
+for (let animal of animais) {
+  animal.emitirSom(); // Cada um executa sua própria versão do método
+}
+```
+
+Mesmo usando o mesmo comando (`animal.emitirSom()`), o comportamento depende de **qual classe foi instanciada**. Isso é extremamente útil ao lidar com coleções de objetos, interfaces gráficas, eventos ou estratégias de negócio.
+
+Outro exemplo mais prático seria uma função que recebe qualquer "meio de transporte" e chama `mover()`:
+
+```js
+class Bicicleta {
+  mover() {
+    console.log("Pedalando...");
+  }
+}
+
+class Carro {
+  mover() {
+    console.log("Acelerando...");
+  }
+}
+
+function iniciarViagem(transporte) {
+  transporte.mover();
+}
+
+iniciarViagem(new Bicicleta()); // Pedalando...
+iniciarViagem(new Carro());     // Acelerando...
+```
+
+Com polimorfismo, a função `iniciarViagem` não precisa se preocupar com qual tipo de transporte está usando — basta confiar que ele sabe se mover. Isso torna o código mais flexível, genérico e fácil de expandir.
+
+---
+
+Programação Orientada a Objetos não é apenas uma forma diferente de organizar o código — é uma forma de **pensar sobre problemas e soluções**, modelando o mundo real com clareza e lógica.
+
+Ao entender e aplicar bem os conceitos de:
+
+- **Classe** e **instância**
+- **Atributos** e **métodos**
+- **Encapsulamento**
+- **Herança**
+- **Polimorfismo**
+
+você começa a construir sistemas que são **modulares, escaláveis e mais fáceis de manter**.
+
+Esses conceitos também são fundamentais para compreender como **frameworks, bibliotecas e componentes** funcionam por baixo dos panos — e são amplamente utilizados em praticamente toda aplicação JavaScript profissional.
+
+Na próxima etapa, vamos mudar um pouco o foco: agora que você já tem uma boa base de programação com JavaScript, vamos montar **seu ambiente de desenvolvimento** e preparar todas as ferramentas necessárias para construir aplicações web reais com confiança.
