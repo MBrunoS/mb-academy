@@ -1,14 +1,5 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import {
-  AlbumIcon,
-  Book,
-  ComponentIcon,
-  Heart,
-  Layout,
-  LayoutTemplate,
-  Pencil,
-  Server,
-} from "lucide-react";
+import { ComponentIcon } from "lucide-react";
 
 /**
  * Shared layout configurations
@@ -44,12 +35,6 @@ export const baseOptions: BaseLayoutProps = {
           text: "Starter",
           description: "Comece com o básico.",
           url: "/courses/starter",
-        },
-        {
-          icon: <Server />,
-          text: "Front-end Junior",
-          description: "Crie interfaces de usuário com HTML, CSS e JavaScript.",
-          url: "/courses/fe-junior",
         },
       ],
     },

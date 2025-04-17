@@ -1,6 +1,0 @@
-{
-  "title": "Front-end Junior",
-  "description": "Trilha para quem quer dar os primeiros passos no mundo do desenvolvimento web",
-  "root": true,
-  "pages": ["---Início---", "index", "test"]
-}

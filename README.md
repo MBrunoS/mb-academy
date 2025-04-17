@@ -27,7 +27,6 @@ resources:
 
 ## TODO
 
-- [ ] Adjust sidebar links (fe-junior)
 - [ ] Update home page (app/(home)/page.tsx)
 - [ ] Add courses page (app/(home)/courses/page.tsx)
 - [ ] Add content for starter course
