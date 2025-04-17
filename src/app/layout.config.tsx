@@ -28,7 +28,7 @@ export const baseOptions: BaseLayoutProps = {
     {
       type: "menu",
       text: "Cursos",
-      url: "/courses/starter",
+      url: "/courses",
       items: [
         {
           icon: <ComponentIcon />,
