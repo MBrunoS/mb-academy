@@ -8,19 +8,16 @@ export default function CoursesPage() {
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
             <div className="flex flex-wrap justify-between gap-3 p-4">
               <div className="flex min-w-72 flex-col gap-3">
-                <p className="text-white tracking-light text-[32px] font-bold leading-tight">
-                  Ignite Your Coding Future
-                </p>
+                <h1 className="text-white tracking-light text-[32px] font-bold leading-tight">
+                  Catálogo de Cursos
+                </h1>
                 <p className="text-[#9db3b9] text-sm font-normal leading-normal">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Quisquam, quos.
+                  Explore nossos cursos, cada um com um nível de dificuldade
+                  diferente, para você aprender a programar de forma eficiente.
                 </p>
               </div>
             </div>
 
-            <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-              Catálogo de Cursos
-            </h2>
             <div className="p-4">
               <div className="flex items-stretch justify-between gap-4 rounded-xl">
                 <div className="flex flex-[2_2_0px] flex-col gap-4">
