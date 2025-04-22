@@ -12,62 +12,36 @@ export default function CoursesPage() {
                   Ignite Your Coding Future
                 </p>
                 <p className="text-[#9db3b9] text-sm font-normal leading-normal">
-                  Embark on a transformative learning journey with our
-                  comprehensive web development courses, designed to equip you
-                  with in-demand skills and propel your career forward.
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Quisquam, quos.
                 </p>
               </div>
             </div>
+
             <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-              Featured Programs
-            </h2>
-            <div className="p-4">
-              <div className="flex items-stretch justify-between gap-4 rounded-xl bg-[#1c2427] p-4 shadow-[0_0_4px_rgba(0,0,0,0.1)]">
-                <div className="flex flex-[2_2_0px] flex-col gap-4">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-white text-base font-bold leading-tight">
-                      Full Stack Web Development Mastery
-                    </p>
-                    <p className="text-[#9db3b9] text-sm font-normal leading-normal">
-                      From fundamental building blocks to advanced frameworks,
-                      our signature program provides a deep dive into front-end,
-                      back-end, and database technologies, empowering you to
-                      build robust and dynamic web applications.
-                    </p>
-                  </div>
-                  <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-8 px-4 flex-row-reverse bg-[#283539] text-white text-sm font-medium leading-normal w-fit">
-                    <span className="truncate">Learn More</span>
-                  </button>
-                </div>
-                <div
-                  className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex-1"
-                  style={{
-                    backgroundImage:
-                      'url("https://cdn.usegalileo.ai/sdxl10/da94df2c-79ef-476a-b716-2aa3788edc63.png")',
-                  }}
-                />
-              </div>
-            </div>
-            <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-              Course Catalog
+              Catálogo de Cursos
             </h2>
             <div className="p-4">
               <div className="flex items-stretch justify-between gap-4 rounded-xl">
                 <div className="flex flex-[2_2_0px] flex-col gap-4">
                   <div className="flex flex-col gap-1">
                     <p className="text-white text-base font-bold leading-tight">
-                      Frontend Engineering Foundations
+                      Starter
                     </p>
                     <p className="text-[#9db3b9] text-sm font-normal leading-normal">
-                      Master the art of crafting interactive and visually
-                      compelling user interfaces. Explore HTML, CSS, JavaScript,
-                      and popular frameworks like React.js to create captivating
-                      web experiences.
+                      Curso básico para iniciantes em programação web, ensinando
+                      desde os conceitos fundamentais até a construção de
+                      projetos reais. Aprenda JavaScript, Git, GitHub e
+                      desenvolva uma base sólida para sua carreira como
+                      desenvolvedor.
                     </p>
                   </div>
-                  <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-8 px-4 flex-row-reverse bg-[#283539] text-white text-sm font-medium leading-normal w-fit">
-                    <span className="truncate">Learn More</span>
-                  </button>
+                  <Link
+                    href="/courses/starter"
+                    className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-8 px-4 flex-row-reverse bg-[#283539] text-white text-sm font-medium leading-normal w-fit"
+                  >
+                    Saiba Mais
+                  </Link>
                 </div>
                 <div
                   className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex-1"
@@ -78,90 +52,9 @@ export default function CoursesPage() {
                 />
               </div>
             </div>
-            <div className="p-4">
-              <div className="flex items-stretch justify-between gap-4 rounded-xl">
-                <div className="flex flex-[2_2_0px] flex-col gap-4">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-white text-base font-bold leading-tight">
-                      Backend Development with Node.js
-                    </p>
-                    <p className="text-[#9db3b9] text-sm font-normal leading-normal">
-                      Delve into server-side programming and build scalable APIs
-                      using Node.js and Express.js. Learn to manage data,
-                      implement authentication, and integrate with databases to
-                      power dynamic web applications.
-                    </p>
-                  </div>
-                  <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-8 px-4 flex-row-reverse bg-[#283539] text-white text-sm font-medium leading-normal w-fit">
-                    <span className="truncate">Learn More</span>
-                  </button>
-                </div>
-                <div
-                  className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex-1"
-                  style={{
-                    backgroundImage:
-                      'url("https://cdn.usegalileo.ai/sdxl10/adc8f1c7-4dc2-498f-8b3f-c43bec352f2a.png")',
-                  }}
-                />
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex items-stretch justify-between gap-4 rounded-xl">
-                <div className="flex flex-[2_2_0px] flex-col gap-4">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-white text-base font-bold leading-tight">
-                      Database Design & Management
-                    </p>
-                    <p className="text-[#9db3b9] text-sm font-normal leading-normal">
-                      Unlock the power of data. Learn to design, implement, and
-                      manage relational and NoSQL databases using
-                      industry-leading technologies like PostgreSQL and MongoDB.
-                      Master data modeling, querying, and optimization
-                      techniques.
-                    </p>
-                  </div>
-                  <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-8 px-4 flex-row-reverse bg-[#283539] text-white text-sm font-medium leading-normal w-fit">
-                    <span className="truncate">Learn More</span>
-                  </button>
-                </div>
-                <div
-                  className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex-1"
-                  style={{
-                    backgroundImage:
-                      'url("https://cdn.usegalileo.ai/sdxl10/0bb83b6e-0a38-40dd-815a-523f6a319895.png")',
-                  }}
-                />
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex items-stretch justify-between gap-4 rounded-xl">
-                <div className="flex flex-[2_2_0px] flex-col gap-4">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-white text-base font-bold leading-tight">
-                      Modern Web Application Architecture
-                    </p>
-                    <p className="text-[#9db3b9] text-sm font-normal leading-normal">
-                      Elevate your coding skills with advanced architectural
-                      patterns. Learn microservices, serverless functions, and
-                      cloud-native development practices to build resilient,
-                      scalable, and performant web applications.
-                    </p>
-                  </div>
-                  <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-8 px-4 flex-row-reverse bg-[#283539] text-white text-sm font-medium leading-normal w-fit">
-                    <span className="truncate">Learn More</span>
-                  </button>
-                </div>
-                <div
-                  className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex-1"
-                  style={{
-                    backgroundImage:
-                      'url("https://cdn.usegalileo.ai/sdxl10/22605e78-1207-49c9-af2f-b5a11fbaf521.png")',
-                  }}
-                />
-              </div>
-            </div>
+
             <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-              Learning Paths
+              Trilhas de Aprendizado
             </h2>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
               <div className="flex flex-col gap-3 pb-3">
@@ -170,15 +63,16 @@ export default function CoursesPage() {
                   style={{
                     backgroundImage:
                       'url("https://cdn.usegalileo.ai/sdxl10/5ae3a45f-4c51-4f55-97fb-8e559a6bc83a.png")',
+                    filter: "grayscale(100%)",
                   }}
                 />
                 <div>
                   <p className="text-white text-base font-medium leading-normal">
-                    Frontend Developer
+                    Frontend
                   </p>
                   <p className="text-[#9db3b9] text-sm font-normal leading-normal">
-                    Become a Frontend Developer, equipped to build engaging user
-                    interfaces.
+                    Aprenda a criar interfaces de usuário interativas e
+                    atraentes.
                   </p>
                 </div>
               </div>
@@ -188,15 +82,15 @@ export default function CoursesPage() {
                   style={{
                     backgroundImage:
                       'url("https://cdn.usegalileo.ai/sdxl10/1787d8bd-3efe-484d-8af9-389205904d93.png")',
+                    filter: "grayscale(100%)",
                   }}
                 />
                 <div>
                   <p className="text-white text-base font-medium leading-normal">
-                    Backend Developer
+                    Backend
                   </p>
                   <p className="text-[#9db3b9] text-sm font-normal leading-normal">
-                    Become a Backend Developer, specializing in server-side
-                    logic and database management.
+                    Aprenda a criar sistemas robustos e escaláveis.
                   </p>
                 </div>
               </div>
@@ -206,15 +100,15 @@ export default function CoursesPage() {
                   style={{
                     backgroundImage:
                       'url("https://cdn.usegalileo.ai/sdxl10/e41a189b-d2e8-4893-b90b-897e1aad4e6a.png")',
+                    filter: "grayscale(100%)",
                   }}
                 />
                 <div>
                   <p className="text-white text-base font-medium leading-normal">
-                    Full Stack Developer
+                    Full Stack
                   </p>
                   <p className="text-[#9db3b9] text-sm font-normal leading-normal">
-                    Become a Full Stack Developer, capable of building complete
-                    web applications from front to back.
+                    Aprenda a criar aplicações completas e escaláveis.
                   </p>
                 </div>
               </div>

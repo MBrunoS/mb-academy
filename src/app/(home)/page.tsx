@@ -22,9 +22,12 @@ export default function HomePage() {
                         Domine a arte da programação com a Forja Academy.
                       </h2>
                     </div>
-                    <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-amber-500 text-[#111618] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]">
-                      Explore Cursos
-                    </button>
+                    <Link
+                      href="/courses"
+                      className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-amber-500 text-[#111618] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
+                    >
+                      Explore Nossos Cursos
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -103,9 +106,12 @@ export default function HomePage() {
                   </div>
                   <div className="flex flex-1 justify-center">
                     <div className="flex justify-center">
-                      <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-amber-500 text-[#111618] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] grow">
-                        <span className="truncate">Enroll Now</span>
-                      </button>
+                      <Link
+                        href="/courses"
+                        className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-amber-500 text-[#111618] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] grow"
+                      >
+                        Explore Nossos Cursos
+                      </Link>
                     </div>
                   </div>
                 </div>
