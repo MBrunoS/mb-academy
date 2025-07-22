@@ -318,6 +318,43 @@ Esse recurso aparece com frequência em aplicações que precisam montar objetos
 Importante: chaves computadas só funcionam na criação do objeto com notação literal ({}). Não funcionam com objeto.chave = valor.
 </Callout>
 
+## Para praticar
+
+Vamos modelar os dados de um livro usando um objeto.
+
+**Cenário:** Crie um objeto que represente um livro com suas principais propriedades e um método para exibir suas informações.
+
+**Requisitos:**
+
+1.  Crie um objeto chamado `livro`.
+2.  Adicione as seguintes propriedades:
+    *   `titulo` (string)
+    *   `autor` (string)
+    *   `anoPublicacao` (number)
+    *   `genero` (string)
+3.  Adicione um método chamado `exibirDetalhes` que, quando chamado, exibe uma mensagem no console como: `"Livro: O Senhor dos Anéis, Autor: J.R.R. Tolkien, Ano: 1954"`. Use `this` para acessar as propriedades do objeto.
+4.  Chame o método `livro.exibirDetalhes()` para testar.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+  ```js
+  let livro = {
+    titulo: "O Senhor dos Anéis",
+    autor: "J.R.R. Tolkien",
+    anoPublicacao: 1954,
+    genero: "Fantasia",
+    exibirDetalhes: function() {
+      console.log(
+        `Livro: ${this.titulo}, Autor: ${this.autor}, Ano: ${this.anoPublicacao}`
+      );
+    }
+  };
+
+  livro.exibirDetalhes();
+  ```
+</details>
+
 ---
 
 Objetos são o coração da manipulação de dados em JavaScript. Eles nos permitem **agrupar informações relacionadas**, nomear essas informações de forma significativa e manipular dados com mais clareza e organização. Praticamente tudo em JavaScript envolve objetos — inclusive arrays, funções e elementos da própria linguagem.

@@ -59,7 +59,7 @@ class Pessoa {
 Neste exemplo:
 
 - `Pessoa` é a classe.
-- O método `constructor` define o que deve acontecer quando criamos uma nova pessoa.
+- O método `constructor` define o que deve acontecer quando criamos uma nova pessoa. A palavra-chave `this` aqui se refere à **instância** específica do objeto que está sendo criada. Quando escrevemos `this.nome = nome;`, estamos dizendo: "defina a propriedade `nome` **deste objeto** que estou criando com o valor que recebi no parâmetro `nome`".
 - `this.nome` e `this.idade` são as **propriedades** de cada instância.
 - `apresentar()` é um **método**, ou seja, um comportamento da pessoa.
 
@@ -97,6 +97,25 @@ aluno2.apresentar(); // Oi, sou Bruno e tenho 24 anos.
 ```
 
 Com isso, temos um código mais **organizado, reaproveitável e escalável**. Basta criar novas instâncias da classe `Aluno`, e todas terão os mesmos comportamentos definidos pela classe.
+
+### Trabalhando com Múltiplos Objetos
+
+Uma das grandes vantagens de usar classes é a facilidade de criar e gerenciar múltiplas instâncias. Podemos, por exemplo, armazenar vários alunos em um array e depois usar um loop para interagir com cada um deles, conectando o que aprendemos sobre POO com arrays e estruturas de repetição.
+
+```js
+let turma = [
+  new Aluno("Ana", 22),
+  new Aluno("Bruno", 24),
+  new Aluno("Carla", 21)
+];
+
+// Usando o forEach que aprendemos no capítulo de arrays
+turma.forEach(aluno => {
+  aluno.apresentar();
+});
+```
+
+Este código irá exibir a apresentação de cada aluno na turma, demonstrando como a combinação de diferentes conceitos do JavaScript nos permite construir estruturas de dados mais complexas e lógicas.
 
 ## Os pilares da Programação Orientada a Objetos
 

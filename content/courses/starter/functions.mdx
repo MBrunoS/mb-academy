@@ -416,6 +416,36 @@ Funções são ferramentas poderosas, mas seu uso desorganizado pode tornar o c�
 - Não confie cegamente em `console.log`. Retornar valores dá mais controle e permite usar o resultado de forma flexível.
 - Pense nas funções como **peças de LEGO**: pequenas, bem definidas, e que se encaixam para formar estruturas maiores.
 
+## Para praticar
+
+Vamos criar uma função que verifica se um número é par ou ímpar.
+
+**Cenário:** Crie uma função que encapsule a lógica de verificação.
+
+**Requisitos:**
+
+1.  Crie uma função chamada `verificarParidade` que aceite um parâmetro `numero`.
+2.  Dentro da função, use o operador de módulo (`%`) para verificar se o número é divisível por 2.
+3.  A função deve retornar a string `"Par"` se o número for par e a string `"Ímpar"` se for ímpar.
+4.  Chame a função com diferentes números (por exemplo, 4, 7, 10) e use `console.log` para exibir o resultado retornado.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+  ```js
+  function verificarParidade(numero) {
+    if (numero % 2 === 0) {
+      return "Par";
+    } else {
+      return "Ímpar";
+    }
+  }
+
+  console.log(`O número 4 é: ${verificarParidade(4)}`); // O número 4 é: Par
+  console.log(`O número 7 é: ${verificarParidade(7)}`); // O número 7 é: Ímpar
+  ```
+</details>
+
 ---
 
 Funções são a alma da organização em um programa. Com elas, saímos do código linear e passamos a **pensar em módulos reutilizáveis**, que encapsulam lógica, simplificam a leitura e permitem que nosso programa cresça de forma sustentável.

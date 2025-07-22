@@ -22,17 +22,17 @@ Para declarar uma variável em JavaScript, usamos as palavras-chave `var`, `let`
 Exemplo de declaração:
 
 ```js
-let nome = "Ana";       // usando let
-const idade = 30;       // usando const
-var cidade = "Lisboa";  // usando var
+let nome = "Ana"; // usando let
+const idade = 30; // usando const
+var cidade = "Lisboa"; // usando var
 ```
 
 ## Regras de Nomeação de Variáveis
 
 JavaScript tem algumas regras e boas práticas para definir nomes de variáveis:
 
-1. **Deve começar com uma letra, underscore (_), ou cifrão ($)**. Não pode começar com números.
-2. **Não pode conter espaços ou caracteres especiais (exceto _ e $)**.
+1. **Deve começar com uma letra, underscore (\_), ou cifrão ($)**. Não pode começar com números.
+2. **Não pode conter espaços ou caracteres especiais (exceto \_ e $)**.
 3. **Evite palavras reservadas**, como `function`, `return`, ou `if`.
 4. **Use nomes descritivos** para facilitar a leitura do código. É recomendável usar o estilo camelCase, como `precoProduto`.
 
@@ -41,7 +41,7 @@ Por exemplo:
 ```js
 let precoProduto = 59.99;
 let _nomeUsuario = "João";
-let $valorTotal = 150.50;
+let $valorTotal = 150.5;
 ```
 
 ## Tipos de Dados em JavaScript
@@ -53,17 +53,17 @@ Em JavaScript, uma variável pode armazenar diferentes tipos de dados. Isso é i
 O tipo `number` representa tanto números inteiros como decimais. Por exemplo:
 
 ```js
-let idade = 25;       // número inteiro
-let altura = 1.75;    // número decimal
+let idade = 25; // número inteiro
+let altura = 1.75; // número decimal
 ```
 
 ### 2. String
 
-Strings são sequências de caracteres usadas para representar texto. Elas são definidas entre aspas simples `'...'`, aspas duplas `"..."`, ou crases ``...`` (template strings). Strings podem conter letras, números, e caracteres especiais:
+Strings são sequências de caracteres usadas para representar texto. Elas são definidas entre aspas simples `'...'`, aspas duplas `"..."`, ou crases `...` (template strings). Strings podem conter letras, números, e caracteres especiais:
 
 ```js
 let nome = "Alice";
-let saudacao = `Olá, ${nome}!`;  // usando template string para interpolação
+let saudacao = `Olá, ${nome}!`; // usando template string para interpolação
 ```
 
 ### 3. Boolean
@@ -82,17 +82,21 @@ let cadastroCompleto = false;
 
 ```js
 let valorNulo = null;
-let valorNaoDefinido;  // automaticamente definido como undefined
+let valorNaoDefinido; // automaticamente definido como undefined
 ```
 
-<Callout>Existem outros tipos em Javascript, mas por enquanto focaremos nesses tipos básicos. Eles são suficientes para entender os conceitos fundamentais de programação e começar a criar aplicações simples.</Callout>
+<Callout>
+  Existem outros tipos em Javascript, mas por enquanto focaremos nesses tipos
+  básicos. Eles são suficientes para entender os conceitos fundamentais de
+  programação e começar a criar aplicações simples.
+</Callout>
 
 Além disso, é importante notar que JavaScript é uma linguagem de tipagem dinâmica, o que significa que uma variável pode mudar de tipo durante a execução do programa. Por exemplo:
 
 ```js
-let valor = 42;        // number
-valor = "quarenta e dois";  // agora é uma string
-valor = true;          // agora é um boolean
+let valor = 42; // number
+valor = "quarenta e dois"; // agora é uma string
+valor = true; // agora é um boolean
 ```
 
 Essa flexibilidade pode ser útil, mas também requer cuidado para evitar erros inesperados no código.
@@ -108,48 +112,36 @@ Operações aritméticas são usadas para fazer cálculos com números. No JavaS
 **Operadores Aritméticos Comuns**:
 
 - **Soma (`+`)**: adiciona dois valores numéricos. Se pelo menos um dos valores for uma string, a operação de soma se torna uma **concatenação de strings**.
-    
-    ```js
-    let a = 10;
-    let b = 5;
-    let soma = a + b;  // soma é 15
-    
-    let texto = "A soma é: ";
-    let resultadoSoma = texto + (a + b);  // concatena a string com o resultado da soma, gerando "A soma é: 15"
-    ```
-    
-- **Subtração (****)**: subtrai um número do outro. Esse operador só faz sentido quando os valores envolvidos são numéricos.
-    
-    ```js
-    let subtracao = a - b;  // subtrai 5 de 10, resultando em 5
-    ```
-    
-- **Multiplicação (****)**: multiplica dois números.
-    
-    ```js
-    let multiplicacao = a * b;  // multiplica 10 por 5, resultando em 50
-    ```
-    
+  ```js
+  let a = 10;
+  let b = 5;
+  let soma = a + b; // soma é 15
+
+  let texto = "A soma é: ";
+  let resultadoSoma = texto + (a + b); // concatena a string com o resultado da soma, gerando "A soma é: 15"
+  ```
+- **Subtração (\*\***)\*\*: subtrai um número do outro. Esse operador só faz sentido quando os valores envolvidos são numéricos.
+  ```js
+  let subtracao = a - b; // subtrai 5 de 10, resultando em 5
+  ```
+- **Multiplicação (\*\***)\*\*: multiplica dois números.
+  ```js
+  let multiplicacao = a * b; // multiplica 10 por 5, resultando em 50
+  ```
 - **Divisão (`/`)**: divide um número por outro. Caso a divisão resulte em um número decimal, o JavaScript o exibirá como tal.
-    
-    ```js
-    let divisao = a / b;  // divide 10 por 5, resultando em 2
-    let resultadoDecimal = 7 / 3;  // resultado será 2.3333...
-    ```
-    
+  ```js
+  let divisao = a / b; // divide 10 por 5, resultando em 2
+  let resultadoDecimal = 7 / 3; // resultado será 2.3333...
+  ```
 - **Módulo (`%`)**: retorna o **resto da divisão** entre dois números.
-    
-    ```js
-    let modulo = a % b;  // 10 dividido por 5 dá resto 0
-    let outroModulo = 7 % 3;  // 7 dividido por 3 dá resto 1
-    ```
-    
+  ```js
+  let modulo = a % b; // 10 dividido por 5 dá resto 0
+  let outroModulo = 7 % 3; // 7 dividido por 3 dá resto 1
+  ```
 - **Exponenciação (`*`)**: eleva um número à potência de outro.
-    
-    ```js
-    let potencia = 2 ** 3;  // 2 elevado à potência de 3 resulta em 8
-    ```
-    
+  ```js
+  let potencia = 2 ** 3; // 2 elevado à potência de 3 resulta em 8
+  ```
 
 ### 2. Concatenação de Strings
 
@@ -159,8 +151,8 @@ Em JavaScript, a operação de soma (`+`) tem um comportamento especial quando u
 
 ```js
 let nome = "Maria";
-let saudacao = "Olá, " + nome + "!";  // concatena a string "Olá, " com o valor de nome e "!" no final
-console.log(saudacao);  // "Olá, Maria!"
+let saudacao = "Olá, " + nome + "!"; // concatena a string "Olá, " com o valor de nome e "!" no final
+console.log(saudacao); // "Olá, Maria!"
 ```
 
 Além disso, você pode usar **template literals** (template strings) para realizar uma concatenação de forma mais legível. Com os templates, você pode embutir variáveis dentro de strings usando `${}`.
@@ -169,8 +161,8 @@ Além disso, você pode usar **template literals** (template strings) para reali
 
 ```js
 let nome = "Maria";
-let saudacao = `Olá, ${nome}!`;  // mais fácil de ler e manter
-console.log(saudacao);  // "Olá, Maria!"
+let saudacao = `Olá, ${nome}!`; // mais fácil de ler e manter
+console.log(saudacao); // "Olá, Maria!"
 ```
 
 ### 3. Operadores de Comparação
@@ -180,69 +172,53 @@ Operadores de comparação são usados para comparar valores. Eles retornam um v
 **Operadores de comparação mais comuns**:
 
 - **Igualdade (==)**: verifica se dois valores são iguais, mas **não considera o tipo**.
-    
-    ```js
-    console.log(5 == '5');  // true, porque o valor é o mesmo, mas os tipos podem ser diferentes
-    ```
-    
+  ```js
+  console.log(5 == "5"); // true, porque o valor é o mesmo, mas os tipos podem ser diferentes
+  ```
 - **Igualdade estrita (===)**: verifica se dois valores são **iguais e do mesmo tipo**.
-    
-    ```js
-    console.log(5 === '5');  // false, porque o tipo é diferente (número vs string)
-    ```
-    
+  ```js
+  console.log(5 === "5"); // false, porque o tipo é diferente (número vs string)
+  ```
 - **Desigualdade (!=)**: verifica se dois valores **não são iguais**, ignorando o tipo.
-    
-    ```js
-    console.log(5 != '5');  // false, porque o valor é o mesmo, apesar dos tipos diferentes
-    ```
-    
+  ```js
+  console.log(5 != "5"); // false, porque o valor é o mesmo, apesar dos tipos diferentes
+  ```
 - **Desigualdade estrita (!==)**: verifica se dois valores são **diferentes ou de tipos diferentes**.
-    
-    ```js
-    console.log(5 !== '5');  // true, porque um é número e o outro é string
-    ```
-    
+  ```js
+  console.log(5 !== "5"); // true, porque um é número e o outro é string
+  ```
 - **Maior que (>)** e **Menor que (&lt;)**: compara valores numéricos e retorna verdadeiro ou falso.
-    
-    ```js
-    console.log(10 > 5);  // true
-    console.log(5 < 3);   // false
-    ```
-    
+  ```js
+  console.log(10 > 5); // true
+  console.log(5 < 3); // false
+  ```
 - **Maior ou igual (&gt;=)** e **Menor ou igual (&lt;=)**: verifica se o valor é maior ou igual, ou menor ou igual.
-    
-    ```js
-    console.log(10 >= 10);  // true
-    console.log(3 <= 2);    // false
-    ```
-    
+  ```js
+  console.log(10 >= 10); // true
+  console.log(3 <= 2); // false
+  ```
 
 ### 4. Operadores Unários
 
 Os operadores unários operam em apenas um operando. O exemplo mais comum é o operador de incremento (`++`) e o operador de decremento (`--`), que aumentam ou diminuem o valor de uma variável em 1, respectivamente.
 
 - **Incremento (`++`)**: adiciona 1 ao valor de uma variável.
-    
-    ```js
-    let contador = 10;
-    contador++;  // agora contador é 11
-    ```
-    
+  ```js
+  let contador = 10;
+  contador++; // agora contador é 11
+  ```
 - **Decremento (`-`)**: subtrai 1 do valor de uma variável.
-    
-    ```js
-    let contador = 10;
-    contador--;  // agora contador é 9
-    ```
-    
+  ```js
+  let contador = 10;
+  contador--; // agora contador é 9
+  ```
 
 Esses operadores podem ser usados tanto antes (prefixo) quanto depois (posfixo) da variável, o que altera ligeiramente o comportamento:
 
 ```js
 let x = 5;
-console.log(++x);  // 6, o incremento é feito antes da impressão
-console.log(x++);  // 6, o valor é impresso antes de ser incrementado, então x se torna 7 depois
+console.log(++x); // 6, o incremento é feito antes da impressão
+console.log(x++); // 6, o valor é impresso antes de ser incrementado, então x se torna 7 depois
 ```
 
 ## Conversão de Tipos
@@ -260,8 +236,8 @@ O operador de soma (`+`) é um dos exemplos mais comuns de conversão implícita
 ```js
 let numero = 10;
 let texto = "O valor é: ";
-let resultado = texto + numero;  // A variável 'numero' será convertida para string
-console.log(resultado);  // "O valor é: 10"
+let resultado = texto + numero; // A variável 'numero' será convertida para string
+console.log(resultado); // "O valor é: 10"
 ```
 
 **Exemplo 2: Concatenação de Booleano com String**
@@ -270,8 +246,8 @@ Quando um valor booleano é concatenado com uma string, o JavaScript converte au
 
 ```js
 let status = true;
-let mensagem = "O status é: " + status;  // 'true' será convertido para string
-console.log(mensagem);  // "O status é: true"
+let mensagem = "O status é: " + status; // 'true' será convertido para string
+console.log(mensagem); // "O status é: true"
 ```
 
 **Exemplo 3: Conversão de Tipos em Comparações**
@@ -279,7 +255,7 @@ console.log(mensagem);  // "O status é: true"
 Em comparações, o JavaScript também pode fazer conversões implícitas de tipos, especialmente com o operador `==` (igualdade). Se os tipos forem diferentes, o JavaScript tenta converter os valores para que ambos os lados da comparação sejam do mesmo tipo.
 
 ```js
-console.log(5 == '5');  // true, porque o JavaScript converte a string '5' para o número 5
+console.log(5 == "5"); // true, porque o JavaScript converte a string '5' para o número 5
 ```
 
 No exemplo acima, mesmo que um dos valores seja uma string e o outro seja um número, o operador `==` faz a conversão implícita e compara os valores depois da conversão.
@@ -291,81 +267,63 @@ Embora o JavaScript faça muitas conversões de tipo automaticamente, em algumas
 **Funções de Conversão Explícita:**
 
 - **`Number()`**: converte um valor para número. Se o valor não puder ser convertido para um número válido, o resultado será `NaN` (Not a Number).
-    
-    ```js
-    let valor = "123";
-    let numero = Number(valor);  // converte a string "123" para o número 123
-    console.log(numero);  // 123
-    ```
-    
-    Caso o valor não seja uma string numérica válida, o resultado será `NaN`.
-    
-    ```js
-    let invalido = "abc";
-    let numeroInvalido = Number(invalido);  // tentativa de converter algo que não é um número
-    console.log(numeroInvalido);  // NaN
-    ```
-    
+  ```js
+  let valor = "123";
+  let numero = Number(valor); // converte a string "123" para o número 123
+  console.log(numero); // 123
+  ```
+  Caso o valor não seja uma string numérica válida, o resultado será `NaN`.
+  ```js
+  let invalido = "abc";
+  let numeroInvalido = Number(invalido); // tentativa de converter algo que não é um número
+  console.log(numeroInvalido); // NaN
+  ```
 - **`String()`**: converte qualquer tipo de valor para uma string. Isso pode ser útil quando você deseja garantir que o valor seja tratado como texto.
-    
-    ```js
-    let numero = 100;
-    let texto = String(numero);  // converte o número 100 para a string "100"
-    console.log(texto);  // "100"
-    ```
-    
+  ```js
+  let numero = 100;
+  let texto = String(numero); // converte o número 100 para a string "100"
+  console.log(texto); // "100"
+  ```
 - **`Boolean()`**: converte um valor para booleano (`true` ou `false`). No JavaScript, qualquer valor que não seja `undefined`, `null`, `0`, `NaN`, uma string vazia `""` ou `false` será convertido para `true`. Esses valores são chamados de "valores truthy". Os outros valores são chamados de "valores falsy", e eles se tornam `false` quando convertidos.
-    
-    ```js
-    let numero1 = 5;
-    let booleano1 = Boolean(numero1);  // qualquer número diferente de 0 se torna true
-    console.log(booleano1);  // true
-    
-    let numero2 = 0;
-    let booleano2 = Boolean(numero2);  // 0 se torna false
-    console.log(booleano2);  // false
-    ```
-    
+  ```js
+  let numero1 = 5;
+  let booleano1 = Boolean(numero1); // qualquer número diferente de 0 se torna true
+  console.log(booleano1); // true
+
+  let numero2 = 0;
+  let booleano2 = Boolean(numero2); // 0 se torna false
+  console.log(booleano2); // false
+  ```
 - **`parseInt()`**: converte uma string em um número inteiro. Ele tenta converter a parte da string que representa um número até encontrar um caractere que não faz parte do número.
-    
-    ```js
-    let textoNumerico = "123abc";
-    let numeroInteiro = parseInt(textoNumerico);  // converte a parte numérica da string
-    console.log(numeroInteiro);  // 123
-    ```
-    
-    Se a string não começar com um número, o `parseInt()` retorna `NaN`.
-    
-    ```js
-    let textoNaoNumerico = "abc123";
-    let numeroInvalido = parseInt(textoNaoNumerico);  // não consegue encontrar um número no início
-    consol.log(numeroInvalido);  // NaN
-    ```
-    
+  ```js
+  let textoNumerico = "123abc";
+  let numeroInteiro = parseInt(textoNumerico); // converte a parte numérica da string
+  console.log(numeroInteiro); // 123
+  ```
+  Se a string não começar com um número, o `parseInt()` retorna `NaN`.
+  ```js
+  let textoNaoNumerico = "abc123";
+  let numeroInvalido = parseInt(textoNaoNumerico); // não consegue encontrar um número no início
+  consol.log(numeroInvalido); // NaN
+  ```
 - **`parseFloat()`**: converte uma string em um número de ponto flutuante (decimal). Ele funciona de forma similar ao `parseInt()`, mas com maior precisão para números decimais.
-    
-    ```js
-    let numeroDecimal = parseFloat("10.5");
-    console.log(numeroDecimal);  // 10.5
-    ```
-    
+  ```js
+  let numeroDecimal = parseFloat("10.5");
+  console.log(numeroDecimal); // 10.5
+  ```
 
 ### 3. Conversões Implicitas e Comparação com `==` e `===`
 
 Em JavaScript, é importante lembrar que a comparação de valores pode ser feita de duas formas principais:
 
 - **`==` (igualdade não estrita)**: compara os valores, mas faz a conversão de tipo implícita se necessário.
-    
-    ```js
-    console.log(5 == '5');  // true, porque o JavaScript converte a string '5' para o número 5 antes de comparar
-    ```
-    
+  ```js
+  console.log(5 == "5"); // true, porque o JavaScript converte a string '5' para o número 5 antes de comparar
+  ```
 - **`===` (igualdade estrita)**: compara tanto os valores quanto os tipos, sem realizar conversões implícitas. Ou seja, os dois valores precisam ser do mesmo tipo e ter o mesmo valor para serem considerados iguais.
-    
-    ```js
-    console.log(5 === '5');  // false, porque um é um número e o outro é uma string
-    ```
-    
+  ```js
+  console.log(5 === "5"); // false, porque um é um número e o outro é uma string
+  ```
 
 ### 4. Conversões em Operações Matemáticas
 
@@ -376,8 +334,8 @@ Durante operações matemáticas, o JavaScript pode tentar converter valores aut
 ```js
 let a = "10";
 let b = 5;
-let resultado = a * b;  // "10" é convertido para número e a operação de multiplicação é realizada
-console.log(resultado);  // 50
+let resultado = a * b; // "10" é convertido para número e a operação de multiplicação é realizada
+console.log(resultado); // 50
 ```
 
 **Exemplo 2: Adição de String e Número**
@@ -387,9 +345,34 @@ Ao tentar somar uma string com um número, o JavaScript irá converter o número
 ```js
 let a = "10";
 let b = 5;
-let resultado = a + b;  // "10" é tratado como uma string e 5 será convertido para string
-console.log(resultado);  // "105" (não é 15 porque o operador + realiza a concatenação de strings)
+let resultado = a + b; // "10" é tratado como uma string e 5 será convertido para string
+console.log(resultado); // "105" (não é 15 porque o operador + realiza a concatenação de strings)
 ```
+
+## Para praticar
+
+Que tal um pequeno desafio para testar seus conhecimentos?
+
+**Cenário:** Crie um pequeno script que calcule a idade de uma pessoa.
+
+**Requisitos:**
+
+1. Crie uma variável para guardar o nome de uma pessoa.
+2. Crie uma variável para guardar o ano de nascimento dela.
+3. Crie uma variável para guardar o ano atual.
+4. Calcule a idade subtraindo o ano de nascimento do ano atual.
+5. Exiba uma mensagem no console no seguinte formato: `"Fulano tem X anos."`
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+  ```js
+  let nome = "Maria";
+  let anoNascimento = 1995;
+  let anoAtual = 2024;
+  let idade = anoAtual - anoNascimento;
+  console.log(`${nome} tem ${idade} anos.`);
+  ```
+</details>
 
 ## Conclusão
 

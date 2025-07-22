@@ -554,6 +554,39 @@ Explicação:
     
 3. **Teste todas as possibilidades:** Ao combinar operadores, certifique-se de que todas as combinações de entradas possíveis foram testadas.
 
+## Para praticar
+
+Vamos testar seus conhecimentos sobre controle de fluxo com um exercício.
+
+**Cenário:** Crie um script que avalie a nota de um aluno.
+
+**Requisitos:**
+
+1. Crie uma variável `nota` e atribua a ela um valor numérico (de 0 a 10).
+2. Use a estrutura `if-else if-else` para verificar a situação do aluno:
+   - Se a nota for maior ou igual a 7, exiba: `"Aprovado"`.
+   - Se a nota for maior ou igual a 5 e menor que 7, exiba: `"Recuperação"`.
+   - Se a nota for menor que 5, exiba: `"Reprovado"`.
+3. Teste com diferentes valores para a variável `nota` e veja se o resultado está correto.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+  ```js
+  let nota = 8.5;
+
+  if (nota >= 7) {
+    console.log("Aprovado");
+  } else if (nota >= 5) {
+    console.log("Recuperação");
+  } else {
+    console.log("Reprovado");
+  }
+  ```
+
+  *Note que no `else if` não precisamos verificar se a nota é `< 7`, pois essa condição só será testada se a primeira (`nota >= 7`) já for falsa.*
+</details>
+
 ## Conclusão
 
 Com o controle de fluxo, seu código passa a **pensar e se adaptar**. Ele pode reagir a diferentes valores, executar blocos diferentes de acordo com regras, e até combinar várias condições em uma lógica sofisticada. Esse é um dos pilares da programação: a capacidade de tomar decisões e conduzir o programa por caminhos diferentes.

@@ -1,5 +1,5 @@
 ---
-title: Estruturas de Repetição (WIP)
+title: Estruturas de Repetição
 description: "-"
 ---
 
@@ -170,6 +170,50 @@ Sempre verifique:
 
 - Sua **condição** de saída
 - Se a variável que controla o loop está sendo **atualizada corretamente**
+
+## Para praticar
+
+Vamos solidificar o conhecimento sobre loops com um exercício clássico.
+
+**Cenário:** Crie um script que exiba a tabuada de um número.
+
+**Requisitos:**
+
+1. Crie uma variável `numero` e atribua a ela um valor inteiro (por exemplo, 7).
+2. Use um loop `for` que vá de 1 a 10.
+3. Dentro do loop, calcule o resultado da multiplicação do `numero` pelo contador do loop (a variável `i`).
+4. Exiba o resultado no formato: `"7 x 1 = 7"`, `"7 x 2 = 14"`, e assim por diante.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+  ```js
+  let numero = 7;
+
+  console.log(`Tabuada do ${numero}:`);
+
+  for (let i = 1; i <= 10; i++) {
+    let resultado = numero * i;
+    console.log(`${numero} x ${i} = ${resultado}`);
+  }
+  ```
+</details>
+
+## Loops e Arrays: uma dupla poderosa
+
+Uma das aplicações mais comuns e poderosas dos loops é para **percorrer e manipular arrays**. Como arrays são listas ordenadas, podemos usar um loop `for` para acessar cada elemento através de seu índice.
+
+Veja um exemplo que conecta o que aprendemos com o que veremos a seguir em Estruturas de Dados:
+
+```js
+let frutas = ["Maçã", "Banana", "Laranja", "Morango"];
+
+for (let i = 0; i < frutas.length; i++) {
+  console.log("Eu gosto de " + frutas[i]);
+}
+```
+
+Neste código, o loop começa no índice `0` e continua enquanto `i` for menor que o tamanho do array (`frutas.length`). A cada iteração, ele exibe o nome da fruta na posição `i`.
 
 ---
 

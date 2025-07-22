@@ -48,6 +48,20 @@ fatorial(4) → 4 * 6 = 24
 fatorial(5) → 5 * 24 = 120
 ```
 
+Ou podemos visualizar assim:
+
+```
+fatorial(5) -> aguardando fatorial(4)
+  fatorial(4) -> aguardando fatorial(3)
+    fatorial(3) -> aguardando fatorial(2)
+      fatorial(2) -> aguardando fatorial(1)
+        fatorial(1) -> retorna 1
+      fatorial(2) -> retorna 2 * 1 = 2
+    fatorial(3) -> retorna 3 * 2 = 6
+  fatorial(4) -> retorna 4 * 6 = 24
+fatorial(5) -> retorna 5 * 24 = 120
+```
+
 Esse tipo de funcionamento é chamado de **pilha de chamadas**. Cada vez que uma função é chamada, o JavaScript **coloca essa chamada em uma pilha (stack)**, e só sai de lá quando o resultado está pronto. É por isso que a **recursão precisa sempre ter um ponto de parada**, ou seja, um **caso base** bem definido — senão, o programa entra em **loop infinito** e trava.
 
 ## Estrutura de uma função recursiva
@@ -168,6 +182,43 @@ Evite recursão quando:
 - A profundidade das chamadas for muito grande (pode estourar a pilha)
 - A lógica puder ser feita de forma simples com um loop
 - O desempenho for crítico e você quiser economizar memória
+
+## Para praticar
+
+Vamos usar a recursão para um problema clássico: a sequência de Fibonacci.
+
+**Cenário:** A sequência de Fibonacci começa com 0 e 1, e cada número subsequente é a soma dos dois anteriores (0, 1, 1, 2, 3, 5, 8...). Crie uma função recursiva que encontre o n-ésimo número da sequência.
+
+**Requisitos:**
+
+1.  Crie uma função `fibonacci(n)`.
+2.  Defina os **casos base**:
+    *   Se `n` for 0, retorne 0.
+    *   Se `n` for 1, retorne 1.
+3.  Para qualquer outro `n`, a função deve retornar a soma de `fibonacci(n - 1)` e `fibonacci(n - 2)`.
+4.  Teste a função com `fibonacci(7)` para ver se o resultado é 13.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+  ```js
+  function fibonacci(n) {
+    // Casos base
+    if (n === 0) {
+      return 0;
+    }
+    if (n === 1) {
+      return 1;
+    }
+
+    // Chamada recursiva
+    return fibonacci(n - 1) + fibonacci(n - 2);
+  }
+
+  console.log(fibonacci(7)); // 13
+  ```
+  *Aviso: Esta implementação é didática, mas ineficiente para números grandes devido às chamadas repetidas. É um ótimo exemplo para entender o conceito de recursão.*
+</details>
 
 ---
 

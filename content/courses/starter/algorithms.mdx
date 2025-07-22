@@ -130,7 +130,9 @@ function calcularTroco(valorCompra, valorPago) {
         // Verifica quantas unidades de cada nota ou moeda cabem no troco restante
         if (troco >= valor) {
             resultado[valor] = Math.floor(troco / valor); // Armazena a quantidade da nota ou moeda
-            troco = (troco % valor).toFixed(2); // Atualiza o valor restante do troco
+            // Atualiza o troco restante. Usamos toFixed(2) para evitar problemas de precisão com ponto flutuante
+            // e parseFloat para garantir que o valor continue sendo um número para a próxima iteração.
+            troco = parseFloat((troco % valor).toFixed(2));
         }
     });
 
@@ -139,6 +141,13 @@ function calcularTroco(valorCompra, valorPago) {
 
 // Exemplo de uso:
 console.log(calcularTroco(82.75, 100));
+// Saída esperada:
+// {
+//   '2': 1,
+//   '5': 1,
+//   '10': 1,
+//   '0.25': 1
+// }
 ```
 
 ### Explicação do Código
@@ -149,9 +158,9 @@ console.log(calcularTroco(82.75, 100));
 4. **Distribuição do troco:** Usamos o método `forEach` para percorrer cada valor em `notasMoedas`. Para cada valor, verificamos quantas unidades dessa nota ou moeda cabem no valor de `troco` atual. Armazenamos o número de unidades no objeto `resultado`, que ao final da execução conterá a quantidade de cada nota e moeda necessária.
 5. **Atualização do Troco Restante:** Após calcular a quantidade de cada nota ou moeda, o valor de `troco` é atualizado usando o operador `%` para obter o valor que ainda falta distribuir. Esse processo é repetido até que o troco restante seja zero.
 
-### Resultado
+### Resultado e Teste
 
-Se chamarmos a função com `calcularTroco(82.75, 100)`, o algoritmo retornará algo como:
+Se chamarmos a função com `calcularTroco(82.75, 100)`, o algoritmo retornará um objeto que representa o troco de R$ 17,25 da forma mais otimizada:
 
 ```js
 {
@@ -161,14 +170,20 @@ Se chamarmos a função com `calcularTroco(82.75, 100)`, o algoritmo retornará 
   0.25: 1 // uma moeda de 0.25
 }
 ```
+*(A ordem das chaves no objeto pode variar, mas os valores estarão corretos)*
 
 Esse resultado indica que o troco total de 17.25 será devolvido com 1 nota de 10, 1 nota de 5, 1 nota de 2 e 1 moeda de 0.25.
 
-Esse exemplo mostra como a criação de um algoritmo eficiente segue uma estrutura organizada e lógica, aproveitando bem os conceitos de divisão de problema e otimização de recursos. Ao seguir esses passos, conseguimos garantir que o algoritmo resolva o problema de maneira precisa, clara e, ao mesmo tempo, eficiente.
+Esse exemplo mostra como a criação de um algoritmo eficiente segue uma estrutura organizada e lógica. Ao seguir esses passos, garantimos que o algoritmo resolva o problema de maneira precisa e clara.
+
+<Callout type="info" title="Um detalhe importante sobre números decimais">
+A computação com números decimais (ponto flutuante) pode gerar pequenas imprecisões. Por exemplo, `0.1 + 0.2` em JavaScript não é exatamente `0.3`. É por isso que usamos `toFixed(2)` para arredondar o troco para duas casas decimais. No entanto, `toFixed` retorna uma string! Para que nosso loop continue funcionando corretamente, convertemos o resultado de volta para um número com `parseFloat()`. Essa é uma ótima lição sobre os cuidados necessários ao trabalhar com dinheiro ou outros valores que exigem precisão. Uma abordagem alternativa e mais robusta seria trabalhar com centavos (números inteiros) para evitar completamente os problemas de ponto flutuante.
+</Callout>
+
+Ao seguir esses passos, conseguimos garantir que o algoritmo resolva o problema de maneira precisa, clara e, ao mesmo tempo, eficiente.
 
 ## A Importância dos Algoritmos para o Desenvolvimento
 
 Dominar a criação de algoritmos é uma das habilidades mais importantes para qualquer programador. Com o tempo, aprender a desenvolver e otimizar algoritmos permite que você aborde problemas complexos com confiança e busque soluções que sejam tanto eficazes quanto eficientes. À medida que avançamos no estudo da programação, aprenderemos a estruturar algoritmos cada vez mais sofisticados, aprimorando nossa capacidade de resolver problemas e transformando ideias em código funcional.
 
 Nos próximos tópicos, vamos explorar elementos essenciais para criar nossos próprios programas, começando com a introdução às variáveis e tipos de dados em JavaScript. Estes são componentes fundamentais que nos ajudarão a desenvolver algoritmos dinâmicos e adaptáveis, possibilitando um progresso contínuo na construção do conhecimento em programação.
-
