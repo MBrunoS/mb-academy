@@ -1,0 +1,71 @@
+---
+title: Entendendo o tsconfig.json
+description: "Aprenda a configurar o compilador TypeScript com o arquivo tsconfig.json e entenda suas principais opções."
+---
+
+Ao adotar o TypeScript, um arquivo se torna o maestro do seu projeto: o `tsconfig.json`. Este arquivo de configuração informa ao compilador TypeScript (`tsc`) como ele deve tratar seus arquivos, quais recursos da linguagem usar e onde colocar os arquivos JavaScript compilados.
+
+## O que é o `tsconfig.json`?
+
+O `tsconfig.json` é um arquivo que fica na raiz do seu projeto e contém uma série de opções de configuração para o compilador TypeScript. Quando você roda o comando `tsc` (ou `npm run build`, se configurado nos scripts), o compilador procura por este arquivo para saber exatamente o que fazer.
+
+## Como Gerar o Arquivo
+
+Você pode criar o arquivo manualmente, mas a forma recomendada de começar é deixar que o próprio TypeScript gere um arquivo de modelo para você. No terminal, na raiz do seu projeto, execute:
+
+```bash
+npx tsc --init
+```
+
+Este comando cria um `tsconfig.json` com dezenas de opções, a maioria comentada. Não se assuste! Para começar, você só precisa se preocupar com algumas delas.
+
+## Opções Essenciais para Iniciantes
+
+Abaixo estão as opções mais importantes que você deve conhecer ao iniciar um projeto.
+
+```json
+{
+  "compilerOptions": {
+    /* Basic Options */
+    "target": "ES2016",            // Versão do JavaScript para a qual o código será compilado.
+    "module": "commonjs",           // Sistema de módulos a ser usado no código compilado.
+    "strict": true,                 // Habilita um conjunto de regras estritas de verificação de tipo.
+
+    /* Module Resolution Options */
+    "esModuleInterop": true,      // Permite compatibilidade entre diferentes sistemas de módulos.
+
+    /* Output Directory */
+    "outDir": "./dist",               // Pasta onde os arquivos .js compilados serão salvos.
+    "rootDir": "./src"              // Pasta onde estão seus arquivos .ts de origem.
+  },
+  "include": ["src/**/*"],        // Diz ao compilador para incluir todos os arquivos dentro da pasta 'src'.
+  "exclude": ["node_modules"]     // Ignora a pasta node_modules.
+}
+```
+
+### Explicação das Opções Chave
+
+-   **`"target"`**: Define para qual versão do JavaScript seu código TypeScript será "traduzido". `"ES2016"` é um bom padrão, pois é compatível com a maioria dos ambientes Node.js e navegadores modernos.
+
+-   **`"module"`**: Especifica o sistema de módulos que o JavaScript gerado usará. `"commonjs"` é o padrão para projetos Node.js. Para projetos front-end que usam navegadores modernos, `"ESNext"` é uma escolha comum.
+
+-   **`"strict"`**: Esta é uma das opções mais importantes. Quando `true`, ela ativa um conjunto de verificações rigorosas (como não permitir `null` ou `undefined` onde não deveriam) que ajudam a pegar erros mais cedo. **É altamente recomendado mantê-la como `true`**.
+
+-   **`"esModuleInterop"`**: Resolve algumas inconsistências entre os sistemas de módulos CommonJS (usado pelo Node.js) e os Módulos ES (o padrão do JavaScript moderno). Mantê-la como `true` evita dores de cabeça ao importar pacotes.
+
+-   **`"outDir"`**: O diretório de saída. É aqui que o `tsc` colocará os arquivos `.js` resultantes da compilação. É uma boa prática separar o código-fonte (`src`) do código compilado (`dist`).
+
+-   **`"rootDir"`**: O diretório raiz do seu código-fonte. O `tsc` usará esta pasta como ponto de partida para compilar os arquivos.
+
+-   **`"include"` e `"exclude"`**: Essas opções no nível raiz (fora de `compilerOptions`) dizem ao compilador quais arquivos e pastas ele deve processar e quais deve ignorar.
+
+## Fluxo de Trabalho Típico
+
+Com o `tsconfig.json` configurado, seu fluxo de trabalho será:
+
+1.  Escrever seu código na pasta `src/` usando arquivos `.ts`.
+2.  Rodar `npm run build` (que executa `tsc`).
+3.  O TypeScript compilará os arquivos de `src/` para JavaScript e os salvará em `dist/`.
+4.  Você executará o código da pasta `dist/` em produção.
+
+Entender o `tsconfig.json` é um passo fundamental para se tornar proficiente em TypeScript e ter controle total sobre seus projetos.

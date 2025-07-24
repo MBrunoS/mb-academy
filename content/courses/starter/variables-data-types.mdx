@@ -1,387 +1,226 @@
 ---
-title: Variáveis e Tipos de Dados
-description: "Aprenda a usar variáveis para armazenar dados e conheça os principais tipos de dados em JavaScript."
+title: Variáveis e Tipos de Dados em TypeScript
+description: "Aprenda a usar variáveis para armazenar dados e conheça os principais tipos de dados com a segurança do TypeScript."
 ---
 
-Quando começamos a programar, é fundamental entender como armazenar e manipular informações, pois elas são o núcleo de qualquer aplicação. É aqui que entram as variáveis e os tipos de dados. Nesta seção, vamos conhecer o que são variáveis, como elas funcionam no JavaScript, e os diferentes tipos de dados que podemos usar.
+Para construir qualquer programa, primeiro precisamos aprender a armazenar e manipular informações. É aqui que entram as **variáveis** e os **tipos de dados**. Eles são os blocos de construção fundamentais de qualquer lógica de programação.
+
+Neste curso, usaremos o **TypeScript**, uma linguagem que nos ajuda a escrever um código mais seguro e claro desde o início.
 
 ## O que são Variáveis?
 
-Uma variável é um espaço de memória onde armazenamos dados temporários para usarmos ao longo de um programa. Podemos pensar em uma variável como uma "caixa" que guarda uma informação, como um número, uma palavra, ou mesmo uma estrutura mais complexa. Variáveis nos permitem reutilizar dados e usá-los em diferentes partes do código.
+Pense em uma variável como uma **caixa com uma etiqueta**. A caixa guarda uma informação (um dado), e a etiqueta é o nome que damos a ela para que possamos encontrá-la e usá-la mais tarde no programa.
 
-Por exemplo, imagine que você quer calcular o preço total de um produto em um site. Você pode armazenar o preço de cada item em uma variável, realizar os cálculos e exibir o resultado. Em JavaScript, as variáveis são definidas por palavras-chave que indicam a maneira como o valor será manipulado e mantido na memória.
+Em TypeScript, podemos ser muito específicos sobre o que cada caixa pode guardar, definindo seu **tipo**.
 
-## Declaração de Variáveis
+## Declarando Variáveis
 
-Para declarar uma variável em JavaScript, usamos as palavras-chave `var`, `let`, ou `const`:
+**Para** criar uma variável, usamos as palavras-chave `let` (para valores que podem mudar) ou `const` (para valores constantes, que não mudam após serem definidos). A sintaxe explícita é:
 
-- **`let`**: permite criar uma variável cujo valor pode ser alterado ao longo do programa. Esta é uma escolha segura e flexível para a maioria das variáveis.
-- **`const`**: define uma variável cujo valor não pode ser alterado após sua atribuição inicial, ideal para dados constantes.
-- **`var`**: uma forma mais antiga e menos recomendada de declarar variáveis. Devido a algumas particularidades de escopo, `var` pode ser menos previsível e, por isso, `let` e `const` são preferidos em códigos modernos.
+`let nomeDaVariavel: tipo = valor;`
 
-Exemplo de declaração:
+```ts
+// Uma variável para guardar um nome, que é um texto (string)
+let nome: string = "Ana";
 
-```js
-let nome = "Ana"; // usando let
-const idade = 30; // usando const
-var cidade = "Lisboa"; // usando var
+// Uma constante para guardar a idade, que é um número (number)
+const idade: number = 30;
+
+// Uma variável para indicar se o usuário está ativo, um valor verdadeiro/falso (boolean)
+let estaAtivo: boolean = true;
 ```
+
+Definir o tipo (`: string`, `: number`) ajuda a evitar erros. Se você tentar colocar um dado do tipo errado na "caixa", o TypeScript irá te avisar.
+
+```ts
+let preco: number = 19.99;
+// preco = "vinte"; // Erro! A variável 'preco' foi definida para aceitar apenas números.
+```
+
+## Inferência de Tipos: Deixando o TypeScript Trabalhar por Você
+
+Embora seja uma boa prática ser explícito, o TypeScript é inteligente. Na maioria das vezes, quando você declara e inicializa uma variável ao mesmo tempo, **ele consegue adivinhar (inferir) o tipo sozinho**.
+
+```ts
+let nomeCompleto = "Carlos Silva"; // TypeScript infere que é do tipo string
+const anoNascimento = 1990;      // TypeScript infere que é do tipo number
+```
+
+Nesses casos, o código funciona exatamente como se você tivesse anotado o tipo, mas fica mais limpo e conciso. O TypeScript ainda garantirá que você não atribua um tipo diferente a essas variáveis mais tarde.
+
+<Callout>
+**Quando ser explícito?** É uma boa ideia adicionar o tipo explicitamente quando você cria uma variável sem inicializá-la, ou quando a função de um código não é imediatamente óbvia. Para iniciantes, ser explícito pode ajudar a reforçar o aprendizado.
+</Callout>
 
 ## Regras de Nomeação de Variáveis
 
-JavaScript tem algumas regras e boas práticas para definir nomes de variáveis:
+Ao criar variáveis, é importante seguir algumas regras e convenções para que seu código seja válido e legível:
 
-1. **Deve começar com uma letra, underscore (\_), ou cifrão ($)**. Não pode começar com números.
-2. **Não pode conter espaços ou caracteres especiais (exceto \_ e $)**.
-3. **Evite palavras reservadas**, como `function`, `return`, ou `if`.
-4. **Use nomes descritivos** para facilitar a leitura do código. É recomendável usar o estilo camelCase, como `precoProduto`.
+1.  **Comece com uma letra, `_` ou `$`**: Nomes de variáveis não podem começar com números.
+2.  **Sem espaços ou caracteres especiais**: Use apenas letras, números, `_` ou `$` no restante do nome.
+3.  **Nomes descritivos**: Use nomes que descrevam o dado que a variável guarda (ex: `precoProduto` em vez de `p`).
+4.  **Use camelCase**: A convenção em TypeScript é começar com letra minúscula e capitalizar a primeira letra de cada palavra subsequente (ex: `nomeCompletoDoUsuario`).
+5.  **Evite palavras reservadas**: Não use nomes que já têm um significado na linguagem, como `let`, `const`, `class`, `function`, etc.
 
-Por exemplo:
+## Tipos de Dados Essenciais
 
-```js
-let precoProduto = 59.99;
-let _nomeUsuario = "João";
-let $valorTotal = 150.5;
-```
+Todo dado em programação tem um tipo. Vamos conhecer os mais básicos:
 
-## Tipos de Dados em JavaScript
+-   **`string`**: Para representar texto. Deve estar entre aspas (`""` ou `''`) ou crases (`` ` ``).
+    ```ts
+    let cidade: string = "Recife";
+    ```
+-   **`number`**: Para representar números, sejam eles inteiros ou decimais.
+    ```ts
+    let quantidade: number = 10;
+    let altura: number = 1.75;
+    ```
+-   **`boolean`**: Para representar valores lógicos de `true` (verdadeiro) ou `false` (falso).
+    ```ts
+    let cadastroCompleto: boolean = false;
+    ```
+-   **`null` e `undefined`**: Tipos especiais que representam a ausência de valor. `null` é uma ausência intencional, enquanto `undefined` significa que uma variável foi criada, mas ainda não tem valor.
 
-Em JavaScript, uma variável pode armazenar diferentes tipos de dados. Isso é importante porque cada tipo de dado ocupa uma parte da memória e possui comportamentos específicos. Vamos ver os principais tipos de dados em JavaScript.
+-   **`any` e `unknown`**: Quando não sabemos o tipo de um dado, podemos usar `any` (que desliga a verificação de tipos, use com cuidado!) ou `unknown` (uma alternativa mais segura que exige verificação antes do uso).
 
-### 1. Number
+## Operações com Variáveis
 
-O tipo `number` representa tanto números inteiros como decimais. Por exemplo:
-
-```js
-let idade = 25; // número inteiro
-let altura = 1.75; // número decimal
-```
-
-### 2. String
-
-Strings são sequências de caracteres usadas para representar texto. Elas são definidas entre aspas simples `'...'`, aspas duplas `"..."`, ou crases `...` (template strings). Strings podem conter letras, números, e caracteres especiais:
-
-```js
-let nome = "Alice";
-let saudacao = `Olá, ${nome}!`; // usando template string para interpolação
-```
-
-### 3. Boolean
-
-O tipo `boolean` representa valores de verdadeiro (`true`) ou falso (`false`). É utilizado para expressar condições, como a validação de um login ou a verificação de uma idade mínima.
-
-```js
-let maiorDeIdade = true;
-let cadastroCompleto = false;
-```
-
-### 4. Null e Undefined
-
-- **`null`**: representa uma ausência intencional de valor. É usado quando queremos indicar que uma variável não tem valor.
-- **`undefined`**: indica que uma variável foi declarada, mas ainda não possui um valor atribuído.
-
-```js
-let valorNulo = null;
-let valorNaoDefinido; // automaticamente definido como undefined
-```
-
-<Callout>
-  Existem outros tipos em Javascript, mas por enquanto focaremos nesses tipos
-  básicos. Eles são suficientes para entender os conceitos fundamentais de
-  programação e começar a criar aplicações simples.
-</Callout>
-
-Além disso, é importante notar que JavaScript é uma linguagem de tipagem dinâmica, o que significa que uma variável pode mudar de tipo durante a execução do programa. Por exemplo:
-
-```js
-let valor = 42; // number
-valor = "quarenta e dois"; // agora é uma string
-valor = true; // agora é um boolean
-```
-
-Essa flexibilidade pode ser útil, mas também requer cuidado para evitar erros inesperados no código.
-
-## Operações com Variáveis e Tipos de Dados
-
-No JavaScript, as variáveis não apenas armazenam dados, mas também podem ser usadas para realizar várias operações. A forma como essas operações funcionam depende do tipo de dado que a variável contém. Nesta seção, vamos explorar as operações mais comuns que você pode realizar com variáveis e como elas se comportam com diferentes tipos de dados.
+Podemos realizar diferentes operações dependendo do tipo de dado.
 
 ### 1. Operações Aritméticas
 
-Operações aritméticas são usadas para fazer cálculos com números. No JavaScript, você pode realizar operações como soma, subtração, multiplicação, divisão, entre outras.
+Usadas com o tipo `number` para fazer cálculos.
 
-**Operadores Aritméticos Comuns**:
-
-- **Soma (`+`)**: adiciona dois valores numéricos. Se pelo menos um dos valores for uma string, a operação de soma se torna uma **concatenação de strings**.
-  ```js
-  let a = 10;
-  let b = 5;
-  let soma = a + b; // soma é 15
-
-  let texto = "A soma é: ";
-  let resultadoSoma = texto + (a + b); // concatena a string com o resultado da soma, gerando "A soma é: 15"
-  ```
-- **Subtração (\*\***)\*\*: subtrai um número do outro. Esse operador só faz sentido quando os valores envolvidos são numéricos.
-  ```js
-  let subtracao = a - b; // subtrai 5 de 10, resultando em 5
-  ```
-- **Multiplicação (\*\***)\*\*: multiplica dois números.
-  ```js
-  let multiplicacao = a * b; // multiplica 10 por 5, resultando em 50
-  ```
-- **Divisão (`/`)**: divide um número por outro. Caso a divisão resulte em um número decimal, o JavaScript o exibirá como tal.
-  ```js
-  let divisao = a / b; // divide 10 por 5, resultando em 2
-  let resultadoDecimal = 7 / 3; // resultado será 2.3333...
-  ```
-- **Módulo (`%`)**: retorna o **resto da divisão** entre dois números.
-  ```js
-  let modulo = a % b; // 10 dividido por 5 dá resto 0
-  let outroModulo = 7 % 3; // 7 dividido por 3 dá resto 1
-  ```
-- **Exponenciação (`*`)**: eleva um número à potência de outro.
-  ```js
-  let potencia = 2 ** 3; // 2 elevado à potência de 3 resulta em 8
-  ```
+-   **Soma (`+`)**: `let soma = 10 + 5; // 15`
+-   **Subtração (`-`)**: `let subtracao = 10 - 5; // 5`
+-   **Multiplicação (`*`)**: `let multiplicacao = 10 * 5; // 50`
+-   **Divisão (`/`)**: `let divisao = 10 / 5; // 2`
+-   **Módulo (`%`)**: Retorna o resto de uma divisão. `let resto = 10 % 3; // 1`
 
 ### 2. Concatenação de Strings
 
-Em JavaScript, a operação de soma (`+`) tem um comportamento especial quando usada com strings. Se um dos operandos for uma string, o JavaScript não fará uma operação aritmética, mas sim uma **concatenação de strings**.
+O operador `+`, quando usado com strings, junta (concatena) os textos.
 
-**Exemplo**:
-
-```js
-let nome = "Maria";
-let saudacao = "Olá, " + nome + "!"; // concatena a string "Olá, " com o valor de nome e "!" no final
-console.log(saudacao); // "Olá, Maria!"
+```ts
+let saudacao: string = "Olá";
+let nome: string = "Maria";
+let mensagem: string = saudacao + ", " + nome + "!"; // "Olá, Maria!"
 ```
 
-Além disso, você pode usar **template literals** (template strings) para realizar uma concatenação de forma mais legível. Com os templates, você pode embutir variáveis dentro de strings usando `${}`.
+Uma forma mais moderna e legível de fazer isso é com **template strings** (usando crases):
 
-**Exemplo com template literals**:
-
-```js
-let nome = "Maria";
-let saudacao = `Olá, ${nome}!`; // mais fácil de ler e manter
-console.log(saudacao); // "Olá, Maria!"
+```ts
+let mensagemModerna: string = `${saudacao}, ${nome}!`; // "Olá, Maria!"
 ```
 
 ### 3. Operadores de Comparação
 
-Operadores de comparação são usados para comparar valores. Eles retornam um valor booleano (`true` ou `false`), que indica se a comparação é verdadeira ou falsa.
+Usados para comparar valores. O resultado é sempre um `boolean` (`true` ou `false`).
 
-**Operadores de comparação mais comuns**:
+-   **`===` (Igualdade Estrita)**: Verifica se dois valores são iguais **e** do mesmo tipo. É o mais recomendado.
+    ```ts
+    console.log(5 === 5);     // true
+    console.log(5 === "5");   // false (tipos diferentes)
+    ```
+-   **`!==` (Desigualdade Estrita)**: Verifica se dois valores são diferentes ou de tipos diferentes.
+    ```ts
+    console.log(5 !== 10);    // true
+    console.log(5 !== "5");   // true
+    ```
+-   **Outros operadores**: `>` (maior que), `<` (menor que), `>=` (maior ou igual), `<=` (menor ou igual).
 
-- **Igualdade (==)**: verifica se dois valores são iguais, mas **não considera o tipo**.
-  ```js
-  console.log(5 == "5"); // true, porque o valor é o mesmo, mas os tipos podem ser diferentes
-  ```
-- **Igualdade estrita (===)**: verifica se dois valores são **iguais e do mesmo tipo**.
-  ```js
-  console.log(5 === "5"); // false, porque o tipo é diferente (número vs string)
-  ```
-- **Desigualdade (!=)**: verifica se dois valores **não são iguais**, ignorando o tipo.
-  ```js
-  console.log(5 != "5"); // false, porque o valor é o mesmo, apesar dos tipos diferentes
-  ```
-- **Desigualdade estrita (!==)**: verifica se dois valores são **diferentes ou de tipos diferentes**.
-  ```js
-  console.log(5 !== "5"); // true, porque um é número e o outro é string
-  ```
-- **Maior que (>)** e **Menor que (&lt;)**: compara valores numéricos e retorna verdadeiro ou falso.
-  ```js
-  console.log(10 > 5); // true
-  console.log(5 < 3); // false
-  ```
-- **Maior ou igual (&gt;=)** e **Menor ou igual (&lt;=)**: verifica se o valor é maior ou igual, ou menor ou igual.
-  ```js
-  console.log(10 >= 10); // true
-  console.log(3 <= 2); // false
-  ```
+## Conversão de Tipos (Type Casting)
 
-### 4. Operadores Unários
+Às vezes, recebemos um dado em um formato, mas precisamos usá-lo em outro. Por exemplo, um número que foi digitado em um campo de texto chega para nós como uma `string`. O processo de transformar um tipo de dado em outro é chamado de **conversão de tipos**.
 
-Os operadores unários operam em apenas um operando. O exemplo mais comum é o operador de incremento (`++`) e o operador de decremento (`--`), que aumentam ou diminuem o valor de uma variável em 1, respectivamente.
+Em TypeScript, preferimos fazer isso de forma **explícita**, para que nosso código seja claro sobre o que está acontecendo.
 
-- **Incremento (`++`)**: adiciona 1 ao valor de uma variável.
-  ```js
-  let contador = 10;
-  contador++; // agora contador é 11
-  ```
-- **Decremento (`-`)**: subtrai 1 do valor de uma variável.
-  ```js
-  let contador = 10;
-  contador--; // agora contador é 9
-  ```
+### Convertendo para `number`
 
-Esses operadores podem ser usados tanto antes (prefixo) quanto depois (posfixo) da variável, o que altera ligeiramente o comportamento:
+Para converter uma `string` (ou outro tipo) em um `number`, usamos a função `Number()`.
 
-```js
-let x = 5;
-console.log(++x); // 6, o incremento é feito antes da impressão
-console.log(x++); // 6, o valor é impresso antes de ser incrementado, então x se torna 7 depois
+```ts
+let idadeTexto: string = "30";
+let idadeNumero: number = Number(idadeTexto);
+console.log(idadeNumero); // 30 (agora é um número)
+
+let precoTexto: string = "49.99";
+let precoNumero: number = Number(precoTexto);
+console.log(precoNumero); // 49.99 (agora é um número)
+```
+Se a conversão não for possível, o resultado será `NaN` (Not a Number).
+
+### Convertendo para `string`
+
+Para converter um `number` ou `boolean` para uma `string`, usamos a função `String()`.
+
+```ts
+let quantidade: number = 5;
+let quantidadeTexto: string = String(quantidade); // "5"
+
+let ativo: boolean = true;
+let ativoTexto: string = String(ativo); // "true"
 ```
 
-## Conversão de Tipos
+### Convertendo para `boolean`
 
-No JavaScript, os tipos de dados podem ser convertidos automaticamente ou explicitamente, dependendo do contexto em que os valores são usados. As conversões de tipos são um conceito fundamental, pois o JavaScript é uma linguagem de tipagem fraca, o que significa que ele tenta fazer essas conversões de forma automática sempre que possível, o que pode levar a comportamentos inesperados, mas também facilita a escrita de código em muitos casos.
+Podemos usar a função `Boolean()` para converter qualquer valor em `true` ou `false`. Isso é útil para verificar se uma variável tem um valor "real".
 
-### 1. Conversões Implícitas (ou Automáticas)
+Em TypeScript, alguns valores são considerados "falsy" (falsos):
+- `0`
+- `""` (uma string vazia)
+- `null`
+- `undefined`
+- `NaN`
 
-As conversões implícitas acontecem automaticamente quando o JavaScript tenta "ajustar" os tipos de dados para realizar operações. Isso ocorre em várias situações, como quando você tenta fazer uma operação entre valores de tipos diferentes, e o JavaScript os converte para um tipo compatível.
+Qualquer outro valor é considerado "truthy" (verdadeiro).
 
-**Exemplo 1: Soma de String e Número**
+```ts
+console.log(Boolean(10));        // true
+console.log(Boolean("Olá"));     // true
 
-O operador de soma (`+`) é um dos exemplos mais comuns de conversão implícita. Quando um número é somado a uma string, o JavaScript converte o número para uma string, pois o operador de soma pode ter o objetivo de concatenar textos.
-
-```js
-let numero = 10;
-let texto = "O valor é: ";
-let resultado = texto + numero; // A variável 'numero' será convertida para string
-console.log(resultado); // "O valor é: 10"
-```
-
-**Exemplo 2: Concatenação de Booleano com String**
-
-Quando um valor booleano é concatenado com uma string, o JavaScript converte automaticamente o valor booleano em uma string correspondente ("true" ou "false").
-
-```js
-let status = true;
-let mensagem = "O status é: " + status; // 'true' será convertido para string
-console.log(mensagem); // "O status é: true"
-```
-
-**Exemplo 3: Conversão de Tipos em Comparações**
-
-Em comparações, o JavaScript também pode fazer conversões implícitas de tipos, especialmente com o operador `==` (igualdade). Se os tipos forem diferentes, o JavaScript tenta converter os valores para que ambos os lados da comparação sejam do mesmo tipo.
-
-```js
-console.log(5 == "5"); // true, porque o JavaScript converte a string '5' para o número 5
-```
-
-No exemplo acima, mesmo que um dos valores seja uma string e o outro seja um número, o operador `==` faz a conversão implícita e compara os valores depois da conversão.
-
-### 2. Conversões Explícitas (ou Manuais)
-
-Embora o JavaScript faça muitas conversões de tipo automaticamente, em algumas situações é necessário que o programador faça a conversão de tipos de forma explícita. Para isso, existem várias funções que permitem transformar valores de um tipo para outro de maneira controlada.
-
-**Funções de Conversão Explícita:**
-
-- **`Number()`**: converte um valor para número. Se o valor não puder ser convertido para um número válido, o resultado será `NaN` (Not a Number).
-  ```js
-  let valor = "123";
-  let numero = Number(valor); // converte a string "123" para o número 123
-  console.log(numero); // 123
-  ```
-  Caso o valor não seja uma string numérica válida, o resultado será `NaN`.
-  ```js
-  let invalido = "abc";
-  let numeroInvalido = Number(invalido); // tentativa de converter algo que não é um número
-  console.log(numeroInvalido); // NaN
-  ```
-- **`String()`**: converte qualquer tipo de valor para uma string. Isso pode ser útil quando você deseja garantir que o valor seja tratado como texto.
-  ```js
-  let numero = 100;
-  let texto = String(numero); // converte o número 100 para a string "100"
-  console.log(texto); // "100"
-  ```
-- **`Boolean()`**: converte um valor para booleano (`true` ou `false`). No JavaScript, qualquer valor que não seja `undefined`, `null`, `0`, `NaN`, uma string vazia `""` ou `false` será convertido para `true`. Esses valores são chamados de "valores truthy". Os outros valores são chamados de "valores falsy", e eles se tornam `false` quando convertidos.
-  ```js
-  let numero1 = 5;
-  let booleano1 = Boolean(numero1); // qualquer número diferente de 0 se torna true
-  console.log(booleano1); // true
-
-  let numero2 = 0;
-  let booleano2 = Boolean(numero2); // 0 se torna false
-  console.log(booleano2); // false
-  ```
-- **`parseInt()`**: converte uma string em um número inteiro. Ele tenta converter a parte da string que representa um número até encontrar um caractere que não faz parte do número.
-  ```js
-  let textoNumerico = "123abc";
-  let numeroInteiro = parseInt(textoNumerico); // converte a parte numérica da string
-  console.log(numeroInteiro); // 123
-  ```
-  Se a string não começar com um número, o `parseInt()` retorna `NaN`.
-  ```js
-  let textoNaoNumerico = "abc123";
-  let numeroInvalido = parseInt(textoNaoNumerico); // não consegue encontrar um número no início
-  consol.log(numeroInvalido); // NaN
-  ```
-- **`parseFloat()`**: converte uma string em um número de ponto flutuante (decimal). Ele funciona de forma similar ao `parseInt()`, mas com maior precisão para números decimais.
-  ```js
-  let numeroDecimal = parseFloat("10.5");
-  console.log(numeroDecimal); // 10.5
-  ```
-
-### 3. Conversões Implicitas e Comparação com `==` e `===`
-
-Em JavaScript, é importante lembrar que a comparação de valores pode ser feita de duas formas principais:
-
-- **`==` (igualdade não estrita)**: compara os valores, mas faz a conversão de tipo implícita se necessário.
-  ```js
-  console.log(5 == "5"); // true, porque o JavaScript converte a string '5' para o número 5 antes de comparar
-  ```
-- **`===` (igualdade estrita)**: compara tanto os valores quanto os tipos, sem realizar conversões implícitas. Ou seja, os dois valores precisam ser do mesmo tipo e ter o mesmo valor para serem considerados iguais.
-  ```js
-  console.log(5 === "5"); // false, porque um é um número e o outro é uma string
-  ```
-
-### 4. Conversões em Operações Matemáticas
-
-Durante operações matemáticas, o JavaScript pode tentar converter valores automaticamente para garantir que a operação tenha sentido. Se um valor não for numérico, o JavaScript pode tentar convertê-lo para um número para poder realizar a operação.
-
-**Exemplo 1: Operação com Strings e Números**
-
-```js
-let a = "10";
-let b = 5;
-let resultado = a * b; // "10" é convertido para número e a operação de multiplicação é realizada
-console.log(resultado); // 50
-```
-
-**Exemplo 2: Adição de String e Número**
-
-Ao tentar somar uma string com um número, o JavaScript irá converter o número para uma string para realizar a concatenação:
-
-```js
-let a = "10";
-let b = 5;
-let resultado = a + b; // "10" é tratado como uma string e 5 será convertido para string
-console.log(resultado); // "105" (não é 15 porque o operador + realiza a concatenação de strings)
+console.log(Boolean(0));         // false
+console.log(Boolean(""));        // false
+console.log(Boolean(null));      // false
 ```
 
 ## Para praticar
 
-Que tal um pequeno desafio para testar seus conhecimentos?
+Vamos testar seus conhecimentos com um desafio usando TypeScript.
 
-**Cenário:** Crie um pequeno script que calcule a idade de uma pessoa.
+**Cenário:** Crie um pequeno script que calcule o preço total de um produto com desconto.
 
 **Requisitos:**
 
-1. Crie uma variável para guardar o nome de uma pessoa.
-2. Crie uma variável para guardar o ano de nascimento dela.
-3. Crie uma variável para guardar o ano atual.
-4. Calcule a idade subtraindo o ano de nascimento do ano atual.
-5. Exiba uma mensagem no console no seguinte formato: `"Fulano tem X anos."`
+1.  Crie uma variável `nomeProduto` do tipo `string`.
+2.  Crie uma variável `preco` do tipo `number`.
+3.  Crie uma constante `percentualDesconto` do tipo `number` com o valor `0.1` (10%).
+4.  Calcule o valor do desconto (`preco * percentualDesconto`).
+5.  Calcule o preço final (`preco - valorDoDesconto`).
+6.  Exiba uma mensagem no console: `"O produto [nomeProduto] custa R$[precoFinal] com desconto."`
+
+<Callout type="info" title="Onde praticar?">
+Como ainda não configuramos nosso ambiente de desenvolvimento local, você pode testar este e outros códigos facilmente no **[TypeScript Playground](https://www.typescriptlang.org/play)**, um editor online oficial.
+</Callout>
 
 <details>
   <summary>Clique para ver uma possível solução</summary>
-  ```js
-  let nome = "Maria";
-  let anoNascimento = 1995;
-  let anoAtual = 2024;
-  let idade = anoAtual - anoNascimento;
-  console.log(`${nome} tem ${idade} anos.`);
+  
+  ```ts
+  let nomeProduto = "Fone de Ouvido Bluetooth"; // Inferência de tipo: string
+  let preco = 150.00;                       // Inferência de tipo: number
+  const percentualDesconto = 0.1;           // Inferência de tipo: number
+
+  let valorDoDesconto = preco * percentualDesconto;
+  let precoFinal = preco - valorDoDesconto;
+
+  console.log(`O produto ${nomeProduto} custa R$${precoFinal.toFixed(2)} com desconto.`);
+  // Usamos toFixed(2) para formatar o número com duas casas decimais.
   ```
 </details>
 
 ## Conclusão
 
-Agora que exploramos as variáveis, os principais tipos de dados e as conversões possíveis entre eles, temos uma base sólida para escrever programas mais úteis e inteligentes. Entendemos que as variáveis são elementos essenciais para armazenar e manipular informações, e que os diferentes tipos de dados (como números, textos, booleanos, nulos e indefinidos) permitem ao programa representar o mundo real de diferentes maneiras.
+Entender variáveis e tipos é o primeiro passo para construir qualquer programa. Com o TypeScript, você ganha uma camada extra de segurança que te ajuda a escrever um código mais robusto e com menos erros.
 
-Além disso, vimos como é possível realizar operações com esses dados — desde cálculos simples até comparações lógicas e concatenações de texto. Também conhecemos os cuidados que devemos tomar com a **tipagem dinâmica** do JavaScript e como as **conversões implícitas e explícitas** afetam o comportamento do código.
-
-A partir daqui, começaremos a escrever programas mais dinâmicos, capazes de **tomar decisões** com base nas informações disponíveis. Isso será possível com o uso das **estruturas de controle de fluxo**, como `if`, `else` e `switch`, que nos permitem criar caminhos diferentes para diferentes situações.
-
-Se até agora trabalhamos com dados estáticos e operações diretas, na próxima seção começaremos a lidar com lógica condicional: **"se tal coisa acontecer, faça isso; caso contrário, faça aquilo"**. Essa habilidade será fundamental para construir programas interativos e responsivos, como validações de formulários, filtros de conteúdo ou lógicas de navegação.
-
-Então, respire fundo, revise esse conteúdo se necessário, e vamos avançar juntos para o próximo passo: **controle de fluxo em JavaScript**.
+Agora que sabemos como armazenar, tipar e operar com dados, o próximo passo é aprender a usar esses dados para **tomar decisões**. Vamos explorar como criar lógica condicional com as **estruturas de controle de fluxo**.

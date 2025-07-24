@@ -1,0 +1,83 @@
+---
+title: "Executando e Refinando o Projeto"
+description: "Vamos executar nossa aplicação de lista de tarefas e ver como podemos melhorá-la com novas funcionalidades."
+---
+
+Com nosso código TypeScript pronto, é hora de ver a mágica acontecer. Vamos executar nossa aplicação de To-Do List no terminal.
+
+## Executando o Projeto
+
+Se você seguiu os passos de configuração do ambiente e implementação, agora pode rodar o projeto facilmente. Abra o terminal na raiz do seu projeto e execute o script `start` que configuramos no `package.json`:
+
+```bash
+npm start
+```
+
+Este comando usa o `ts-node` para compilar e executar o arquivo `src/index.ts` em memória. A saída no seu terminal deverá ser algo assim:
+
+```
+Tarefa "Estudar TypeScript" adicionada com sucesso!
+Tarefa "Fazer o projeto prático" adicionada com sucesso!
+
+--- Lista de Tarefas ---
+[ ] 1: Estudar TypeScript
+[ ] 2: Fazer o projeto prático
+----------------------
+
+Tarefa "Estudar TypeScript" marcada como concluída.
+
+--- Lista de Tarefas ---
+[x] 1: Estudar TypeScript
+[ ] 2: Fazer o projeto prático
+----------------------
+
+Tarefa com ID 2 removida com sucesso.
+
+--- Lista de Tarefas ---
+[x] 1: Estudar TypeScript
+----------------------
+```
+
+Parabéns! Você acabou de construir e executar seu primeiro projeto completo com TypeScript, aplicando todos os conceitos fundamentais do curso.
+
+## Desafios para Evoluir o Projeto
+
+Uma aplicação de verdade nunca está "terminada". Que tal usar seu conhecimento para adicionar novas funcionalidades? Aqui estão alguns desafios:
+
+### Desafio 1: Evitar Tarefas Duplicadas
+
+Modifique o método `adicionarTarefa` para que ele não permita adicionar uma tarefa com a mesma descrição de uma já existente. Antes de adicionar, verifique se já existe uma tarefa com aquela descrição no array `tarefas`.
+
+<details>
+<summary>Dica</summary>
+Você pode usar o método `some()` ou `find()` do array para verificar a existência da tarefa.
+</details>
+
+### Desafio 2: Editar a Descrição de uma Tarefa
+
+Crie um novo método `editarTarefa(id: number, novaDescricao: string): void`. Ele deve encontrar a tarefa pelo `id` e, se existir, atualizar sua propriedade `descricao`.
+
+### Desafio 3: Limpar Todas as Tarefas
+
+Adicione um método `limparTarefas(): void` que esvazie o array `tarefas`, removendo todos os itens de uma só vez.
+
+### Desafio 4 (Avançado): Salvar e Carregar Tarefas
+
+Atualmente, as tarefas são perdidas toda vez que o script termina. Para torná-lo mais útil, você pode:
+
+1.  **Salvar:** Criar um método `salvarTarefas()` que converta o array `tarefas` para uma string JSON (`JSON.stringify()`) e a salve em um arquivo local (ex: `tarefas.json`) usando o módulo `fs` (File System) do Node.js.
+2.  **Carregar:** Modificar o construtor da classe para que ele tente ler o arquivo `tarefas.json` (`fs.readFileSync()`), converter a string JSON de volta para um array (`JSON.parse()`) e carregar as tarefas salvas quando a aplicação iniciar.
+
+Este último desafio é mais complexo, mas é um excelente exercício para aprender a interagir com o sistema de arquivos e persistir dados.
+
+## Conclusão do Projeto
+
+Este projeto de To-Do List, embora simples, é uma demonstração poderosa de como os conceitos que você aprendeu se conectam para criar algo funcional. Você usou:
+
+-   **TypeScript** para tipagem (`interface`, `class`, tipos de variáveis).
+-   **POO** para organizar a lógica (`GerenciadorDeTarefas`).
+-   **Arrays e seus métodos** (`push`, `forEach`, `find`, `filter`) para gerenciar os dados.
+-   **Funções** (métodos da classe) para encapsular comportamentos.
+-   **Node.js e NPM** para gerenciar o ambiente e executar o código.
+
+Sinta-se à vontade para experimentar, adicionar suas próprias funcionalidades e usar este projeto como base para o seu portfólio. O mais importante na jornada de um desenvolvedor é **continuar construindo**.

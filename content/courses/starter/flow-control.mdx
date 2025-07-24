@@ -3,11 +3,7 @@ title: Controle de Fluxo
 description: "Aprenda a controlar o fluxo de execução do seu código com condições, operadores lógicos e estruturas como if/else e switch."
 ---
 
-Até aqui, aprendemos como armazenar informações e realizar operações em um programa. Agora, daremos um passo além e veremos como o programa pode **"tomar decisões"** e **controlar seu fluxo de execução** com base em condições e repetições.
-
-Imagine que você está desenvolvendo um aplicativo que ajuda pessoas a planejar suas tarefas. Com base na hora do dia, você quer exibir mensagens como "Bom dia", "Boa tarde" ou "Boa noite". Ou talvez precise verificar se o usuário preencheu todas as informações de cadastro antes de permitir o envio. É nesse contexto que o **controle de fluxo** entra em ação.
-
-Nesta seção, exploraremos como utilizar condições, estruturas condicionais e operadores lógicos para criar programas dinâmicos e interativos.
+Até aqui, aprendemos como armazenar informações com tipos definidos. Agora, vamos ver como o programa pode **"tomar decisões"** e controlar seu fluxo de execução com base em condições. O controle de fluxo permite que seu código reaja a diferentes situações de forma dinâmica.
 
 ## O que é Controle de Fluxo?
 
@@ -44,24 +40,24 @@ No contexto da programação, uma condição geralmente envolve a comparação d
 
 ### Operadores relacionais
 
-| Operador | Descrição | Exemplo | Resultado |
-| --- | --- | --- | --- |
-| `>` | Maior que | `5 > 3` | `true` |
-| `<` | Menor que | `5 < 3` | `false` |
-| `>=` | Maior ou igual a | `5 >= 5` | `true` |
-| `<=` | Menor ou igual a | `4 <= 3` | `false` |
-| `===` | Igualdade estrita (valor e tipo) | `"5" === 5` | `false` |
-| `!==` | Diferença estrita (valor e tipo) | `"5" !== 5` | `true` |
+| Operador | Descrição                        | Exemplo     | Resultado |
+| -------- | -------------------------------- | ----------- | --------- |
+| `>`      | Maior que                        | `5 > 3`     | `true`    |
+| `<`      | Menor que                        | `5 < 3`     | `false`   |
+| `>=`     | Maior ou igual a                 | `5 >= 5`    | `true`    |
+| `<=`     | Menor ou igual a                 | `4 <= 3`    | `false`   |
+| `===`    | Igualdade estrita (valor e tipo) | `"5" === 5` | `false`   |
+| `!==`    | Diferença estrita (valor e tipo) | `"5" !== 5` | `true`    |
 
 **Exemplo básico de condição:**
 
-```js
+```ts
 let idade = 18;
 
 if (idade >= 18) {
-    console.log("Você é maior de idade.");
+  console.log("Você é maior de idade.");
 } else {
-    console.log("Você é menor de idade.");
+  console.log("Você é menor de idade.");
 }
 // Saída: "Você é maior de idade."
 ```
@@ -80,11 +76,11 @@ Códigos com condições simples verificam apenas uma expressão e tomam uma aç
 
 **Exemplo prático:**
 
-```js
+```ts
 let saldo = 150;
 
 if (saldo > 100) {
-    console.log("Você tem saldo suficiente.");
+  console.log("Você tem saldo suficiente.");
 }
 // Saída: "Você tem saldo suficiente."
 ```
@@ -100,14 +96,14 @@ Podemos combinar várias condições em uma única expressão usando **operadore
 
 **Exemplo prático:**
 
-```js
+```ts
 let saldo = 150;
 let compra = 120;
 
 if (saldo > compra && compra > 0) {
-    console.log("Compra aprovada.");
+  console.log("Compra aprovada.");
 } else {
-    console.log("Compra recusada.");
+  console.log("Compra recusada.");
 }
 // Saída: "Compra aprovada."
 ```
@@ -115,35 +111,13 @@ if (saldo > compra && compra > 0) {
 Aqui:
 
 1. O programa verifica duas condições:
-    - O `saldo` é maior que o valor da `compra`.
-    - O valor da `compra` é maior que zero.
+   - O `saldo` é maior que o valor da `compra`.
+   - O valor da `compra` é maior que zero.
 2. Ambas as condições precisam ser verdadeiras para que a mensagem "Compra aprovada." seja exibida.
-
-<Callout>
-Evite duplicar lógica: Sempre busque escrever condições de forma clara e reutilizável. Por exemplo:
-
-```js
-let idade = 20;
-
-// Código redundante
-if (idade >= 18) {
-    console.log("Maior de idade");
-} else if (idade < 18) {
-    console.log("Menor de idade");
-}
-
-// Código mais simples
-if (idade >= 18) {
-    console.log("Maior de idade");
-} else {
-    console.log("Menor de idade");
-}
-```
-</Callout>
 
 ## 2. Estruturas Condicionais
 
-As **estruturas condicionais** são ferramentas que permitem implementar as condições de maneira organizada no código. Elas são usadas para definir diferentes caminhos de execução com base no resultado de uma expressão lógica. Em JavaScript, as principais estruturas condicionais são:
+As **estruturas condicionais** são ferramentas que permitem implementar as condições de maneira organizada no código. Elas são usadas para definir diferentes caminhos de execução com base no resultado de uma expressão lógica. As principais estruturas condicionais no TypeScript são:
 
 1. **`if` e `else`**
 2. **`else if`**
@@ -152,19 +126,19 @@ As **estruturas condicionais** são ferramentas que permitem implementar as cond
 
 Vamos explorar cada uma delas detalhadamente, com exemplos práticos e explicações.
 
-### 2.1 `if` e `else`
+### `if` e `else`
 
-O bloco **`if`** é a estrutura condicional mais básica em JavaScript. Ele avalia uma expressão e executa o código dentro de suas chaves (`{}`) apenas se o resultado da expressão for verdadeiro (`true`).
+O bloco **`if`** é a estrutura condicional mais básica. Ele avalia uma expressão e executa o código dentro de suas chaves (`{}`) apenas se o resultado da expressão for verdadeiro (`true`).
 
 Já o bloco **`else`** é usado para especificar o que deve acontecer quando a condição no **`if`** não for atendida (ou seja, quando o resultado for falso).
 
 **Sintaxe**
 
-```js
+```ts
 if (condição) {
-    // Código a ser executado se a condição for verdadeira
+  // Código a ser executado se a condição for verdadeira
 } else {
-    // Código a ser executado se a condição for falsa
+  // Código a ser executado se a condição for falsa
 }
 ```
 
@@ -172,13 +146,13 @@ if (condição) {
 
 Imagine que queremos verificar se uma pessoa é maior de idade:
 
-```js
+```ts
 let idade = 17;
 
 if (idade >= 18) {
-    console.log("Você é maior de idade.");
+  console.log("Você é maior de idade.");
 } else {
-    console.log("Você é menor de idade.");
+  console.log("Você é menor de idade.");
 }
 // Saída: "Você é menor de idade."
 ```
@@ -191,21 +165,21 @@ Nesse caso:
 **Dicas importantes**
 
 - Sempre use chaves (`{}`), mesmo quando o bloco de código tiver apenas uma linha. Isso torna o código mais seguro e fácil de expandir no futuro.
-- Certifique-se de que a condição seja uma expressão que retorne um valor booleano (ou algo que o JavaScript possa converter para `true` ou `false`).
+- Certifique-se de que a condição seja uma expressão que retorne um valor booleano (ou algo que o TypeScript possa converter para `true` ou `false`).
 
-### 2.2 `else if`
+### `else if`
 
 Quando precisamos verificar mais de uma condição, podemos usar a estrutura **`else if`**. Ela permite adicionar testes intermediários antes de chegar ao bloco **`else`**.
 
 **Sintaxe**
 
-```js
+```ts
 if (condição1) {
-    // Código para condição1
+  // Código para condição1
 } else if (condição2) {
-    // Código para condição2
+  // Código para condição2
 } else {
-    // Código para todas as outras situações
+  // Código para todas as outras situações
 }
 ```
 
@@ -213,15 +187,15 @@ if (condição1) {
 
 Vamos verificar se a temperatura de uma sala está baixa, ideal ou alta:
 
-```js
+```ts
 let temperatura = 28;
 
 if (temperatura < 18) {
-    console.log("Está frio.");
+  console.log("Está frio.");
 } else if (temperatura >= 18 && temperatura <= 25) {
-    console.log("A temperatura está agradável.");
+  console.log("A temperatura está agradável.");
 } else {
-    console.log("Está quente.");
+  console.log("Está quente.");
 }
 // Saída: "Está quente."
 ```
@@ -232,23 +206,23 @@ Aqui:
 - Se a primeira condição não for verdadeira, verifica se está entre 18 e 25 (agradável).
 - Caso nenhuma dessas condições seja atendida, considera que está quente.
 
-### 2.3 `switch-case`
+### `switch-case`
 
 A estrutura **`switch-case`** é ideal para situações em que você precisa comparar uma variável com vários valores possíveis. Ela é frequentemente usada quando há muitas condições que dependem de um único valor.
 
 **Sintaxe**
 
-```js
+```ts
 switch (variavel) {
-    case valor1:
-        // Código para valor1
-        break;
-    case valor2:
-        // Código para valor2
-        break;
-    default:
-        // Código para todos os outros casos
-        break;
+  case valor1:
+    // Código para valor1
+    break;
+  case valor2:
+    // Código para valor2
+    break;
+  default:
+    // Código para todos os outros casos
+    break;
 }
 ```
 
@@ -256,71 +230,45 @@ switch (variavel) {
 
 Vamos verificar o dia da semana com base em um número:
 
-```js
+```ts
 let dia = 3;
+let nomeDoDia: string;
 
 switch (dia) {
-    case 1:
-        console.log("Segunda-feira");
-        break;
-    case 2:
-        console.log("Terça-feira");
-        break;
-    case 3:
-        console.log("Quarta-feira");
-        break;
-    case 4:
-        console.log("Quinta-feira");
-        break;
-    case 5:
-        console.log("Sexta-feira");
-        break;
-    case 6:
-        console.log("Sábado");
-        break;
-    case 7:
-        console.log("Domingo");
-        break;
-    default:
-        console.log("Dia inválido");
-        break;
+  case 1:
+    nomeDoDia = "Segunda-feira";
+    break;
+  case 2:
+    nomeDoDia = "Terça-feira";
+    break;
+  case 3:
+    nomeDoDia = "Quarta-feira";
+    break;
+  // ... outros casos
+  default:
+    nomeDoDia = "Dia inválido";
+    break;
 }
-// Saída: "Quarta-feira"
+
+console.log(nomeDoDia); // Saída: Quarta-feira
 ```
-
-**Como funciona:**
-
-1. O programa compara o valor da variável `dia` com cada `case`.
-2. Quando encontra uma correspondência, executa o código associado a esse `case`.
-3. O comando **`break`** impede que os outros blocos sejam executados após encontrar o caso correto.
 
 <Callout type="warn">
-É importante lembrar do `break` ao final de cada `case`, pois sem ele, o JavaScript **continua executando os próximos blocos**, mesmo que a condição tenha sido satisfeita — comportamento chamado de “fall-through”.
+  O comando `break` é essencial para impedir que o código continue executando os
+  casos abaixo do que foi correspondido.
 </Callout>
 
-**O bloco `default`**
+### Operador Ternário
 
-O **`default`** é opcional, mas é uma boa prática incluí-lo. Ele serve como um "plano B" caso nenhuma das condições seja atendida.
+É uma forma compacta de escrever um `if-else` simples, geralmente para atribuir um valor a uma variável.
 
-### 2.4 Operador Ternário
+**Sintaxe:** `condição ? valor_se_true : valor_se_false;`
 
-O **operador ternário** é uma forma compacta de escrever condições simples que envolvem apenas duas possibilidades (verdadeiro ou falso). Ele é útil para tornar o código mais conciso, mas deve ser usado com cuidado para não prejudicar a legibilidade.
-
-**Sintaxe**
-
-```js
-condição ? expressão_se_verdadeiro : expressão_se_falso;
-```
-
-**Exemplo**
-
-Vamos verificar se um número é par ou ímpar:
-
-```js
+```ts
 let numero = 7;
-let resultado = (numero % 2 === 0) ? "Par" : "Ímpar";
-console.log(resultado);
-// Saída: "Ímpar"
+let resultado: string = numero % 2 === 0 ? "Par" : "Ímpar";
+
+console.log(resultado); // Saída: Ímpar
 ```
 
 Aqui:
@@ -330,17 +278,19 @@ Aqui:
 - Caso contrário, recebe o valor "Ímpar".
 
 <Callout type="warn">
-O operador ternário é excelente para **atribuições diretas e retornos rápidos**, mas não deve substituir `if-else` quando há mais de uma ação sendo executada. Priorize legibilidade.
+  O operador ternário é excelente para **atribuições diretas e retornos
+  rápidos**, mas não deve substituir `if-else` quando há mais de uma ação sendo
+  executada. Priorize legibilidade.
 </Callout>
 
 ### Comparando as Estruturas
 
-| Estrutura | Quando usar |
-| --- | --- |
-| `if-else` | Para condições simples ou que envolvam múltiplas expressões lógicas. |
-| `else if` | Quando há mais de duas condições possíveis que precisam ser verificadas. |
-| `switch-case` | Quando há muitas comparações baseadas no mesmo valor. |
-| Operador ternário | Para condições simples que não comprometem a legibilidade do código. |
+| Estrutura         | Quando usar                                                              |
+| ----------------- | ------------------------------------------------------------------------ |
+| `if-else`         | Para condições simples ou que envolvam múltiplas expressões lógicas.     |
+| `else if`         | Quando há mais de duas condições possíveis que precisam ser verificadas. |
+| `switch-case`     | Quando há muitas comparações baseadas no mesmo valor.                    |
+| Operador ternário | Para condições simples que não comprometem a legibilidade do código.     |
 
 ### Boas Práticas no Uso de Estruturas Condicionais
 
@@ -351,7 +301,7 @@ O operador ternário é excelente para **atribuições diretas e retornos rápid
 
 ## 3. Operadores Lógicos
 
-Os **operadores lógicos** são ferramentas poderosas em programação que permitem combinar ou modificar condições, como já vimos antes. Eles são fundamentais para criar expressões lógicas mais complexas, ampliando o controle sobre o fluxo do programa. Em JavaScript, temos três operadores lógicos principais:
+Os **operadores lógicos** são ferramentas poderosas em programação que permitem combinar ou modificar condições, como já vimos antes. Eles são fundamentais para criar expressões lógicas mais complexas, ampliando o controle sobre o fluxo do programa. Em TypeScript, temos três operadores lógicos principais:
 
 1. **AND (`&&`)**
 2. **OR (`||`)**
@@ -359,28 +309,28 @@ Os **operadores lógicos** são ferramentas poderosas em programação que permi
 
 Cada um deles desempenha um papel específico e pode ser usado em conjunto para atender a diferentes necessidades. Vamos detalhar cada operador com exemplos claros.
 
-### 3.1 Operador **AND** (`&&`)
+### Operador **AND** (`&&`)
 
 O operador **AND** é usado para combinar duas ou mais condições e retorna `true` apenas se **todas** as condições forem verdadeiras.
 
 **Sintaxe**
 
-```js
-condição1 && condição2
+```ts
+condição1 && condição2;
 ```
 
 **Exemplo**
 
 Imagine que queremos verificar se uma pessoa está apta para votar (ser maior de 18 anos **e** ser cidadã registrada):
 
-```js
+```ts
 let idade = 20;
 let cidadania = true;
 
 if (idade >= 18 && cidadania) {
-    console.log("Você está apto para votar.");
+  console.log("Você está apto para votar.");
 } else {
-    console.log("Você não está apto para votar.");
+  console.log("Você não está apto para votar.");
 }
 // Saída: "Você está apto para votar."
 ```
@@ -393,36 +343,36 @@ if (idade >= 18 && cidadania) {
 **Tabela Verdade do `&&`**
 
 | Condição 1 | Condição 2 | Resultado |
-| --- | --- | --- |
-| `true` | `true` | `true` |
-| `true` | `false` | `false` |
-| `false` | `true` | `false` |
-| `false` | `false` | `false` |
+| ---------- | ---------- | --------- |
+| `true`     | `true`     | `true`    |
+| `true`     | `false`    | `false`   |
+| `false`    | `true`     | `false`   |
+| `false`    | `false`    | `false`   |
 
 Esta tabela ilustra claramente que o operador AND só retorna `true` quando ambas as condições são verdadeiras. Isso é fundamental para entender como construir expressões lógicas mais complexas em seus programas.
 
-### 3.2 Operador **OR** (`||`)
+### Operador **OR** (`||`)
 
 O operador **OR** retorna `true` se **pelo menos uma** das condições for verdadeira. Ele é útil quando apenas uma das condições precisa ser atendida.
 
 **Sintaxe**
 
-```js
-condição1 || condição2
+```ts
+condição1 || condição2;
 ```
 
 **Exemplo**
 
 Vamos verificar se uma pessoa pode acessar um desconto em um evento. O desconto é aplicado para menores de 18 anos **ou** estudantes:
 
-```js
+```ts
 let idade = 20;
 let estudante = true;
 
 if (idade < 18 || estudante) {
-    console.log("Você tem direito a desconto.");
+  console.log("Você tem direito a desconto.");
 } else {
-    console.log("Você não tem direito a desconto.");
+  console.log("Você não tem direito a desconto.");
 }
 // Saída: "Você tem direito a desconto."
 ```
@@ -434,33 +384,33 @@ if (idade < 18 || estudante) {
 **Tabela Verdade do `||`**
 
 | Condição 1 | Condição 2 | Resultado |
-| --- | --- | --- |
-| `true` | `true` | `true` |
-| `true` | `false` | `true` |
-| `false` | `true` | `true` |
-| `false` | `false` | `false` |
+| ---------- | ---------- | --------- |
+| `true`     | `true`     | `true`    |
+| `true`     | `false`    | `true`    |
+| `false`    | `true`     | `true`    |
+| `false`    | `false`    | `false`   |
 
-### 3.3 Operador **NOT** (`!`)
+### Operador **NOT** (`!`)
 
 O operador **NOT** inverte o valor lógico de uma expressão. Ele transforma `true` em `false` e vice-versa.
 
 **Sintaxe**
 
 ```js
-!condição
+!condição;
 ```
 
 **Exemplo**
 
 Vamos verificar se uma pessoa **não** é maior de idade:
 
-```js
+```ts
 let idade = 16;
 
-if (! (idade >= 18)) {
-    console.log("Você não é maior de idade.");
+if (!(idade >= 18)) {
+  console.log("Você não é maior de idade.");
 } else {
-    console.log("Você é maior de idade.");
+  console.log("Você é maior de idade.");
 }
 // Saída: "Você não é maior de idade."
 ```
@@ -470,7 +420,7 @@ if (! (idade >= 18)) {
 - A expressão `idade >= 18` é avaliada como `false` porque `16` não é maior ou igual a `18`.
 - O operador **NOT** (`!`) inverte o resultado, transformando `false` em `true`.
 
-### 3.4 Combinações de Operadores Lógicos
+### Combinações de Operadores Lógicos
 
 Os operadores lógicos podem ser combinados para criar condições mais elaboradas. Quando combinamos vários operadores, é importante entender a **precedência** e usar parênteses para controlar a ordem das operações.
 
@@ -478,15 +428,15 @@ Os operadores lógicos podem ser combinados para criar condições mais elaborad
 
 Imagine que queremos liberar acesso a uma área apenas para maiores de idade **e** estudantes, mas que também permitimos o acesso a menores de idade **ou** professores:
 
-```js
+```ts
 let idade = 17;
 let estudante = true;
 let professor = false;
 
-if ((idade >= 18 && estudante) || (idade < 18 || professor)) {
-    console.log("Acesso permitido.");
+if ((idade >= 18 && estudante) || idade < 18 || professor) {
+  console.log("Acesso permitido.");
 } else {
-    console.log("Acesso negado.");
+  console.log("Acesso negado.");
 }
 // Saída: "Acesso permitido."
 ```
@@ -495,20 +445,20 @@ if ((idade >= 18 && estudante) || (idade < 18 || professor)) {
 
 Queremos restringir o acesso apenas para quem **não** é professor:
 
-```js
+```ts
 let professor = false;
 
 if (!professor) {
-    console.log("Acesso permitido.");
+  console.log("Acesso permitido.");
 } else {
-    console.log("Acesso negado.");
+  console.log("Acesso negado.");
 }
 // Saída: "Acesso permitido."
 ```
 
 ### Precedência dos Operadores Lógicos
 
-Quando combinamos operadores, o JavaScript segue uma ordem de precedência para avaliar as expressões. A ordem é a seguinte:
+Quando combinamos operadores, o TypeScript segue uma ordem de precedência para avaliar as expressões. A ordem é a seguinte:
 
 1. **NOT** (`!`) – Avaliado primeiro.
 2. **AND** (`&&`) – Avaliado depois.
@@ -516,12 +466,12 @@ Quando combinamos operadores, o JavaScript segue uma ordem de precedência para 
 
 **Exemplo**
 
-```js
+```ts
 let a = true;
 let b = false;
 let c = true;
 
-console.log(!a || b && c);
+console.log(!a || (b && c));
 // Saída: false
 ```
 
@@ -534,24 +484,24 @@ Explicação:
 ### Boas Práticas no Uso de Operadores Lógicos
 
 1. **Use parênteses para deixar as condições claras:** Mesmo que você conheça a precedência, parênteses tornam o código mais legível para outras pessoas.
-    
-    ```js
-    if ((idade >= 18 && estudante) || professor) {
-        // Mais claro e fácil de entender
-    }
-    ```
-    
+
+   ```ts
+   if ((idade >= 18 && estudante) || professor) {
+     // Mais claro e fácil de entender
+   }
+   ```
+
 2. **Evite expressões muito longas:** Quebrar condições em variáveis auxiliares melhora a legibilidade.
-    
-    ```js
-    let maiorDeIdade = idade >= 18;
-    let temDesconto = estudante || professor;
-    
-    if (maiorDeIdade && temDesconto) {
-        console.log("Acesso permitido.");
-    }
-    ```
-    
+
+   ```ts
+   let maiorDeIdade = idade >= 18;
+   let temDesconto: boolean = estudante || professor;
+
+   if (maiorDeIdade && temDesconto) {
+     console.log("Acesso permitido.");
+   }
+   ```
+
 3. **Teste todas as possibilidades:** Ao combinar operadores, certifique-se de que todas as combinações de entradas possíveis foram testadas.
 
 ## Para praticar
@@ -562,35 +512,34 @@ Vamos testar seus conhecimentos sobre controle de fluxo com um exercício.
 
 **Requisitos:**
 
-1. Crie uma variável `nota` e atribua a ela um valor numérico (de 0 a 10).
-2. Use a estrutura `if-else if-else` para verificar a situação do aluno:
-   - Se a nota for maior ou igual a 7, exiba: `"Aprovado"`.
-   - Se a nota for maior ou igual a 5 e menor que 7, exiba: `"Recuperação"`.
-   - Se a nota for menor que 5, exiba: `"Reprovado"`.
-3. Teste com diferentes valores para a variável `nota` e veja se o resultado está correto.
+1.  Crie uma variável `nota` do tipo `number` e atribua a ela um valor (de 0 a 10).
+2.  Use a estrutura `if-else if-else` para verificar a situação do aluno:
+    - Se a nota for maior ou igual a 7, exiba: `"Aprovado"`.
+    - Se a nota for maior ou igual a 5 e menor que 7, exiba: `"Recuperação"`.
+    - Se a nota for menor que 5, exiba: `"Reprovado"`.
+3.  Teste com diferentes valores para a variável `nota`.
 
 <details>
   <summary>Clique para ver uma possível solução</summary>
 
-  ```js
-  let nota = 8.5;
+```ts
+let nota = 8.5;
 
-  if (nota >= 7) {
-    console.log("Aprovado");
-  } else if (nota >= 5) {
-    console.log("Recuperação");
-  } else {
-    console.log("Reprovado");
-  }
-  ```
+if (nota >= 7) {
+  console.log("Aprovado");
+} else if (nota >= 5) {
+  console.log("Recuperação");
+} else {
+  console.log("Reprovado");
+}
+```
 
-  *Note que no `else if` não precisamos verificar se a nota é `< 7`, pois essa condição só será testada se a primeira (`nota >= 7`) já for falsa.*
+_Note que no `else if` não precisamos verificar se a nota é `< 7`, pois essa condição só será testada se a primeira (`nota >= 7`) já for falsa._
+
 </details>
 
 ## Conclusão
 
-Com o controle de fluxo, seu código passa a **pensar e se adaptar**. Ele pode reagir a diferentes valores, executar blocos diferentes de acordo com regras, e até combinar várias condições em uma lógica sofisticada. Esse é um dos pilares da programação: a capacidade de tomar decisões e conduzir o programa por caminhos diferentes.
+Com o controle de fluxo, seu código passa a **pensar e se adaptar**. Ele pode reagir a diferentes valores e executar blocos de código de acordo com regras. Esse é um dos pilares da programação: a capacidade de tomar decisões.
 
-Essa seção fecha o ciclo de manipulação e decisão. Primeiro, aprendemos a armazenar dados. Agora, aprendemos a reagir a esses dados. No próximo passo, vamos ver como **repetir ações de forma controlada**, usando as estruturas de repetição como `for`, `while` e `do-while`.
-
-Elas nos permitirão processar coleções de dados, repetir cálculos, e muito mais — de forma simples, legível e eficiente.
+No próximo passo, vamos aprender como **repetir ações de forma controlada**, usando as estruturas de repetição como `for` e `while`.

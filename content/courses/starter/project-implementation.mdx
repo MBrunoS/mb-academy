@@ -1,0 +1,189 @@
+---
+title: "Implementando a Lógica do Projeto"
+description: "Vamos escrever o código da nossa aplicação de lista de tarefas, implementando a classe e seus métodos com TypeScript."
+---
+
+Com o planejamento feito, é hora de colocar a mão no código. Vamos implementar a classe `GerenciadorDeTarefas` e toda a lógica para manipular nossas tarefas no arquivo `src/index.ts`.
+
+## 1. A Estrutura da Classe
+
+Primeiro, vamos definir a `interface` para nossa tarefa e a estrutura inicial da nossa classe, conforme planejamos.
+
+```ts
+// src/index.ts
+
+interface Tarefa {
+  id: number;
+  descricao: string;
+  concluida: boolean;
+}
+
+class GerenciadorDeTarefas {
+  private tarefas: Tarefa[] = [];
+  private ultimoId: number = 0;
+
+  // Métodos da classe virão aqui
+}
+```
+
+## 2. Implementando os Métodos
+
+Agora, vamos adicionar os métodos um a um dentro da classe `GerenciadorDeTarefas`.
+
+### Adicionar Tarefa
+
+Este método receberá a descrição da tarefa, criará um novo objeto `Tarefa` com um ID único e o adicionará ao nosso array `tarefas`.
+
+```ts
+// Dentro da classe GerenciadorDeTarefas
+
+adicionarTarefa(descricao: string): void {
+  this.ultimoId++;
+  const novaTarefa: Tarefa = {
+    id: this.ultimoId,
+    descricao: descricao,
+    concluida: false
+  };
+  this.tarefas.push(novaTarefa);
+  console.log(`Tarefa "${descricao}" adicionada com sucesso!`);
+}
+```
+
+### Listar Tarefas
+
+Este método percorrerá o array `tarefas` e exibirá cada uma no console, formatando a saída para mostrar o status de conclusão.
+
+```ts
+// Dentro da classe GerenciadorDeTarefas
+
+listarTarefas(): void {
+  console.log("\n--- Lista de Tarefas ---");
+  if (this.tarefas.length === 0) {
+    console.log("Nenhuma tarefa cadastrada.");
+    return;
+  }
+
+  this.tarefas.forEach(tarefa => {
+    const status = tarefa.concluida ? "[x]" : "[ ]";
+    console.log(`${status} ${tarefa.id}: ${tarefa.descricao}`);
+  });
+  console.log("----------------------\n");
+}
+```
+
+### Marcar como Concluída
+
+Este método buscará uma tarefa pelo `id` e, se a encontrar, mudará sua propriedade `concluida` para `true`.
+
+```ts
+// Dentro da classe GerenciadorDeTarefas
+
+marcarComoConcluida(id: number): void {
+  const tarefa = this.tarefas.find(t => t.id === id);
+
+  if (tarefa) {
+    tarefa.concluida = true;
+    console.log(`Tarefa "${tarefa.descricao}" marcada como concluída.`);
+  } else {
+    console.log(`Erro: Tarefa com ID ${id} não encontrada.`);
+  }
+}
+```
+*Aqui usamos o método `find()`, que é ótimo para buscar um item específico em um array.*
+
+### Remover Tarefa
+
+Este método usará o `filter()` para criar um novo array contendo todas as tarefas, exceto aquela com o `id` que queremos remover.
+
+```ts
+// Dentro da classe GerenciadorDeTarefas
+
+removerTarefa(id: number): void {
+  const tamanhoOriginal = this.tarefas.length;
+  this.tarefas = this.tarefas.filter(t => t.id !== id);
+
+  if (this.tarefas.length < tamanhoOriginal) {
+    console.log(`Tarefa com ID ${id} removida com sucesso.`);
+  } else {
+    console.log(`Erro: Tarefa com ID ${id} não encontrada.`);
+  }
+}
+```
+
+## 3. Juntando Tudo
+
+Agora que a classe está pronta, podemos criar uma instância dela e usar seus métodos para gerenciar nossas tarefas. O código completo do arquivo `src/index.ts` ficará assim:
+
+```ts
+// src/index.ts
+
+interface Tarefa {
+  id: number;
+  descricao: string;
+  concluida: boolean;
+}
+
+class GerenciadorDeTarefas {
+  private tarefas: Tarefa[] = [];
+  private ultimoId: number = 0;
+
+  adicionarTarefa(descricao: string): void {
+    this.ultimoId++;
+    const novaTarefa: Tarefa = {
+      id: this.ultimoId,
+      descricao: descricao,
+      concluida: false
+    };
+    this.tarefas.push(novaTarefa);
+    console.log(`Tarefa "${descricao}" adicionada com sucesso!`);
+  }
+
+  listarTarefas(): void {
+    console.log("\n--- Lista de Tarefas ---");
+    if (this.tarefas.length === 0) {
+      console.log("Nenhuma tarefa cadastrada.");
+      return;
+    }
+    this.tarefas.forEach(tarefa => {
+      const status = tarefa.concluida ? "[x]" : "[ ]";
+      console.log(`${status} ${tarefa.id}: ${tarefa.descricao}`);
+    });
+    console.log("----------------------\n");
+  }
+
+  marcarComoConcluida(id: number): void {
+    const tarefa = this.tarefas.find(t => t.id === id);
+    if (tarefa) {
+      tarefa.concluida = true;
+      console.log(`Tarefa "${tarefa.descricao}" marcada como concluída.`);
+    } else {
+      console.log(`Erro: Tarefa com ID ${id} não encontrada.`);
+    }
+  }
+
+  removerTarefa(id: number): void {
+    const tamanhoOriginal = this.tarefas.length;
+    this.tarefas = this.tarefas.filter(t => t.id !== id);
+    if (this.tarefas.length < tamanhoOriginal) {
+      console.log(`Tarefa com ID ${id} removida com sucesso.`);
+    } else {
+      console.log(`Erro: Tarefa com ID ${id} não encontrada.`);
+    }
+  }
+}
+
+// --- Execução do nosso programa ---
+const gerenciador = new GerenciadorDeTarefas();
+
+gerenciador.adicionarTarefa("Estudar TypeScript");
+gerenciador.adicionarTarefa("Fazer o projeto prático");
+gerenciador.listarTarefas();
+
+gerenciador.marcarComoConcluida(1);
+gerenciador.listarTarefas();
+
+gerenciador.removerTarefa(2);
+gerenciador.listarTarefas();
+```
+
+Com o código pronto, a próxima etapa é executá-lo e ver nossa aplicação funcionando. Vamos fazer isso na página seguinte.

@@ -1,0 +1,84 @@
+---
+title: "Planejamento do Projeto: To-Do List no Terminal"
+description: "Vamos planejar nosso primeiro projeto prático: uma lista de tarefas (To-Do List) que rodará no terminal."
+---
+
+Chegou o momento mais esperado: aplicar tudo o que você aprendeu em um projeto prático, do zero. Vamos construir uma **Aplicação de Lista de Tarefas (To-Do List)** que funcionará diretamente no seu terminal.
+
+Este projeto é perfeito para consolidar seus conhecimentos, pois ele envolve todos os conceitos que vimos: variáveis, tipos, funções, arrays, objetos, classes e a configuração de um ambiente com TypeScript.
+
+## 1. O Objetivo do Projeto
+
+Nosso objetivo é criar um script simples, executado via terminal, que permita ao usuário gerenciar uma lista de tarefas. Queremos ser capazes de adicionar, visualizar, completar e remover tarefas.
+
+## 2. Definindo as Funcionalidades (Features)
+
+Um bom planejamento começa definindo o que a aplicação fará. Nossas funcionalidades principais serão:
+
+1.  **Adicionar uma nova tarefa:** O usuário deve poder inserir a descrição de uma nova tarefa.
+2.  **Listar todas as tarefas:** Exibir todas as tarefas cadastradas, mostrando seu ID e se estão concluídas ou não.
+3.  **Marcar uma tarefa como concluída:** O usuário poderá marcar uma tarefa como feita, usando o ID dela.
+4.  **Remover uma tarefa:** Permitir a exclusão de uma tarefa, também via ID.
+
+## 3. Modelando os Dados
+
+Como vamos representar uma tarefa no nosso código? Uma tarefa tem várias características. Usaremos uma `interface` do TypeScript para definir esse "contrato".
+
+Uma tarefa terá:
+-   `id`: Um número único para identificá-la.
+-   `descricao`: O texto da tarefa (uma string).
+-   `concluida`: Um booleano (`true` ou `false`) para indicar seu status.
+
+Em TypeScript, isso fica assim:
+
+```ts
+interface Tarefa {
+  id: number;
+  descricao: string;
+  concluida: boolean;
+}
+```
+
+## 4. Estruturando o Código com uma Classe
+
+Para organizar nossa lógica, usaremos a Programação Orientada a Objetos. Vamos criar uma classe `GerenciadorDeTarefas` que será responsável por todas as operações.
+
+Essa classe terá uma propriedade `private` para armazenar a lista de tarefas, que será um array de objetos `Tarefa`.
+
+```ts
+class GerenciadorDeTarefas {
+  private tarefas: Tarefa[] = [];
+  private ultimoId: number = 0;
+
+  // Nossos métodos virão aqui...
+}
+```
+
+Os métodos da classe corresponderão às nossas funcionalidades:
+
+-   `adicionarTarefa(descricao: string): void`
+-   `listarTarefas(): void`
+-   `marcarComoConcluida(id: number): void`
+-   `removerTarefa(id: number): void`
+
+## 5. Configurando o Ambiente do Projeto
+
+Antes de começar a codificar, vamos preparar nosso ambiente:
+
+1.  Crie uma nova pasta para o projeto (ex: `todo-list-cli`).
+2.  Dentro dela, inicie um projeto NPM:
+    ```bash
+    npm init -y
+    ```
+3.  Instale as dependências de desenvolvimento:
+    ```bash
+    npm install typescript ts-node nodemon --save-dev
+    ```
+4.  Crie o arquivo `tsconfig.json`:
+    ```bash
+    npx tsc --init
+    ```
+    ...e configure-o com as opções essenciais que aprendemos (`target`, `module`, `strict`, `outDir`, `rootDir`).
+5.  Crie a pasta `src` e, dentro dela, o arquivo `index.ts`.
+
+Com o planejamento e a estrutura prontos, estamos prontos para começar a codificar. Na próxima página, vamos implementar a classe `GerenciadorDeTarefas` e seus métodos.
