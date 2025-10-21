@@ -1,0 +1,9 @@
+{
+  "title": "Funções",
+  "description": "Aprenda a criar e usar funções tipadas em TypeScript para organizar e reutilizar seu código com segurança.",
+  "pages": [
+    "index",
+    "basic-functions",
+    "advanced-functions"
+  ]
+}

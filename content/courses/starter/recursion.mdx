@@ -7,7 +7,7 @@ Quando estamos escrevendo funções, normalmente pensamos em resolver um problem
 
 Vamos começar com a definição: **recursão é quando uma função chama a si mesma como parte de sua execução**, geralmente com uma entrada ligeiramente diferente da anterior. Esse processo continua até que a função atinja uma **condição de parada**, que é o momento em que ela **não se chama mais**.
 
-Um bom jeito de entender a recursão é com um exemplo cotidiano: **abrir uma gaveta dentro de uma gaveta**. Imagine uma caixa que contém outra caixa, que contém outra caixa, e assim por diante. Como você abriria todas elas? Uma maneira natural seria: "Abra a caixa atual, veja se há outra dentro. Se houver, abra a próxima da mesma forma." Isso é recursão.
+Um bom jeito de entender a recursão é com um exemplo cotidiano: imagine uma caixa que contém outra caixa, que contém outra caixa, e assim por diante. Como você abriria todas elas? Uma maneira natural seria: "Abra a caixa atual, veja se há outra dentro. Se houver, abra a próxima da mesma forma." Isso é recursão.
 
 Outro exemplo bem conhecido é o **cálculo do fatorial** de um número, que pode ser definido de forma recursiva:
 
@@ -16,8 +16,8 @@ Outro exemplo bem conhecido é o **cálculo do fatorial** de um número, que pod
 
 Vamos transformar isso em código:
 
-```jsx
-function fatorial(n) {
+```ts
+function fatorial(n: number): number {
   if (n === 1) {
     return 1; // caso base
   }
@@ -64,74 +64,52 @@ fatorial(5) -> retorna 5 * 24 = 120
 
 Esse tipo de funcionamento é chamado de **pilha de chamadas**. Cada vez que uma função é chamada, o JavaScript **coloca essa chamada em uma pilha (stack)**, e só sai de lá quando o resultado está pronto. É por isso que a **recursão precisa sempre ter um ponto de parada**, ou seja, um **caso base** bem definido — senão, o programa entra em **loop infinito** e trava.
 
-## Estrutura de uma função recursiva
+## Estrutura de uma Função Recursiva
 
-Toda função recursiva deve conter dois elementos principais:
+Toda função recursiva precisa de dois elementos:
 
-1. **Caso base (ou condição de parada)**
-    
-    É a situação em que a função **não se chama novamente**, encerrando o ciclo.
-    
-2. **Chamada recursiva**
-    
-    É o ponto onde a função **chama a si mesma**, modificando a entrada de alguma forma.
-    
+1.  **Caso Base:** Uma condição que encerra a recursão, impedindo um loop infinito.
+2.  **Chamada Recursiva:** O ponto onde a função chama a si mesma, geralmente com uma entrada modificada que se aproxima do caso base.
 
-Se faltar o caso base, ou se ele nunca for alcançado, o resultado será uma **recursão infinita** — e como a memória é limitada, isso costuma gerar um erro de **estouro de pilha** (stack overflow).
+<Callout type="warn">
+Se o caso base nunca for atingido, a função entrará em recursão infinita, causando um erro de **estouro de pilha (stack overflow)**.
+</Callout>
 
-Vamos ver um exemplo errado, que **não tem condição de parada**:
+## Recursão vs. Laços
 
-```jsx
-function contar(n) {
-  console.log(n);
-  contar(n + 1);
-}
+Qualquer problema recursivo pode ser resolvido com um laço (`for`, `while`), e vice-versa. A recursão brilha em problemas com estrutura naturalmente hierárquica, como navegar em árvores de dados ou sistemas de arquivos, pois o código tende a ser mais limpo e expressivo.
 
-contar(1); // ⚠ Isso vai rodar para sempre (ou até dar erro)
-```
+**Contagem com Laço:**
 
-O número só aumenta e a função nunca para de se chamar. Por isso, sempre comece planejando **quando a função deve parar** antes mesmo de escrever a chamada recursiva.
-
-## Comparando recursão e laços
-
-Qualquer coisa que possa ser feita com recursão pode ser feita com um `loop` — e vice-versa. Mas a recursão **brilha em problemas com estrutura naturalmente recursiva**, como:
-
-- Processamento de **estruturas de dados aninhadas** (listas dentro de listas, árvores, etc.)
-- **Busca em profundidade** (como labirintos ou navegação de menus)
-- Problemas matemáticos com definição recursiva (como fatorial, sequência de Fibonacci, etc.)
-
-Vamos comparar dois exemplos que fazem exatamente a mesma coisa: contar de 1 até um número qualquer.
-
-Com `for`:
-
-```jsx
-function contarAte(n) {
+```ts
+function contarAteComLoop(n: number): void {
   for (let i = 1; i <= n; i++) {
     console.log(i);
   }
 }
 ```
 
-Com recursão:
+**Contagem com Recursão:**
 
-```jsx
-function contarAte(n, atual = 1) {
-  if (atual > n) return;
+```ts
+function contarAteComRecursao(n: number, atual: number = 1): void {
+  if (atual > n) {
+    return; // Caso base
+  }
   console.log(atual);
-  contarAte(n, atual + 1);
+  contarAteComRecursao(n, atual + 1); // Chamada recursiva
 }
 ```
 
 Note que a versão recursiva é um pouco mais difícil de entender à primeira vista, mas ela segue o mesmo princípio: imprime um número, e chama a si mesma com o próximo.
-
 ## Recursão com retorno acumulado
 
 Além de imprimir coisas ou executar ações, funções recursivas também podem **acumular valores** e retornar um resultado composto. Isso é muito comum em problemas que envolvem soma, multiplicação, contagem ou construção de textos e estruturas.
 
 Exemplo: somar todos os números de 1 até `n`.
 
-```jsx
-function somar(n) {
+```ts
+function somar(n: number): number {
   if (n === 1) {
     return 1;
   }
@@ -142,30 +120,6 @@ console.log(somar(4)); // 10 → 4 + 3 + 2 + 1
 ```
 
 Esse padrão é muito parecido com o do fatorial, mas usamos soma em vez de multiplicação. O raciocínio é sempre o mesmo: **reduzir o problema a uma versão menor dele mesmo** e confiar que a função sabe resolver essa versão menor.
-
-## Recursão e estruturas aninhadas
-
-Recursão é extremamente útil para navegar em **estruturas de dados aninhadas**, como arrays dentro de arrays, objetos dentro de objetos, ou sistemas de pastas e subpastas.
-
-Veja um exemplo com um array aninhado:
-
-```jsx
-function percorrer(lista) {
-  for (let item of lista) {
-    if (Array.isArray(item)) {
-      percorrer(item); // chamada recursiva
-    } else {
-      console.log(item);
-    }
-  }
-}
-
-let dados = [1, 2, [3, 4, [5, 6]], 7];
-percorrer(dados);
-// Saída: 1 2 3 4 5 6 7
-```
-
-Cada vez que encontramos um array dentro de outro array, usamos a mesma função para percorrê-lo. Isso evita que precisemos criar múltiplos laços para cada profundidade.
 
 ## Quando (não) usar recursão
 
@@ -191,18 +145,16 @@ Vamos usar a recursão para um problema clássico: a sequência de Fibonacci.
 
 **Requisitos:**
 
-1.  Crie uma função `fibonacci(n)`.
-2.  Defina os **casos base**:
-    *   Se `n` for 0, retorne 0.
-    *   Se `n` for 1, retorne 1.
-3.  Para qualquer outro `n`, a função deve retornar a soma de `fibonacci(n - 1)` e `fibonacci(n - 2)`.
+1.  Crie uma função `fibonacci(n: number): number`.
+2.  Defina os **casos base**: se `n` for 0 ou 1.
+3.  Para qualquer outro `n`, retorne a soma de `fibonacci(n - 1)` e `fibonacci(n - 2)`.
 4.  Teste a função com `fibonacci(7)` para ver se o resultado é 13.
 
 <details>
   <summary>Clique para ver uma possível solução</summary>
 
-  ```js
-  function fibonacci(n) {
+  ```ts
+  function fibonacci(n: number): number {
     // Casos base
     if (n === 0) {
       return 0;
@@ -222,8 +174,4 @@ Vamos usar a recursão para um problema clássico: a sequência de Fibonacci.
 
 ---
 
-Recursão é um conceito elegante e extremamente poderoso. Ao aprender a usá-la, você amplia sua capacidade de resolver problemas de forma mais expressiva e concisa. No início, pode parecer confuso ver uma função se chamando “do nada”, mas com prática, o raciocínio se torna natural: **você resolve o problema atual pensando que já sabe resolver o problema menor**.
-
-E essa é justamente a beleza da recursão: confiar que a função sabe se virar com menos trabalho, e focar em resolver apenas o pedaço que está nas suas mãos.
-
-Na próxima seção, vamos começar a trabalhar com **estruturas de dados** em JavaScript — começando com **arrays**, que são listas ordenadas de valores. Eles vão nos permitir agrupar informações, navegar por coleções, e realizar operações em série — algo essencial para qualquer tipo de aplicação.
+Recursão é um conceito poderoso. Ao aprendê-la, você amplia sua capacidade de resolver problemas de forma mais expressiva. Na próxima seção, vamos começar a trabalhar com **estruturas de dados** em TypeScript, começando com **arrays**.

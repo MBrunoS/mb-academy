@@ -1,0 +1,206 @@
+---
+title: Tipagem e Estruturas de Objetos
+description: "Aprenda a definir tipos e interfaces para objetos, criar estruturas aninhadas e trabalhar com métodos."
+---
+
+## Definindo a Estrutura de um Objeto com `type` e `interface`
+
+Antes de criar um objeto, uma boa prática em TypeScript é definir sua "forma" ou "contrato". Em TypeScript, podemos fazer isso de duas maneiras diferentes: usando `type` ou `interface`, o que torna nosso código mais robusto e autodescritivo.
+
+-   **`type` (Tipo Alias):** Cria um nome para qualquer tipo. É muito flexível.
+
+    ```ts
+    type Pessoa = {
+      nome: string;
+      idade: number;
+      profissao: string;
+    };
+    ```
+
+-   **`interface` (Interface):** Similar ao `type`, mas mais focada em definir a estrutura de objetos. É uma prática comum usá-la para esse fim.
+
+    ```ts
+    interface Animal {
+      especie: string;
+      peso: number;
+    }
+    ```
+
+<Callout>
+Para iniciantes, a diferença entre `type` e `interface` é sutil. A convenção comum é usar **`interface` para definir a forma de objetos** e **`type` para outros tipos de dados** (como tipos primitivos, uniões, etc.).
+</Callout>
+
+## Estruturas Aninhadas
+
+Uma das coisas mais poderosas (e mais comuns) em objetos é que **os valores das propriedades podem ser outros tipos complexos**, não apenas strings ou números. Isso nos permite criar **objetos aninhados**, **arrays dentro de objetos**, **funções como propriedades** e combinações dessas estruturas.
+
+Esse recurso é essencial para modelar entidades completas, e podemos refletir essa estrutura nos nossos tipos.
+
+```ts
+interface Endereco {
+  rua: string;
+  numero: number;
+  cidade: string;
+}
+
+interface Cliente {
+  nome: string;
+  email: string;
+  endereco: Endereco;
+  telefones: string[];
+}
+
+const cliente: Cliente = {
+  nome: "Camila",
+  email: "camila@email.com",
+  endereco: {
+    rua: "Rua das Flores",
+    numero: 123,
+    cidade: "Curitiba"
+  },
+  telefones: ["11999999999", "11988888888"]
+};
+
+console.log(cliente.endereco.cidade); // "Curitiba"
+console.log(cliente.telefones[0]);   // "11999999999"
+```
+
+## Métodos em Objetos
+
+Podemos incluir funções dentro de interfaces e objetos. Quando uma função é uma propriedade de um objeto, a chamamos de **método**.
+
+```ts
+interface Produto {
+  nome: string;
+  preco: number;
+  exibirInfo: () => void; // Método que não retorna nada (void)
+}
+
+let notebook: Produto = {
+  nome: "Notebook Gamer",
+  preco: 5000,
+  exibirInfo() {
+    console.log(`Produto: ${this.nome}, Preço: R$${this.preco}`);
+  }
+};
+
+notebook.exibirInfo(); // "Produto: Notebook Gamer, Preço: R$5000"
+```
+
+<Callout type="warn">
+Note o uso de `this` para acessar outras propriedades do objeto dentro do próprio método. `this` se refere ao objeto onde o método está sendo executado, e será abordado em outros cursos posteriores.
+</Callout>
+
+## Propriedades Opcionais
+
+Às vezes, nem todas as propriedades de um objeto são obrigatórias. Podemos marcar propriedades como opcionais usando o operador `?`:
+
+```ts
+interface Usuario {
+  nome: string;
+  email: string;
+  telefone?: string; // Propriedade opcional
+  idade?: number;     // Propriedade opcional
+}
+
+let usuario1: Usuario = {
+  nome: "Ana",
+  email: "ana@email.com"
+  // telefone e idade são opcionais, então não precisam ser fornecidos
+};
+
+let usuario2: Usuario = {
+  nome: "João",
+  email: "joao@email.com",
+  telefone: "11999999999",
+  idade: 25
+};
+```
+
+## Propriedades Readonly
+
+Podemos marcar propriedades como somente leitura usando `readonly`:
+
+```ts
+interface Configuracao {
+  readonly nome: string;
+  readonly versao: string;
+  ativo: boolean;
+}
+
+let config: Configuracao = {
+  nome: "Minha App",
+  versao: "1.0.0",
+  ativo: true
+};
+
+// config.nome = "Outro Nome"; // Erro! Propriedade readonly
+config.ativo = false; // OK, propriedade normal
+```
+
+## Para praticar
+
+Vamos criar uma estrutura completa para representar um funcionário de uma empresa.
+
+**Cenário:** Crie uma interface para um funcionário com dados pessoais e profissionais.
+
+**Requisitos:**
+
+1. Crie uma interface `Endereco` com `rua`, `numero`, `cidade` e `estado`.
+2. Crie uma interface `Funcionario` com:
+   - `nome` e `email` (obrigatórios)
+   - `telefone` (opcional)
+   - `endereco` (obrigatório, do tipo `Endereco`)
+   - `departamento` (obrigatório)
+   - `salario` (obrigatório, readonly)
+   - `calcularSalarioAnual` (método que retorna `number`)
+3. Crie um objeto `funcionario` que implemente essa interface.
+4. Chame o método `calcularSalarioAnual` e exiba o resultado.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+interface Endereco {
+  rua: string;
+  numero: number;
+  cidade: string;
+  estado: string;
+}
+
+interface Funcionario {
+  nome: string;
+  email: string;
+  telefone?: string;
+  endereco: Endereco;
+  departamento: string;
+  readonly salario: number;
+  calcularSalarioAnual: () => number;
+}
+
+let funcionario: Funcionario = {
+  nome: "Maria Silva",
+  email: "maria@empresa.com",
+  telefone: "11999999999",
+  endereco: {
+    rua: "Rua das Flores",
+    numero: 123,
+    cidade: "São Paulo",
+    estado: "SP"
+  },
+  departamento: "TI",
+  salario: 8000,
+  calcularSalarioAnual() {
+    return this.salario * 12;
+  }
+};
+
+console.log(`Salário anual: R$ ${funcionario.calcularSalarioAnual()}`);
+// Resultado: Salário anual: R$ 96000
+```
+
+</details>
+
+---
+
+Tipagem e estruturas são fundamentais para criar código TypeScript robusto e organizado. Com `type` e `interface`, você define contratos claros para seus objetos, tornando o código mais seguro e fácil de manter. Na próxima seção, exploraremos conceitos mais avançados de manipulação de objetos.

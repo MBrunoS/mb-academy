@@ -1,0 +1,12 @@
+{
+  "title": "Estruturas de Dados",
+  "description": "Aprenda a trabalhar com arrays e objetos para organizar e manipular dados de forma eficiente.",
+  "pages": [
+    "index",
+    "arrays-introduction",
+    "arrays-advanced",
+    "objects-introduction",
+    "objects-typing",
+    "objects-advanced"
+  ]
+}

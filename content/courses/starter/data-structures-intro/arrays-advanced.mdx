@@ -1,0 +1,240 @@
+---
+title: Conceitos Avançados de Arrays
+description: "Aprenda conceitos avançados de arrays: multidimensionais, operadores spread/rest e desestruturação."
+---
+
+## Arrays multidimensionais
+
+Um array também pode conter **outros arrays dentro de si** — isso é chamado de **array multidimensional**. Funciona como uma tabela com linhas e colunas:
+
+```ts
+let matriz: number[][] = [
+  [1, 2],
+  [3, 4],
+  [5, 6]
+];
+
+console.log(matriz[0][0]); // 1
+console.log(matriz[2][1]); // 6
+```
+
+Esse tipo de estrutura é útil para representar dados organizados em grades, como um tabuleiro de jogo, um calendário, ou a estrutura de uma planilha.
+
+### Tipagem de arrays multidimensionais
+
+Para arrays mais complexos, podemos usar tipos mais específicos:
+
+```ts
+// Array de arrays de strings
+let tabuleiro: string[][] = [
+  ["X", "O", "X"],
+  ["O", "X", "O"],
+  ["X", "O", "X"]
+];
+
+// Array de arrays de números com tamanho fixo (tupla)
+let coordenadas: [number, number][] = [
+  [10, 20],
+  [30, 40],
+  [50, 60]
+];
+```
+
+## Spread e Rest: trabalhando com múltiplos valores
+
+À medida que você começar a trabalhar com arrays com mais frequência, vai perceber que em alguns momentos será necessário **espalhar** os valores de um array em outro local — ou, no caminho inverso, **agrupar múltiplos valores** em um único array. Para isso, o TypeScript oferece duas ferramentas poderosas que compartilham a mesma sintaxe: os **operadores spread** e **rest**. Ambos usam `...`, mas têm comportamentos diferentes dependendo do contexto.
+
+### Spread (`...`) — espalhando valores
+
+O operador spread permite **desempacotar** os valores de um array (ou objeto) para que eles sejam passados um a um para outro local: outro array ou uma função.
+
+Por exemplo, digamos que temos um array com alguns números e queremos criar outro array com os mesmos números, mas adicionando mais alguns:
+
+```ts
+let numeros: number[] = [1, 2, 3];
+let novosNumeros: number[] = [...numeros, 4, 5];
+
+console.log(novosNumeros); // [1, 2, 3, 4, 5]
+```
+
+O `...numeros` pegou os itens 1, 2 e 3 e os "espalhou" dentro do novo array.
+
+O spread também é útil para **copiar arrays** (sem criar referência):
+
+```ts
+let original: string[] = ["a", "b", "c"];
+let copia: string[] = [...original];
+
+copia.push("d");
+
+console.log(original); // ["a", "b", "c"]
+console.log(copia);    // ["a", "b", "c", "d"]
+```
+
+Se tivéssemos feito `let copia = original`, os dois apontariam para o mesmo array. Com spread, criamos uma **cópia real**.
+
+Outra aplicação comum é passar os elementos de um array como argumentos individuais de uma função:
+
+```ts
+function somar(a: number, b: number, c: number): number {
+  return a + b + c;
+}
+
+let valores: number[] = [2, 4, 6];
+console.log(somar(...valores)); // 12
+```
+
+### Rest (`...`) — agrupando valores
+
+Enquanto o spread serve para espalhar elementos, o **rest** faz o oposto: **agrupa múltiplos valores em um array**. Ele é usado geralmente na **declaração de funções**, quando você não sabe quantos argumentos vai receber.
+
+```ts
+function listar(...itens: string[]): void {
+  console.log("Itens recebidos:", itens);
+}
+
+listar("banana", "maçã", "laranja");
+// Itens recebidos: ["banana", "maçã", "laranja"]
+```
+
+Note que `...itens` capturou **todos os argumentos** passados e agrupou em um array.
+
+Você também pode usar o rest com desestruturação de arrays, para capturar os "restantes":
+
+```ts
+let numeros: number[] = [10, 20, 30, 40];
+let [primeiro, ...outros]: [number, ...number[]] = numeros;
+
+console.log(primeiro); // 10
+console.log(outros);   // [20, 30, 40]
+```
+
+Essa técnica é especialmente útil quando queremos separar os primeiros itens de uma lista, ou tratar o "resto" de maneira separada.
+
+Em resumo:
+
+| Símbolo | Nome | O que faz | Onde é usado |
+| --- | --- | --- | --- |
+| `...x` | Spread | Espalha elementos individuais | Chamadas de função, arrays, objetos |
+| `...x` | Rest | Agrupa vários elementos em um array | Parâmetros de função, desestruturação |
+
+Apesar de usarem a mesma sintaxe (`...`), o comportamento do operador depende do **contexto**. Com o tempo, você vai perceber o quanto essas ferramentas tornam seu código mais limpo, expressivo e moderno.
+
+## Desestruturação de arrays
+
+Desestruturar um array significa extrair seus valores de forma prática para variáveis. Isso é feito usando colchetes:
+
+```ts
+let numeros: number[] = [10, 20, 30];
+let [a, b, c]: [number, number, number] = numeros;
+
+console.log(a); // 10
+console.log(b); // 20
+```
+
+Você pode ignorar valores usando vírgulas vazias:
+
+```ts
+let [primeiro, , terceiro]: [number, any, number] = numeros;
+```
+
+E também pode usar **rest operator** para capturar os "restantes":
+
+```ts
+let [head, ...resto]: [number, ...number[]] = [1, 2, 3, 4];
+console.log(head);  // 1
+console.log(resto); // [2, 3, 4]
+```
+
+Essas técnicas tornam o código mais limpo e moderno, e são muito úteis na hora de receber arrays de dados de uma API ou dividir partes de uma lista para tratar separadamente.
+
+## Tipos avançados para arrays
+
+### Arrays com tipos mistos (Union Types)
+
+```ts
+let misto: (string | number)[] = ["texto", 42, "outro", 100];
+```
+
+### Arrays readonly
+
+```ts
+let numeros: readonly number[] = [1, 2, 3, 4, 5];
+// numeros.push(6); // Erro! Array é readonly
+```
+
+### Tuplas (arrays com tamanho e tipos fixos)
+
+```ts
+let coordenada: [number, number] = [10, 20];
+let rgb: [number, number, number] = [255, 128, 0];
+```
+
+### Arrays de objetos tipados
+
+```ts
+interface Pessoa {
+  nome: string;
+  idade: number;
+}
+
+let pessoas: Pessoa[] = [
+  { nome: "Ana", idade: 25 },
+  { nome: "João", idade: 30 }
+];
+```
+
+## Para praticar
+
+Vamos criar um sistema de gerenciamento de notas usando conceitos avançados de arrays.
+
+**Cenário:** Você precisa processar notas de alunos e gerar relatórios.
+
+**Requisitos:**
+
+1. Crie um array de objetos `alunos` com `nome: string` e `notas: number[]`.
+2. Use desestruturação para extrair a primeira nota de cada aluno.
+3. Use spread operator para criar um array com todas as notas de todos os alunos.
+4. Calcule a média geral usando `reduce`.
+5. Use rest operator em uma função para receber notas variáveis.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+interface Aluno {
+  nome: string;
+  notas: number[];
+}
+
+let alunos: Aluno[] = [
+  { nome: "Ana", notas: [8, 7, 9] },
+  { nome: "João", notas: [6, 8, 7] },
+  { nome: "Maria", notas: [9, 9, 10] }
+];
+
+// Desestruturação para extrair primeira nota
+let primeirasNotas: number[] = alunos.map(([primeiraNota]) => primeiraNota);
+
+// Spread para juntar todas as notas
+let todasNotas: number[] = alunos.reduce((acc, aluno) => [...acc, ...aluno.notas], []);
+
+// Calcular média geral
+let mediaGeral: number = todasNotas.reduce((acc, nota) => acc + nota, 0) / todasNotas.length;
+
+// Função com rest operator
+function calcularMedia(...notas: number[]): number {
+  return notas.reduce((acc, nota) => acc + nota, 0) / notas.length;
+}
+
+console.log("Primeiras notas:", primeirasNotas);
+console.log("Todas as notas:", todasNotas);
+console.log("Média geral:", mediaGeral.toFixed(2));
+console.log("Média de algumas notas:", calcularMedia(8, 7, 9, 6));
+```
+
+</details>
+
+---
+
+Arrays avançados abrem um mundo de possibilidades para organizar e manipular dados complexos. Com spread/rest operators, desestruturação e tipagens avançadas, você tem ferramentas poderosas para criar código mais expressivo e seguro. Esses conceitos são fundamentais para trabalhar com dados reais em aplicações modernas.

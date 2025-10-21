@@ -1,0 +1,129 @@
+---
+title: Introdução aos Objetos
+description: "Aprenda a criar, acessar e modificar objetos para representar entidades com propriedades nomeadas."
+---
+
+Depois de aprender a trabalhar com arrays — estruturas ideais para lidar com **listas ordenadas** de valores — é hora de conhecer outra estrutura fundamental do TypeScript: os **objetos**. Eles são a ferramenta mais poderosa da linguagem para **organizar dados complexos**, especialmente quando queremos representar **entidades com várias características**.
+
+Se arrays servem para organizar informações como uma sequência (índices numéricos), objetos funcionam como uma **coleção de propriedades nomeadas**. Em vez de acessar os valores por posição, como `array[0]`, você os acessa por **nome**, como `objeto.nome`. Isso faz com que objetos sejam perfeitos para representar **dados do mundo real**, como um usuário, um produto, um livro, um endereço — qualquer coisa com atributos.
+
+## O que é um objeto?
+
+Um objeto é uma **estrutura composta por pares de chave e valor**, também chamados de **propriedades**. Cada chave (ou propriedade) é uma **string** que descreve o nome do dado, e o valor pode ser qualquer tipo: número, texto, booleano, função, outro objeto, ou até mesmo um array.
+
+## Criando e Usando Objetos
+
+Podemos criar objetos usando chaves `{}`. Veja um exemplo de um objeto que representa uma pessoa:
+
+```ts
+let pessoa = {
+  nome: "Marina",
+  idade: 30,
+  profissao: "Designer"
+};
+
+// Se tentarmos adicionar uma propriedade que não existe no objeto, o TypeScript acusa um erro.
+// pessoa.cidade = "São Paulo"; // Erro!
+```
+
+### Acessando e Modificando Propriedades
+
+O acesso e a modificação são feitos com a **notação de ponto (`.`)**, que é a forma mais comum:
+
+```ts
+console.log(pessoa.nome); // "Marina"
+console.log(pessoa.idade);     // 30
+console.log(pessoa.profissao); // "Designer"
+```
+
+Também é possível acessar usando colchetes:
+
+```ts
+console.log(pessoa["nome"]); // "Marina"
+```
+
+Essa notação com colchetes é útil quando o nome da propriedade está dentro de uma variável:
+
+```ts
+let prop = "idade";
+console.log(pessoa[prop]); // 30
+```
+
+A notação de colchetes também permite acessar propriedades com nomes compostos ou caracteres especiais, como veremos adiante.
+
+Ambas as notações funcionam, mas a **notação de ponto é preferível** sempre que possível, por ser mais legível e fácil de usar.
+
+## Adicionando e modificando propriedades
+
+Objetos em TypeScript são **dinâmicos**, ou seja, podem ser **modificados a qualquer momento**. Você pode atualizar propriedades existentes com facilidade, usando tanto a notação de ponto quanto a notação de colchetes:
+
+```ts
+// Atualizando uma propriedade existente
+pessoa.idade = 26;
+pessoa['profissao'] = "Programador";
+```
+
+As alterações são imediatas e persistem enquanto o objeto estiver na memória.
+
+Também podemos remover propriedades opcionais (que podem ser `undefined`) com o operador `delete`:
+
+```ts
+const outraPessoa = {
+  nome: "João",
+  idade: 25,
+  profissao: "Designer",
+  temGato: undefined
+};
+
+delete outraPessoa.temGato;
+```
+
+Em sistemas reais, essa flexibilidade é extremamente útil, pois muitas vezes os dados são montados dinamicamente com base em informações externas — como o preenchimento de um formulário, o retorno de uma API, ou a resposta de um servidor.
+
+Mas com grande flexibilidade, vem a responsabilidade: modificar ou remover propriedades arbitrariamente, sem controle, pode gerar objetos confusos e difíceis de manter. Por isso, é importante manter **nomes coerentes, padronizados e organizados** dentro dos objetos.
+
+## Para praticar
+
+Vamos criar um objeto simples para representar um produto.
+
+**Cenário:** Crie um objeto que represente um produto de uma loja.
+
+**Requisitos:**
+
+1. Crie um objeto chamado `produto` com as propriedades: `nome` (string), `preco` (number) e `disponivel` (boolean).
+2. Acesse e exiba cada propriedade no console.
+3. Modifique o preço do produto.
+4. Adicione uma nova propriedade `categoria` (string).
+5. Exiba o objeto completo no console.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+let produto = {
+  nome: "Smartphone",
+  preco: 1200,
+  disponivel: true
+};
+
+// Acessando propriedades
+console.log("Nome:", produto.nome);
+console.log("Preço:", produto.preco);
+console.log("Disponível:", produto.disponivel);
+
+// Modificando propriedades
+produto.preco = 1000;
+console.log("Novo preço:", produto.preco);
+
+// Adicionando nova propriedade
+produto.categoria = "Eletrônicos";
+
+// Exibindo objeto completo
+console.log("Produto completo:", produto);
+```
+
+</details>
+
+---
+
+Objetos básicos são fundamentais para organizar dados com propriedades nomeadas. Com eles, você pode representar entidades do mundo real de forma clara e estruturada. Na próxima seção, aprenderemos sobre tipagem e estruturas mais complexas.

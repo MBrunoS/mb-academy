@@ -1,6 +1,6 @@
 ---
 title: Programação Orientada a Objetos
-description: "Aprenda os conceitos de Programação Orientada a Objetos (POO) com classes, objetos, herança e polimorfismo em JavaScript."
+description: "Aprenda os pilares da Programação Orientada a Objetos (POO)"
 ---
 
 A essa altura, você já conhece variáveis, funções, arrays, objetos e estruturas de controle. Com isso, já consegue construir programas úteis e funcionais. Mas conforme os programas crescem, a organização do código se torna cada vez mais importante. Chega um ponto em que não basta só "fazer funcionar" — é preciso manter o código legível, modular, reutilizável e fácil de manter.
@@ -15,11 +15,13 @@ Esses objetos são inspirados no mundo real. Por exemplo, um objeto `Carro` pode
 
 A ideia é **encapsular dados e comportamentos** relacionados em um único "pacote" lógico, o objeto. Isso melhora a organização, reduz repetições e facilita a manutenção e a evolução dos sistemas.
 
-## Classes e objetos: o molde e a instância
+TypeScript, por ser fortemente tipado, é uma linguagem excelente para aplicar os conceitos de POO com clareza e segurança.
+
+## Classes e Objetos: O Molde e a Instância
 
 Até agora, vimos como criar objetos manualmente usando a notação literal `{}`. Isso funciona bem quando precisamos de poucos objetos com estrutura simples e pontual. Por exemplo:
 
-```js
+```ts
 let aluno1 = {
   nome: "Ana",
   idade: 22,
@@ -43,52 +45,25 @@ Para evitar esse problema, usamos **classes**: um molde (ou modelo) que define a
 
 Veja um exemplo simples:
 
-```js
-class Pessoa {
-  constructor(nome, idade) {
-    this.nome = nome;
-    this.idade = idade;
-  }
-
-  apresentar() {
-    console.log(`Olá, meu nome é ${this.nome} e tenho ${this.idade} anos.`);
-  }
-}
-```
-
-Neste exemplo:
-
-- `Pessoa` é a classe.
-- O método `constructor` define o que deve acontecer quando criamos uma nova pessoa. A palavra-chave `this` aqui se refere à **instância** específica do objeto que está sendo criada. Quando escrevemos `this.nome = nome;`, estamos dizendo: "defina a propriedade `nome` **deste objeto** que estou criando com o valor que recebi no parâmetro `nome`".
-- `this.nome` e `this.idade` são as **propriedades** de cada instância.
-- `apresentar()` é um **método**, ou seja, um comportamento da pessoa.
-
-Para criar objetos com base na classe, usamos a palavra-chave `new`:
-
-```js
-let pessoa1 = new Pessoa("Lúcia", 30);
-let pessoa2 = new Pessoa("Carlos", 45);
-
-pessoa1.apresentar(); // Olá, meu nome é Lúcia e tenho 30 anos.
-pessoa2.apresentar(); // Olá, meu nome é Carlos e tenho 45 anos.
-```
-
-Cada pessoa criada tem seus próprios dados, mas compartilha os mesmos métodos e estrutura.
-
-Agora veja o mesmo exemplo inicial usando uma classe:
-
-```js
+```ts
 class Aluno {
-  constructor(nome, idade) {
+  // Propriedades (atributos)
+  nome: string;
+  idade: number;
+
+  // O construtor é um método especial para criar e inicializar um objeto
+  constructor(nome: string, idade: number) {
     this.nome = nome;
     this.idade = idade;
   }
 
-  apresentar() {
+  // Método (comportamento)
+  apresentar(): void {
     console.log(`Oi, sou ${this.nome} e tenho ${this.idade} anos.`);
   }
 }
 
+// Criando instâncias (objetos) da classe Aluno
 let aluno1 = new Aluno("Ana", 22);
 let aluno2 = new Aluno("Bruno", 24);
 
@@ -98,156 +73,120 @@ aluno2.apresentar(); // Oi, sou Bruno e tenho 24 anos.
 
 Com isso, temos um código mais **organizado, reaproveitável e escalável**. Basta criar novas instâncias da classe `Aluno`, e todas terão os mesmos comportamentos definidos pela classe.
 
-### Trabalhando com Múltiplos Objetos
-
-Uma das grandes vantagens de usar classes é a facilidade de criar e gerenciar múltiplas instâncias. Podemos, por exemplo, armazenar vários alunos em um array e depois usar um loop para interagir com cada um deles, conectando o que aprendemos sobre POO com arrays e estruturas de repetição.
-
-```js
-let turma = [
-  new Aluno("Ana", 22),
-  new Aluno("Bruno", 24),
-  new Aluno("Carla", 21)
-];
-
-// Usando o forEach que aprendemos no capítulo de arrays
-turma.forEach(aluno => {
-  aluno.apresentar();
-});
-```
-
-Este código irá exibir a apresentação de cada aluno na turma, demonstrando como a combinação de diferentes conceitos do JavaScript nos permite construir estruturas de dados mais complexas e lógicas.
-
-## Os pilares da Programação Orientada a Objetos
+## Os Pilares da POO com TypeScript
 
 A POO se sustenta sobre três pilares principais, que definem sua forma de organizar código:
 
-1. **Encapsulamento**
-2. **Herança**
-3. **Polimorfismo**
+### 1. Encapsulamento: Protegendo os Dados
 
-Vamos entender cada um com calma, com exemplos simples e práticos.
+Encapsulamento é a prática de **esconder os detalhes internos** de um objeto e expor apenas o necessário. Em TypeScript, usamos **modificadores de acesso** para isso:
 
-### Encapsulamento: protegendo os dados
-
-O encapsulamento, consiste em **esconder os detalhes internos de implementação** e permitir acesso apenas ao que for realmente necessário.
-
-Isso é feito criando uma **interface pública**, com métodos específicos para leitura ou alteração, e mantendo a lógica interna separada. Isso evita que o usuário (ou outro programador) use o objeto de forma incorreta ou inesperada.
+-   **`public`**: A propriedade ou método é acessível de qualquer lugar (padrão, se não for especificado).
+-   **`private`**: Acessível apenas **dentro** da própria classe. É usado para proteger dados sensíveis.
+-   **`protected`**: Acessível dentro da classe e de classes que herdam dela.
 
 A ideia é: **quanto menos o código externo souber sobre o funcionamento interno de um objeto, melhor**. Isso ajuda a evitar efeitos colaterais e torna o código mais seguro e fácil de refatorar.
 
-No JavaScript moderno, podemos usar o símbolo `#` para declarar propriedades **privadas**, acessíveis apenas dentro da própria classe:
+```ts
+class ContaBancaria {
+  private saldo: number = 0;
 
-```js
-class Conta {
-  #saldo = 0;
-
-  depositar(valor) {
-    this.#saldo += valor;
+  depositar(valor: number): void {
+    if (valor > 0) {
+      this.saldo += valor;
+    }
   }
 
-  verSaldo() {
-    console.log(`Saldo atual: R$ ${this.#saldo}`);
+  verSaldo(): number {
+    return this.saldo;
   }
 }
 
-let conta = new Conta();
-conta.depositar(100);
-conta.verSaldo(); // Saldo atual: R$ 100
-// conta.#saldo = 1000; // Erro: propriedade privada
+let minhaConta = new ContaBancaria();
+minhaConta.depositar(100);
+console.log(minhaConta.verSaldo()); // 100
+// minhaConta.saldo = 5000; // Erro! A propriedade 'saldo' é privada.
+```
+
+TypeScript também oferece uma sintaxe mais curta para declarar propriedades diretamente no construtor:
+
+```ts
+class Produto {
+  // Declara e inicializa as propriedades no construtor
+  constructor(public nome: string, private preco: number) {}
+
+  getPreco(): number {
+    return this.preco;
+  }
+}
 ```
 
 Esse controle evita que o saldo seja alterado diretamente, forçando o uso do método `depositar`, onde podemos aplicar validações e proteger a integridade dos dados.
 
 Além de segurança, o encapsulamento favorece o **princípio da responsabilidade única**, pois cada classe cuida apenas do que é seu e se comunica com o exterior por meio de métodos específicos.
 
-### Herança: especializando comportamentos
+### 2. Herança: Reutilizando Código
 
 Herança é o processo de **criar uma nova classe baseada em outra já existente**, herdando seus atributos e comportamentos. Isso permite **reutilizar código** e criar uma hierarquia lógica entre classes.
 
-A classe que serve de base é chamada de **superclasse** (ou classe pai), e a classe que herda dela é chamada de **subclasse** (ou classe filha).
+A classe que serve de base é chamada de **superclasse** (ou classe pai), e a classe que herda dela é chamada de **subclasse** (ou classe filha), e usa a palavra-chave `extends`.
 
 Por exemplo, podemos criar uma classe genérica `Animal`, e a partir dela criar subclasses `Cachorro` e `Gato` que herdam suas características, mas também definem comportamentos próprios:
 
-```js
+```ts
 class Animal {
-  constructor(nome) {
-    this.nome = nome;
-  }
+  constructor(public nome: string) {}
 
-  emitirSom() {
-    console.log("Som genérico");
+  mover(distancia: number = 0): void {
+    console.log(`${this.nome} moveu-se ${distancia}m.`);
   }
 }
 
 class Cachorro extends Animal {
-  emitirSom() {
-    console.log("Au au!");
+  // O construtor da subclasse deve chamar o construtor da superclasse com `super()`
+  constructor(nome: string) {
+    super(nome);
+  }
+
+  latir(): void {
+    console.log("Au, au!");
   }
 }
 
-let dog = new Cachorro("Bolt");
-dog.emitirSom(); // "Au au!"
-```
-
-Note que a subclasse `Cachorro` **sobrescreveu** (`override`) o método `emitirSom`, mas manteve o resto da estrutura herdada de `Animal`.
-
-A herança também permite o uso da palavra-chave `super` para acessar o comportamento da superclasse:
-
-```js
-class Cavalo extends Animal {
-  emitirSom() {
-    super.emitirSom(); // Chama a versão da classe pai
-    console.log(`${this.nome} relincha: Hiiiiii!`);
-  }
-}
+let dog = new Cachorro("Rex");
+dog.latir();    // Au, au!
+dog.mover(10);  // Rex moveu-se 10m.
 ```
 
 A herança facilita a criação de hierarquias lógicas no código e reduz repetição, mas deve ser usada com cuidado para manter o design simples e compreensível.
 
-### Polimorfismo: diferentes formas de agir
+### 3. Polimorfismo: Múltiplas Formas
 
-Polimorfismo é a capacidade de usar o **mesmo método** com objetos diferentes, obtendo **resultados específicos de cada um**. Isso torna o código mais genérico e adaptável, pois podemos trabalhar com diversas classes como se fossem uma só — desde que compartilhem a mesma interface (ou seja, os mesmos métodos).
+Polimorfismo é a capacidade de um método se comportar de maneiras diferentes dependendo do objeto que o chama, obtendo resultados específicos de cada um. Isso geralmente é alcançado **sobrescrevendo** um método da superclasse, e torna o código mais genérico e adaptável, pois podemos trabalhar com diversas classes como se fossem uma só — desde que compartilhem a mesma interface (ou seja, os mesmos métodos).
 
-Continuando o exemplo dos animais:
+```ts
+class Gato extends Animal {
+  constructor(nome: string) {
+    super(nome);
+  }
 
-```js
-let animais = [
-  new Cachorro("Rex"),
-  new Gato("Felix"),
-  new Cavalo("Spirit")
-];
-
-for (let animal of animais) {
-  animal.emitirSom(); // Cada um executa sua própria versão do método
-}
-```
-
-Mesmo usando o mesmo comando (`animal.emitirSom()`), o comportamento depende de **qual classe foi instanciada**. Isso é extremamente útil ao lidar com coleções de objetos, interfaces gráficas, eventos ou estratégias de negócio.
-
-Outro exemplo mais prático seria uma função que recebe qualquer "meio de transporte" e chama `mover()`:
-
-```js
-class Bicicleta {
-  mover() {
-    console.log("Pedalando...");
+  // Sobrescrevendo o método mover
+  mover(distancia: number = 5): void {
+    console.log("Pulo silencioso...");
+    super.mover(distancia);
   }
 }
 
-class Carro {
-  mover() {
-    console.log("Acelerando...");
-  }
-}
+let rex = new Cachorro("Rex");
+let felix = new Gato("Felix");
 
-function iniciarViagem(transporte) {
-  transporte.mover();
-}
-
-iniciarViagem(new Bicicleta()); // Pedalando...
-iniciarViagem(new Carro());     // Acelerando...
+rex.mover(10);   // Rex moveu-se 10m.
+felix.mover();   // Pulo silencioso... Felix moveu-se 5m.
 ```
 
-Com polimorfismo, a função `iniciarViagem` não precisa se preocupar com qual tipo de transporte está usando — basta confiar que ele sabe se mover. Isso torna o código mais flexível, genérico e fácil de expandir.
+Neste exemplo, a classe `Gato` sobrescreve o método `mover` da classe `Animal`, fazendo com que o gato se mova de forma diferente.
+
+Esse é um exemplo simples, mas mostra como o polimorfismo pode ser usado para criar código mais genérico e adaptável.
 
 ---
 
@@ -265,4 +204,4 @@ você começa a construir sistemas que são **modulares, escaláveis e mais fác
 
 Esses conceitos também são fundamentais para compreender como **frameworks, bibliotecas e componentes** funcionam por baixo dos panos — e são amplamente utilizados em praticamente toda aplicação JavaScript profissional.
 
-Na próxima etapa, vamos mudar um pouco o foco: agora que você já tem uma boa base de programação com JavaScript, vamos montar **seu ambiente de desenvolvimento** e preparar todas as ferramentas necessárias para construir aplicações web reais com confiança.
+Na próxima etapa, vamos mudar um pouco o foco: agora que você já tem uma boa base de programação com TypeScript, vamos montar **seu ambiente de desenvolvimento** e preparar todas as ferramentas necessárias para construir aplicações web reais com confiança.

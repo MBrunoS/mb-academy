@@ -1,0 +1,249 @@
+---
+title: Funções Avançadas
+description: "Aprenda conceitos avançados de funções: parâmetros com valores padrão, funções anônimas, arrow functions e callbacks."
+---
+
+## Parâmetros com valores padrão
+
+Podemos definir valores padrão para parâmetros, que serão usados caso nenhum argumento seja fornecido. O TypeScript infere o tipo a partir do valor padrão, mas você pode anotar o tipo explicitamente.
+
+```ts
+function saudar(nome: string = "visitante"): void {
+  console.log(`Olá, ${nome}!`);
+}
+
+saudar("Clara"); // Olá, Clara!
+saudar(); // Olá, visitante!
+```
+
+No primeiro caso, a função usa o valor `"Clara"` que foi passado como argumento. No segundo, como nenhum argumento foi fornecido, o parâmetro `nome` assume o valor `"visitante"`.
+
+Você pode combinar vários parâmetros com valores padrão:
+
+```ts
+function apresentar(nome = "alguém", idade = 0) {
+  console.log(`${nome} tem ${idade} anos.`);
+}
+
+apresentar();                     // alguém tem 0 anos.
+apresentar("João");               // João tem 0 anos.
+apresentar("Laura", 25);          // Laura tem 25 anos.
+```
+
+Valores padrão são avaliados **somente quando o argumento está ausente ou é `undefined`**. Isso significa que se você passar `null`, ele será considerado como valor válido:
+
+```ts
+function saudacao(nome = "anônimo") {
+  console.log("Olá, " + nome + "!");
+}
+
+saudacao(null); // Olá, null!
+```
+
+Esse detalhe é importante para evitar confusões. Se você quiser tratar `null` como ausência de valor, terá que verificar isso manualmente dentro da função.
+
+## Guardando funções em variáveis
+
+Funções podem ser tratadas como valores. Isso significa que podemos **armazenar uma função em uma variável**, da mesma forma que armazenamos números, textos ou objetos.
+
+```ts
+const exibirMensagem = function () {
+  console.log("Essa é uma função armazenada em uma variável.");
+};
+
+exibirMensagem(); // Essa é uma função armazenada em uma variável.
+```
+
+Quando fazemos isso, estamos criando uma **função anônima** — ou seja, uma função **sem nome próprio** — e atribuindo ela a uma variável, que passa a ser usada como identificador da função. A função ainda pode ser chamada normalmente usando o nome da variável.
+
+Esse tipo de construção é extremamente útil em situações onde queremos:
+
+- Passar funções como argumentos para outras funções (callbacks);
+- Armazenar funções dentro de objetos (como métodos);
+- Substituir funções dinamicamente durante a execução do programa.
+
+Por exemplo:
+
+```ts
+const mostrar = function () {
+  console.log("Sou uma função anônima!");
+};
+
+function executar(funcao) {
+  funcao(); // Executa a função recebida como argumento
+}
+
+executar(mostrar);
+```
+
+Também é comum criar a função diretamente dentro do argumento:
+
+```ts
+executar(function () {
+  console.log("Executando diretamente um comportamento!");
+});
+```
+
+Esse estilo abre portas para a **programação funcional**, que é um dos paradigmas mais importantes no JavaScript moderno.
+
+## Arrow Functions
+
+As **arrow functions** (`=>`) são uma forma mais concisa de escrever funções. O TypeScript integra a sintaxe de tipos perfeitamente com elas.
+
+```ts
+// Função tradicional
+function somar(a: number, b: number): number {
+  return a + b;
+}
+
+// Arrow function equivalente
+const somarArrow = (a: number, b: number): number => a + b;
+```
+
+Elas são muito úteis para funções curtas e callbacks.
+
+## Funções como argumentos (Callbacks)
+
+Um dos conceitos mais poderosos é o uso de **funções como argumentos**. Isso é possível porque, como vimos, **funções são valores como qualquer outro** — e podem ser passadas como parâmetro, armazenadas em variáveis, ou retornadas por outras funções.
+
+Uma função que é passada como argumento para outra função é chamada de **callback**. Ela será **executada dentro da função principal**, geralmente em resposta a algum evento, ação ou condição.
+
+Veja um exemplo simples:
+
+```ts
+function executar(funcao: Function) {
+  console.log("Iniciando execução...");
+  funcao(); // Executa a função recebida como argumento
+  console.log("Execução finalizada.");
+}
+
+executar(function () {
+  console.log("Olá do callback!");
+});
+```
+
+Neste caso, a função `executar` recebe outra função como argumento e a chama no meio do seu próprio processo. O trecho passado como callback é uma **função anônima** — ou seja, sem nome, criada diretamente como valor.
+
+Em TypeScript, quando uma função aceita um **callback**, podemos definir o tipo desse callback, ou seja, os tipos de seus parâmetros e retorno.
+
+```ts
+type CallbackSaudacao = (nome: string) => void;
+
+function processarUsuario(nome: string, callback: CallbackSaudacao): void {
+  console.log("Processando usuário...");
+  callback(nome);
+}
+
+processarUsuario("Marina", (usuario) => {
+  console.log(`Bem-vindo, ${usuario}!`);
+});
+```
+
+Isso garante que apenas funções que correspondem à assinatura esperada possam ser passadas como argumento.
+
+Callbacks são muito usados para lidar com situações **assíncronas**, como:
+
+- Executar algo depois de um tempo (`setTimeout`)
+- Reagir a eventos do navegador (como cliques de botão)
+- Processar dados recebidos de uma requisição
+- Aplicar transformações em listas com `map`, `filter`, `forEach`
+
+Veja mais exemplos práticos:
+
+```ts
+// Executa algo após 2 segundos
+setTimeout(() => {
+  console.log("Tempo esgotado!");
+}, 2000);
+
+// Processa todos os itens de uma lista
+let nomes = ["Ana", "Pedro", "Lucas"];
+
+nomes.forEach(function (nome: string) {
+  console.log("Olá, " + nome);
+});
+```
+
+Ou usando arrow function:
+
+```ts
+nomes.forEach((nome: string) => console.log("Olá, " + nome));
+```
+
+Uma função também pode **aceitar um callback como forma de configurar seu comportamento**, tornando-se mais genérica e reutilizável:
+
+```ts
+function processarUsuario(nome: string, callback: Function) {
+  console.log("Iniciando processamento...");
+  callback(nome);
+  console.log("Processamento concluído.");
+}
+
+function mostrarSaudacao(usuario: string) {
+  console.log("Bem-vindo, " + usuario + "!");
+}
+
+processarUsuario("Marina", mostrarSaudacao);
+```
+
+Esse tipo de padrão é amplamente utilizado em bibliotecas, APIs e frameworks JavaScript. Dominar callbacks abre caminho para entender conceitos mais avançados, como **promises**, **async/await**, **eventos personalizados** e **programação reativa**.
+
+## Boas práticas ao trabalhar com funções
+
+Funções são ferramentas poderosas, mas seu uso desorganizado pode tornar o código ainda mais difícil de entender. Algumas boas práticas fazem toda a diferença:
+
+- Use **nomes descritivos**. A função deve dizer claramente o que faz: `calcularMedia`, `validarEmail`, `gerarIdAleatorio`.
+- **Evite fazer tudo em uma única função**. Divida responsabilidades. Se sua função está ficando muito longa, provavelmente ela precisa ser dividida.
+- Sempre que possível, prefira **funções puras** — que recebem dados e retornam um resultado, sem depender de variáveis externas nem alterar o que está fora.
+- Não confie cegamente em `console.log`. Retornar valores dá mais controle e permite usar o resultado de forma flexível.
+- Pense nas funções como **peças de LEGO**: pequenas, bem definidas, e que se encaixam para formar estruturas maiores.
+
+## Para praticar
+
+Vamos criar uma função mais complexa que combina vários conceitos aprendidos.
+
+**Cenário:** Crie um sistema para calcular o preço final de um produto com desconto.
+
+**Requisitos:**
+
+1. Crie uma função chamada `calcularDesconto` que aceite dois parâmetros: `precoOriginal` (number) e `percentualDesconto` (number).
+2. A função deve retornar um number representando o preço final após o desconto.
+3. A fórmula é: `precoOriginal - (precoOriginal * percentualDesconto / 100)`.
+4. Crie uma segunda função chamada `exibirPrecoFinal` que receba o preço original, o percentual de desconto e o preço final, e exiba uma mensagem formatada.
+5. Teste com diferentes valores de preço e desconto.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+function calcularDesconto(precoOriginal: number, percentualDesconto: number): number {
+  const valorDesconto = precoOriginal * percentualDesconto / 100;
+  const precoFinal = precoOriginal - valorDesconto;
+  return Math.round(precoFinal * 100) / 100; // Arredonda para 2 casas decimais
+}
+
+function exibirPrecoFinal(precoOriginal: number, percentualDesconto: number, precoFinal: number): void {
+  console.log(`Preço original: R$ ${precoOriginal.toFixed(2)}`);
+  console.log(`Desconto: ${percentualDesconto}%`);
+  console.log(`Preço final: R$ ${precoFinal.toFixed(2)}`);
+}
+
+// Testando a função
+const preco1 = calcularDesconto(100, 15);
+exibirPrecoFinal(100, 15, preco1);
+// Preço original: R$ 100.00
+// Desconto: 15%
+// Preço final: R$ 85.00
+
+const preco2 = calcularDesconto(250, 20);
+exibirPrecoFinal(250, 20, preco2);
+// Preço original: R$ 250.00
+// Desconto: 20%
+// Preço final: R$ 200.00
+```
+
+</details>
+
+---
+
+Funções avançadas abrem um mundo de possibilidades na programação. Com elas, você pode criar código mais flexível, reutilizável e poderoso. Esses conceitos são fundamentais para trabalhar com bibliotecas modernas, frameworks e construir aplicações complexas de forma organizada.

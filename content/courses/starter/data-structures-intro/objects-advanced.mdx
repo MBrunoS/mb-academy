@@ -1,0 +1,261 @@
+---
+title: Conceitos Avançados de Objetos
+description: "Aprenda iteração, desestruturação, propriedades especiais e técnicas avançadas para manipular objetos."
+---
+
+## Iterando sobre objetos
+
+Enquanto arrays são estruturas ordenadas, que podemos percorrer com `for` tradicionais e métodos como `forEach`, os objetos funcionam de forma diferente. Como eles não têm uma ordem garantida entre suas propriedades e não usam índices numéricos, precisamos de outras abordagens para **iterar** (ou seja, **percorrer cada propriedade** de um objeto).
+
+A forma mais direta de fazer isso é usando o **laço `for...in`**, que itera sobre todas as chaves (ou nomes de propriedades) do objeto:
+
+```ts
+let pessoa = {
+  nome: "Mariana",
+  idade: 34,
+  cidade: "Fortaleza"
+};
+
+for (let chave in pessoa) {
+  console.log(chave + ": " + pessoa[chave]);
+}
+```
+
+Esse código exibe:
+
+```
+nome: Mariana
+idade: 34
+cidade: Fortaleza
+```
+
+É importante entender que `for...in` percorre as **chaves**, e não os valores diretamente. Para acessar o valor de cada propriedade, usamos colchetes: `pessoa[chave]`. Isso é necessário porque, durante o loop, `chave` é uma variável, e não um nome fixo.
+
+<Callout>
+Dica: não use for...in em arrays — ele pode percorrer também propriedades herdadas ou índices não numéricos. Para arrays, prefira for, forEach, ou for...of.
+</Callout>
+
+Outra forma moderna de iterar sobre um objeto é usando os métodos do objeto global `Object`, que transformam as propriedades em arrays:
+
+### `Object.keys(objeto)`
+
+Retorna um array com as **chaves** do objeto.
+
+```ts
+let props = Object.keys(pessoa);
+console.log(props); // ["nome", "idade", "cidade"]
+```
+
+### `Object.values(objeto)`
+
+Retorna um array com os **valores**.
+
+```ts
+console.log(Object.values(pessoa)); // ["Mariana", 34, "Fortaleza"]
+```
+
+### `Object.entries(objeto)`
+
+Retorna um array de pares `[chave, valor]`.
+
+```ts
+console.log(Object.entries(pessoa));
+// [["nome", "Mariana"], ["idade", 34], ["cidade", "Fortaleza"]]
+```
+
+Isso nos permite usar `forEach`, `map` e outras funções de array para manipular objetos indiretamente:
+
+```ts
+Object.entries(pessoa).forEach(([chave, valor]) => {
+  console.log(`${chave}: ${valor}`);
+});
+```
+
+Essa abordagem é muito útil para transformar, filtrar ou exibir propriedades de objetos de forma dinâmica — como em formulários, tabelas ou componentes de interface.
+
+## Desestruturação de objetos
+
+A desestruturação de objetos é uma funcionalidade que permite **extrair valores diretamente de um objeto e atribuí-los a variáveis**, de forma concisa e expressiva. Ela é uma alternativa ao acesso tradicional (`objeto.propriedade`) e pode deixar o código mais limpo, especialmente quando precisamos trabalhar com várias propriedades ao mesmo tempo.
+
+Veja a diferença:
+
+```ts
+// Forma tradicional
+let nome = usuario.nome;
+let idade = usuario.idade;
+
+// Com desestruturação
+let { nome, idade } = usuario;
+```
+
+Se o nome da propriedade no objeto for o mesmo nome da variável que você deseja criar, essa forma é perfeita. Mas se quiser criar um nome diferente, pode **renomear** durante a desestruturação:
+
+```ts
+let { nome: nomeCompleto } = usuario;
+console.log(nomeCompleto); // A variável se chama "nomeCompleto", mas pega o valor de "nome"
+```
+
+Também é possível fazer **desestruturação aninhada**, acessando objetos dentro de objetos:
+
+```ts
+let usuario = {
+  nome: "Luan",
+  endereco: {
+    cidade: "Salvador",
+    estado: "BA"
+  }
+};
+
+let { endereco: { cidade, estado } } = usuario;
+console.log(cidade); // "Salvador"
+```
+
+Você pode **usar valores padrão** durante a desestruturação, o que é útil quando uma propriedade pode estar ausente:
+
+```ts
+let { telefone = "sem telefone" } = usuario;
+console.log(telefone); // "sem telefone"
+```
+
+E, com o operador **rest (`...`)**, é possível capturar todas as outras propriedades que não foram extraídas explicitamente:
+
+```ts
+let { nome, ...resto } = usuario;
+console.log(resto);
+// { endereco: { cidade: "Salvador", estado: "BA" } }
+```
+
+A desestruturação também pode ser usada diretamente em parâmetros de função, tornando a leitura mais clara e direta:
+
+```ts
+function exibir({ nome, idade }: { nome: string; idade: number }) {
+  console.log(`${nome} tem ${idade} anos.`);
+}
+
+exibir({ nome: "Lucas", idade: 22 });
+```
+
+Essa técnica é muito comum em bibliotecas como React, especialmente na manipulação de **props**, **state** e dados de **hooks**. Dominar desestruturação é fundamental para trabalhar com TypeScript de forma fluente.
+
+## Propriedades com nomes compostos
+
+Em alguns casos, pode ser necessário criar chaves com **espaços, números iniciais ou caracteres especiais** — por exemplo, se estiver lidando com dados importados de outra fonte, formulários com nomes de campo compostos, ou gerando objetos dinamicamente.
+
+Para isso, usamos **aspas** ao definir a chave:
+
+```ts
+let produto = {
+  "nome completo": "Notebook Dell",
+  "preço (R$)": 3500
+};
+```
+
+Essas propriedades **não podem ser acessadas com a notação de ponto**, pois `produto.nome completo` geraria erro de sintaxe. Para acessar esses nomes compostos, usamos a **notação de colchetes**:
+
+```ts
+console.log(produto["nome completo"]); // "Notebook Dell"
+console.log(produto["preço (R$)"]);    // 3500
+```
+
+Esse recurso permite grande flexibilidade na construção de objetos, mas **deve ser usado com cautela**, pois dificulta o uso da notação de ponto, que é mais legível.
+
+Uma dica prática: **evite espaços** ou caracteres especiais em nomes de propriedade sempre que puder. Use convenções como camelCase (`nomeCompleto`) ou snake_case (`nome_completo`) para manter a clareza e facilitar o acesso.
+
+## Propriedades computadas
+
+Às vezes, você pode precisar que o **nome de uma propriedade** seja determinado dinamicamente — ou seja, baseado no valor de uma variável ou expressão no momento em que o objeto é criado. Para isso, usamos o recurso das **propriedades computadas** (computed properties).
+
+A sintaxe consiste em usar **colchetes** em volta da expressão que determina o nome da chave, dentro da criação do objeto:
+
+```ts
+let campo = "email";
+
+let usuario = {
+  nome: "Beatriz",
+  [campo]: "beatriz@email.com"
+};
+
+console.log(usuario.email); // "beatriz@email.com"
+```
+
+Aqui, a variável `campo` foi usada como o nome da propriedade. Isso é muito útil quando:
+
+- Você está criando objetos de forma programática (ex: a partir de campos de um formulário);
+- Os nomes das propriedades são dinâmicos, baseados em alguma lógica;
+- Você precisa criar múltiplas propriedades com base em um loop ou em dados externos.
+
+Você também pode usar **expressões mais complexas** como chave:
+
+```ts
+let prefixo = "dados_";
+let usuario = {
+  [prefixo + "cpf"]: "123.456.789-00"
+};
+
+console.log(usuario["dados_cpf"]); // "123.456.789-00"
+```
+
+Esse recurso aparece com frequência em aplicações que precisam montar objetos a partir de variáveis ou responder a interações do usuário de forma flexível.
+
+<Callout type="warn">
+Importante: chaves computadas só funcionam na criação do objeto com notação literal (`{}`). Não funcionam com objeto.chave = valor.
+</Callout>
+
+## Para praticar
+
+Vamos criar um sistema de gerenciamento de produtos usando conceitos avançados de objetos.
+
+**Cenário:** Crie um sistema para processar dados de produtos de uma loja.
+
+**Requisitos:**
+
+1. Crie um objeto `produto` com propriedades: `nome`, `preco`, `categoria` e `disponivel`.
+2. Use `Object.keys()` para obter todas as chaves do objeto.
+3. Use `Object.values()` para obter todos os valores.
+4. Use `Object.entries()` para iterar sobre o objeto e exibir cada par chave-valor.
+5. Use desestruturação para extrair `nome` e `preco` em variáveis separadas.
+6. Crie uma função que receba um objeto produto via desestruturação e calcule o preço com desconto.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+let produto = {
+  nome: "Smartphone",
+  preco: 1200,
+  categoria: "Eletrônicos",
+  disponivel: true
+};
+
+// Object.keys()
+console.log("Chaves:", Object.keys(produto));
+// Resultado: ["nome", "preco", "categoria", "disponivel"]
+
+// Object.values()
+console.log("Valores:", Object.values(produto));
+// Resultado: ["Smartphone", 1200, "Eletrônicos", true]
+
+// Object.entries()
+console.log("Entradas:");
+Object.entries(produto).forEach(([chave, valor]) => {
+  console.log(`${chave}: ${valor}`);
+});
+
+// Desestruturação
+let { nome, preco } = produto;
+console.log(`Produto: ${nome}, Preço: R$ ${preco}`);
+
+// Função com desestruturação
+function calcularDesconto({ preco }: { preco: number }, percentual: number): number {
+  return preco * (1 - percentual / 100);
+}
+
+let precoComDesconto = calcularDesconto(produto, 10);
+console.log(`Preço com 10% de desconto: R$ ${precoComDesconto}`);
+```
+
+</details>
+
+---
+
+Conceitos avançados de objetos abrem um mundo de possibilidades para manipular dados complexos. Com iteração, desestruturação e propriedades especiais, você tem ferramentas poderosas para criar código mais expressivo e flexível. Esses conceitos são fundamentais para trabalhar com dados reais em aplicações modernas.

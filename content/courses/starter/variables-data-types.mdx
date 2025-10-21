@@ -129,6 +129,27 @@ Usados para comparar valores. O resultado é sempre um `boolean` (`true` ou `fal
     ```
 -   **Outros operadores**: `>` (maior que), `<` (menor que), `>=` (maior ou igual), `<=` (menor ou igual).
 
+### 4. Operadores de Incremento e Decremento
+
+Estes são operadores unários (atuam em um único valor) que servem como atalhos para adicionar ou subtrair 1 de uma variável numérica.
+
+-   **Incremento (`++`)**: Adiciona 1 ao valor da variável.
+    ```ts
+    let contador: number = 10;
+    contador++; // Agora, contador é 11
+    console.log(contador);
+    ```
+-   **Decremento (`--`)**: Subtrai 1 do valor da variável.
+    ```ts
+    let placar: number = 5;
+    placar--; // Agora, placar é 4
+    console.log(placar);
+    ```
+
+<Callout>
+Você pode ver esses operadores antes (prefixo: `++contador`) ou depois (postfixo: `contador++`) da variável. Por enquanto, saiba que ambos modificam a variável, mas o momento em que o valor é retornado na expressão difere. Para um iniciante, o mais importante é entender seu efeito principal de somar ou subtrair 1.
+</Callout>
+
 ## Conversão de Tipos (Type Casting)
 
 Às vezes, recebemos um dado em um formato, mas precisamos usá-lo em outro. Por exemplo, um número que foi digitado em um campo de texto chega para nós como uma `string`. O processo de transformar um tipo de dado em outro é chamado de **conversão de tipos**.

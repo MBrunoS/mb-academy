@@ -1,0 +1,221 @@
+---
+title: Introdução a Arrays
+description: "Aprenda a criar, acessar e manipular arrays para armazenar listas de dados de forma eficiente."
+---
+
+Depois de entender os tipos básicos, vamos conhecer a estrutura de dados mais comum para organizar coleções de informações: os **arrays**.
+
+Arrays são estruturas que nos permitem **armazenar múltiplos valores em uma única variável**. Eles funcionam como **listas ordenadas**, onde cada item ocupa uma posição específica. Imagine uma estante de livros com várias prateleiras: cada prateleira tem um número (posição) e guarda um livro (valor). Você pode acessar o conteúdo de qualquer prateleira informando o número dela. Com arrays, a lógica é a mesma.
+
+Sem arrays, teríamos que criar uma variável para cada dado individual. Para representar as idades de cinco pessoas, por exemplo, precisaríamos fazer algo como:
+
+```ts
+let idade1 = 25;
+let idade2 = 32;
+let idade3 = 29;
+let idade4 = 41;
+let idade5 = 19;
+```
+
+Esse código é repetitivo, difícil de manter, e não funciona bem se quisermos somar todas as idades ou percorrê-las com um loop. Com arrays, podemos resolver isso de forma muito mais eficiente:
+
+## Criando Arrays
+
+A forma mais comum de declarar um array em TypeScript é usando colchetes `[]` após o tipo:
+
+```ts
+let frutas: string[];
+let numeros: number[];
+let booleanos: boolean[];
+```
+
+Uma sintaxe alternativa, mas menos comum, é usar a notação genérica `Array<T>`:
+
+```ts
+let nomes: Array<string>;
+```
+
+A grande vantagem é que o TypeScript nos impede de adicionar itens de um tipo incorreto:
+
+```ts
+// numeros.push("cinco"); // Erro! O array 'numeros' só aceita 'number'.
+```
+
+Isso é muito útil para evitar erros de tipo e manter o código mais seguro.
+
+Para criar um array com valores, podemos usar a sintaxe de inicialização:
+
+```ts
+let frutas: string[] = ["maçã", "banana", "laranja"];
+let numeros: number[] = [1, 2, 3, 4, 5];
+let booleanos: boolean[] = [true, false, true];
+```
+
+O TypeScript também nos permite inferir o tipo de um array a partir dos valores que ele contém:
+
+```ts
+let frutas = ["maçã", "banana", "laranja"]; // TypeScript infere que é do tipo string[]
+let numeros = [1, 2, 3, 4, 5]; // TypeScript infere que é do tipo number[]
+let booleanos = [true, false, true]; // TypeScript infere que é do tipo boolean[]
+```
+
+Nesses casos, o código funciona exatamente como se você tivesse anotado o tipo, mas fica mais limpo e conciso. O TypeScript ainda garantirá que você não atribua um tipo diferente a essas variáveis mais tarde.
+
+<Callout>
+**Quando ser explícito?** É uma boa ideia adicionar o tipo explicitamente quando você cria uma variável sem inicializá-la, ou quando a função de um código não é imediatamente óbvia. Para iniciantes, ser explícito pode ajudar a reforçar o aprendizado.
+</Callout>
+
+## Acessando e Modificando Elementos
+
+Para acessar um item, usamos o nome do array seguido do índice entre colchetes. Para alterar o valor de um item, o processo é o mesmo:
+
+```ts
+let cores: string[] = ["vermelho", "verde", "azul"];
+
+console.log(cores[0]); // "vermelho"
+
+cores[1] = "amarelo";
+console.log(cores); // ["vermelho", "amarelo", "azul"]
+```
+
+Se tentarmos acessar um índice que não existe, o retorno será `undefined`, pois o valor não foi definido:
+
+```ts
+console.log(cores[10]); // undefined
+```
+
+Podemos também adicionar novos elementos "pulando" índices, embora isso crie **buracos** no array:
+
+```ts
+let lista: string[] = [];
+lista[3] = "teste";
+
+console.log(lista); // [empty × 3, "teste"]
+```
+
+O mais recomendado é **usar métodos apropriados** para adicionar itens — falaremos disso em breve.
+
+## Propriedades e Métodos Úteis
+
+Arrays possuem propriedades e métodos úteis, para manipulação e consulta de seus elementos.
+
+-   **`length`**: Retorna o tamanho do array.
+
+    ```ts
+    console.log(cores.length); // 3
+    ```
+
+-   **`push()` e `pop()`**: Adicionam e removem itens no **final** do array.
+-   **`shift()` e `unshift()`**: Adicionam e removem itens no **início** do array.
+-   **`join()`**: Transforma o array em uma string.
+
+## Iterando sobre Arrays
+
+Podemos usar loops `for` ou métodos como `forEach` para percorrer os elementos de um array.
+
+```ts
+let nomes: string[] = ["Ana", "Lucas", "Bruna"];
+
+// Com forEach e arrow function
+nomes.forEach(nome => {
+  console.log(`Olá, ${nome.toUpperCase()}`);
+});
+
+// Com for...of
+for (let nome of nomes) {
+  console.log(`Olá, ${nome.toUpperCase()}`);
+}
+```
+
+## Métodos de Transformação: map, filter e reduce
+
+Os métodos `map`, `filter` e `reduce` são essenciais para a programação funcional com arrays em TypeScript. Eles permitem criar código declarativo e poderoso.
+
+### `map` - Transformando cada item
+
+Cria um **novo array** aplicando uma função a cada elemento do array original. É perfeito para quando você quer transformar cada item de uma lista em outra coisa.
+
+Exemplo: dobrar cada número de um array.
+
+```ts
+let numeros: number[] = [1, 2, 3, 4];
+let dobrados: number[] = numeros.map(function(numero) {
+  return numero * 2;
+});
+
+console.log(dobrados); // [2, 4, 6, 8]
+console.log(numeros);  // [1, 2, 3, 4] (o original não é modificado)
+```
+
+Com arrow function, fica ainda mais limpo:
+
+```ts
+let dobrados: number[] = numeros.map(numero => numero * 2);
+```
+
+### `filter` - Selecionando itens
+
+Cria um **novo array** com os elementos que passam em um teste (retornam `true`). É ideal para **filtrar** uma lista com base em uma condição.
+
+Exemplo: pegar apenas os números pares.
+
+```ts
+let numeros: number[] = [1, 2, 3, 4, 5, 6];
+let pares: number[] = numeros.filter(n => n % 2 === 0);
+
+console.log(pares); // [2, 4, 6]
+```
+
+### `reduce` - Acumulando um valor
+
+Reduz o array a um **único valor**, aplicando uma função que acumula o resultado. É usado para "reduzir" a lista a um único resultado, como uma soma, uma média, ou um objeto consolidado.
+
+A função redutora recebe dois argumentos principais: o `acumulador` (o valor acumulado até o momento) e o `valorAtual` (o item atual do array).
+
+Exemplo: somar todos os números de um array.
+
+```ts
+let numeros: number[] = [1, 2, 3, 4, 5];
+let soma: number = numeros.reduce((acumulador, valorAtual) => acumulador + valorAtual, 0);
+
+console.log(soma); // 15
+```
+
+## Para praticar
+
+Vamos combinar o poder dos métodos de array para resolver um problema um pouco mais complexo.
+
+**Cenário:** Você tem uma lista de produtos. Precisa calcular o preço total apenas dos produtos que custam mais de R$ 100.
+
+**Requisitos:**
+
+1.  Crie um array de objetos `produtos`. Cada objeto deve ter `nome: string` e `preco: number`.
+2.  Use `filter()` para criar um novo array contendo apenas os produtos com `preco` maior que 100.
+3.  Use `map()` nesse novo array para extrair apenas os preços.
+4.  Use `reduce()` para somar os preços e obter o valor total.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+  ```ts
+  const produtos: { nome: string, preco: number }[] = [
+    { nome: 'Teclado', preco: 120 },
+    { nome: 'Mouse', preco: 80 },
+    { nome: 'Monitor', preco: 1500 },
+    { nome: 'Cadeira', preco: 90 },
+    { nome: 'Headset', preco: 250 }
+  ];
+
+  const totalProdutosCaros: number = produtos
+    .filter(p => p.preco > 100)
+    .map(p => p.preco)
+    .reduce((acc, preco) => acc + preco, 0);
+
+  console.log(`A soma dos produtos com preço maior que R$100 é: R$${totalProdutosCaros}`); 
+  // Resultado: 1870 (120 + 1500 + 250)
+  ```
+</details>
+
+---
+
+Arrays são fundamentais para organizar dados em listas. Com os métodos `map`, `filter` e `reduce`, você tem ferramentas poderosas para manipular essas listas de forma declarativa e eficiente. Na próxima seção, exploraremos conceitos mais avançados de arrays.

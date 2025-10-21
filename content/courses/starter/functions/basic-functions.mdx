@@ -1,0 +1,223 @@
+---
+title: Funções Básicas
+description: "Aprenda a criar funções simples, trabalhar com parâmetros, retornar valores e entender o escopo de variáveis."
+---
+
+## Criando uma função tipada
+
+Para criar uma função em TypeScript, usamos a palavra-chave `function`, seguida por um nome (o identificador da função), parênteses (que podem ou não conter parâmetros tipados), uma anotação do **tipo de retorno** e o bloco de código entre chaves (que contém as instruções a serem executadas).
+
+```ts
+function mostrarMensagem(): void {
+  console.log("Olá! Essa mensagem foi gerada por uma função.");
+}
+```
+
+<Callout>
+  `(): void` significa que a função não recebe parâmetros e não retorna nenhum
+  valor (o retorno é `void`, ou "vazio").
+</Callout>
+
+Para usar a função, basta chamá-la:
+
+```ts
+mostrarMensagem();
+```
+
+Toda vez que `mostrarMensagem()` for executada, o código dentro da função será executado.
+
+Esse simples mecanismo já nos permite **reutilizar comportamentos** sem reescrever as instruções. Imagine que você queira exibir essa mensagem em cinco lugares diferentes do seu código. Basta chamar a função cinco vezes, sem precisar duplicar nenhuma linha.
+
+## Passando informações para uma função
+
+Funções se tornam mais úteis quando **recebem dados como entrada**. Isso é feito por meio dos **parâmetros**, que são variáveis locais declaradas entre os parênteses da função. No momento em que a função é chamada, podemos passar os **argumentos**, que são os valores reais que serão usados nos parâmetros. Em TypeScript, definimos o tipo de cada **parâmetro**.
+
+É importante entender a diferença entre **parâmetro** e **argumento** — dois termos que são parecidos, mas representam coisas distintas.
+
+- **Parâmetro**: O nome e tipo que a função espera receber (`nome: string`), definido entre os parênteses na declaração.
+- **Argumento**: O valor real que passamos na chamada da função (`"Lívia"`).
+
+Por exemplo:
+
+```ts
+function cumprimentar(nome: string): void {
+  console.log(`Olá, ${nome}!`);
+}
+
+cumprimentar("Lívia"); // Olá, Lívia!
+cumprimentar("Fernando"); // Olá, Fernando!
+// cumprimentar(123); // Erro! O argumento deve ser uma string.
+```
+
+Aqui, `nome` é o **parâmetro**, enquanto `"Lívia"` é o **argumento** passado à função.
+
+As funções podem ter múltiplos parâmetros, e a ordem deles importa. O primeiro argumento será atribuído ao primeiro parâmetro, o segundo ao segundo, e assim por diante. Veja um exemplo:
+
+```ts
+function apresentar(nome: string, idade: number, cidade: string): void {
+  console.log(`${nome} tem ${idade} anos e mora em ${cidade}.`);
+}
+
+apresentar("Júlio", 28, "Recife"); // Júlio tem 28 anos e mora em Recife.
+```
+
+Os argumentos passados devem seguir a mesma ordem definida na função, ou os dados podem ser usados de forma incorreta.
+
+Se a função for chamada com **menos argumentos do que parâmetros**, os valores que faltarem serão `undefined`. Isso pode gerar comportamentos inesperados, por isso é bom garantir que os dados estejam sempre completos — ou então usar **valores padrão** para os parâmetros, como veremos a seguir.
+
+Também é possível passar **valores que vêm de variáveis**:
+
+```ts
+let usuario = "Mariana";
+cumprimentar(usuario); // Olá, Mariana!
+```
+
+Esse padrão será muito comum em programas reais, onde os dados não estão fixos no código, mas são digitados por um usuário, recebidos de um servidor ou lidos de uma estrutura de dados.
+
+## Retornando valores com `return`
+
+Em muitas situações, queremos que uma função **nos dê de volta um resultado**, em vez de apenas executar um código. Isso é feito usando o comando `return`, que **encerra a função** e **devolve um valor para quem a chamou**.
+
+Esse valor pode ser um número, uma string, um booleano, um array, um objeto, ou até mesmo outra função. Qualquer tipo de dado pode ser retornado.
+
+Vamos começar com um exemplo simples: calcular a média entre dois números e retornar o resultado.
+
+```ts
+function calcularMedia(a: number, b: number): number {
+  return (a + b) / 2;
+}
+
+let resultado = calcularMedia(8, 6);
+console.log(`A média é: ${resultado}`); // A média é: 7
+```
+
+Neste exemplo, o valor que `calcularMedia` retorna é armazenado na variável `resultado`. Depois disso, podemos usar esse valor como quisermos: exibir na tela, fazer outro cálculo, comparar com outra coisa, etc.
+
+É importante entender que **o `return` termina imediatamente a execução da função**. Nenhuma linha abaixo dele será executada:
+
+```ts
+function teste() {
+  return "Função terminou aqui.";
+  console.log("Isso nunca será executado.");
+}
+```
+
+Se uma função tem um tipo de retorno definido (ex: `: number`), ela **obrigatoriamente** precisa retornar um valor daquele tipo.
+
+```ts
+function mostrarMensagem(): string {
+  return 50; // Erro
+}
+```
+
+Se a função **não tiver um `return` explícito**, seu tipo de retorno é `void`, mas o valor retornado será `undefined` por padrão.
+
+```ts
+function semRetorno(): void {
+  console.log("Essa função não retorna nada.");
+}
+
+let resultado = semRetorno();
+console.log(resultado); // undefined
+```
+
+Por isso, sempre que você quiser que uma função **gere uma informação utilizável**, é fundamental usar o `return`. Isso torna a função **mais reaproveitável e modular**, porque o que ela faz não depende de onde ela está — apenas dos valores que ela recebe e do que ela devolve.
+
+Você também pode usar `return` para **encerrar a execução antecipadamente**, caso alguma condição não seja satisfeita:
+
+```ts
+function dividir(a: number, b: number): number | string {
+  if (b === 0) {
+    return "Erro: divisão por zero!";
+  }
+
+  return a / b;
+}
+
+console.log(dividir(10, 2)); // 5
+console.log(dividir(10, 0)); // Erro: divisão por zero!
+```
+
+Esse tipo de abordagem torna o código **mais defensivo e confiável**, antecipando erros e evitando que o programa continue com dados inválidos.
+
+## Escopo: o universo interno de uma função
+
+Uma das características mais importantes das funções é que elas **criam um escopo próprio**. Isso significa que **as variáveis declaradas dentro da função só existem durante a execução dela.** Ou seja, todo código que você escreve dentro de uma função **fica isolado** do restante do programa. Esse conceito é conhecido como **escopo local**.
+
+```ts
+function teste(): void {
+  let mensagem = "Olá do escopo local!";
+  console.log(mensagem);
+}
+
+teste(); // Olá do escopo local!
+console.log(mensagem); // Erro: mensagem is not defined
+```
+
+Esse comportamento é importante para evitar conflitos entre variáveis com nomes iguais em diferentes partes do código. Ele também ajuda a tornar as funções mais previsíveis e confiáveis, já que elas não dependem de variáveis externas (a menos que isso seja intencional).
+
+Dentro da função, porém, é possível **acessar variáveis que estão no escopo mais externo**, como variáveis globais ou variáveis declaradas fora da função, mas dentro de um mesmo bloco maior. Essa característica é chamada de **escopo léxico**.
+
+```ts
+let idioma = "pt-BR";
+
+function mostrarIdioma() {
+  console.log("Idioma atual:", idioma);
+}
+
+mostrarIdioma(); // Idioma atual: pt-BR
+```
+
+O contrário, no entanto, não é verdadeiro: o escopo externo **não enxerga** variáveis internas da função.
+
+Se uma função interna **declarar uma variável com o mesmo nome** de uma variável externa, a variável mais interna "sombreia" a externa — ou seja, ela passa a ser usada dentro daquele escopo:
+
+```ts
+let cor = "azul";
+
+function mostrarCor() {
+  let cor = "vermelho";
+  console.log("Cor dentro da função:", cor);
+}
+
+mostrarCor(); // Cor dentro da função: vermelho
+console.log("Cor fora da função:", cor); // Cor fora da função: azul
+```
+
+Saber navegar entre os escopos é essencial para escrever código organizado e seguro, principalmente quando você estiver trabalhando com funções aninhadas, closures e objetos.
+
+## Para praticar
+
+Vamos criar uma função que verifica se um número é par ou ímpar.
+
+**Cenário:** Crie uma função que encapsule a lógica de verificação.
+
+**Requisitos:**
+
+1.  Crie uma função chamada `verificarParidade` que aceite um parâmetro `numero` do tipo `number`.
+2.  A função deve retornar uma `string`.
+3.  Dentro da função, use o operador de módulo (`%`) para verificar se o número é divisível por 2.
+4.  Retorne a string `"Par"` se o número for par e a string `"Ímpar"` se for ímpar.
+5.  Chame a função e exiba o resultado no console.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+function verificarParidade(numero: number): string {
+  if (numero % 2 === 0) {
+    return "Par";
+  } else {
+    return "Ímpar";
+  }
+}
+
+console.log(`O número 4 é: ${verificarParidade(4)}`); // O número 4 é: Par
+console.log(`O número 7 é: ${verificarParidade(7)}`); // O número 7 é: Ímpar
+```
+
+</details>
+
+---
+
+Funções básicas são o fundamento de toda programação. Com elas, você aprende a **organizar seu código em blocos reutilizáveis**, **passar informações** e **receber resultados**. Esses conceitos serão essenciais para todos os tópicos que você aprenderá a seguir.
