@@ -5,6 +5,73 @@ description: "Aprenda a configurar o compilador TypeScript com o arquivo tsconfi
 
 Ao adotar o TypeScript, um arquivo se torna o maestro do seu projeto: o `tsconfig.json`. Este arquivo de configuração informa ao compilador TypeScript (`tsc`) como ele deve tratar seus arquivos, quais recursos da linguagem usar e onde colocar os arquivos JavaScript compilados.
 
+## TypeScript: Uma linguagem que compila para JavaScript
+
+Antes de mergulhar nas configurações, é importante entender uma característica fundamental do TypeScript: **ele não é executado diretamente pelos navegadores ou pelo Node.js**. Em vez disso, o TypeScript é uma linguagem que **compila** (ou "traduz") para JavaScript.
+
+### O que é compilação?
+
+Compilação é o processo de **transformar código de uma linguagem em outra**. No caso do TypeScript:
+
+- **Entrada**: Código TypeScript (`.ts`) com tipos, interfaces e recursos avançados
+- **Processo**: Compilador TypeScript (`tsc`) analisa e transforma o código
+- **Saída**: Código JavaScript (`.js`) puro, que pode ser executado em qualquer ambiente
+
+```ts
+// Código TypeScript (entrada)
+function saudar(nome: string): string {
+  return `Olá, ${nome}!`;
+}
+```
+
+```js
+// Código JavaScript compilado (saída)
+function saudar(nome) {
+  return `Olá, ${nome}!`;
+}
+```
+
+### Por que TypeScript precisa ser compilado?
+
+O TypeScript adiciona recursos que o JavaScript puro não possui:
+
+- **Tipagem estática** (`nome: string`)
+- **Interfaces e tipos personalizados**
+- **Recursos de linguagem mais avançados**
+- **Verificações de erro em tempo de compilação**
+
+Como os navegadores e o Node.js só entendem JavaScript, precisamos "traduzir" o TypeScript para JavaScript antes de executar.
+
+### Ferramentas para executar TypeScript
+
+Existem duas abordagens principais:
+
+#### 1. **Compilação tradicional** (`tsc`)
+```bash
+# Compila TypeScript para JavaScript
+npx tsc arquivo.ts
+
+# Executa o JavaScript resultante
+node arquivo.js
+```
+
+#### 2. **Execução direta** (`ts-node`)
+```bash
+# Executa TypeScript diretamente (sem gerar arquivo .js)
+npx ts-node arquivo.ts
+```
+
+O `ts-node` é especialmente útil durante o desenvolvimento, pois permite testar código TypeScript rapidamente sem gerar arquivos JavaScript intermediários.
+
+### Desenvolvimento vs Produção
+
+- **Durante o desenvolvimento**: Use `ts-node` para testes rápidos e experimentação
+- **Em produção**: Use `tsc` para compilar e gerar arquivos JavaScript otimizados
+
+<Callout>
+**Dica**: O `ts-node` é ideal para aprender e experimentar, mas em projetos reais você sempre compilará com `tsc` para gerar o código JavaScript final.
+</Callout>
+
 ## O que é o `tsconfig.json`?
 
 O `tsconfig.json` é um arquivo que fica na raiz do seu projeto e contém uma série de opções de configuração para o compilador TypeScript. Quando você roda o comando `tsc` (ou `npm run build`, se configurado nos scripts), o compilador procura por este arquivo para saber exatamente o que fazer.

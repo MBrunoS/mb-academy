@@ -1,6 +1,6 @@
 ---
-title: NPM
-description: "Aprenda a usar o NPM (Node Package Manager) para instalar, gerenciar e compartilhar pacotes em seus projetos JavaScript."
+title: NPM e Gerenciamento de Pacotes
+description: "Aprenda a usar o NPM para instalar, gerenciar e compartilhar pacotes em seus projetos TypeScript."
 ---
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
@@ -126,23 +126,51 @@ O NPM vai fazer algumas perguntas (nome do projeto, versão, etc.) e gerar o arq
 npm init -y
 ```
 
-## Instalando dependências de desenvolvimento
+## Instalando Dependências
 
-Nem todos os pacotes são usados em tempo de execução. Alguns são usados apenas no processo de desenvolvimento — como ferramentas de teste, linting, formatação, etc.
+Existem dois tipos de dependências:
 
-Para instalar um pacote como **dependência de desenvolvimento**, use:
+1.  **`dependencies`**: Pacotes que seu projeto precisa para **funcionar em produção** (ex: um framework web).
+2.  **`devDependencies`**: Pacotes usados apenas durante o **desenvolvimento** (ex: ferramentas de teste, compiladores).
+
+### Instalando o TypeScript e o `ts-node`
+
+Para nossos projetos, vamos precisar de duas ferramentas essenciais como dependências de desenvolvimento:
+
+-   `typescript`: O compilador do TypeScript.
+-   `ts-node`: Uma ferramenta que permite executar arquivos TypeScript diretamente, sem a etapa manual de compilação.
+
+Instalamos ambos com o seguinte comando:
 
 ```bash
-npm install nome-do-pacote --save-dev
+npm install typescript ts-node --save-dev
 ```
 
-Exemplo:
+O `--save-dev` (ou `-D`) informa ao NPM que estes são pacotes para o ambiente de desenvolvimento. Após a instalação, eles aparecerão na seção `devDependencies` do seu `package.json`.
+
+## Instalando uma dependência de produção
+
+Se seu projeto precisasse de uma biblioteca para funcionar (por exemplo, `axios`), você a instalaria assim:
 
 ```bash
-npm install eslint --save-dev
+npm install axios
 ```
 
-No `package.json`, essas dependências aparecem separadas em `"devDependencies"`.
+Este pacote seria listado em `dependencies`.
+
+## O que é a pasta `node_modules`?
+
+Quando você instala um pacote, o NPM o baixa (junto com suas próprias dependências) para uma pasta chamada `node_modules`. Esta pasta geralmente contém muitos arquivos e **não deve ser enviada para o Git**. Adicione `node_modules/` ao seu arquivo `.gitignore`.
+
+## Instalando dependências de um projeto existente
+
+Quando você baixa um projeto de outra pessoa, ele não vem com a pasta `node_modules`. Para instalar todas as dependências listadas no `package.json`, basta rodar:
+
+```bash
+npm install
+```
+
+O NPM lerá os campos `dependencies` e `devDependencies` e instalará tudo o que for necessário.
 
 ## Scripts personalizados
 
