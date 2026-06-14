@@ -1,0 +1,103 @@
+---
+title: Como a IA Funciona (Sem Mistério)
+description: "Entenda o que são LLMs, como eles são treinados, e por que eles erram — para usá-los melhor."
+---
+
+A Inteligência Artificial parece magia quando você não entende o que acontece por dentro. Quando você entende, ela continua impressionante — mas você passa a saber quando confiar nela e quando desconfiar.
+
+## O que é um LLM?
+
+**LLM** significa *Large Language Model* — Modelo de Linguagem de Grande Escala. São os sistemas que alimentam ferramentas como ChatGPT, Claude, Copilot e Gemini.
+
+A ideia central é surpreendentemente simples: um LLM é treinado para **prever qual palavra (ou token) vem a seguir**, dado um contexto.
+
+Pense assim: se você escreve "A capital do Brasil é...", o modelo foi treinado em tantos textos que a probabilidade de "Brasília" ser a próxima palavra é altíssima. Ele não "sabe" que Brasília é a capital no sentido humano — ele aprendeu que essa sequência de tokens ocorre frequentemente junto.
+
+Essa distinção importa muito.
+
+## Como o treinamento funciona
+
+O processo tem, de forma simplificada, duas etapas:
+
+### 1. Pré-treinamento
+
+O modelo é exposto a enormes quantidades de texto: internet, livros, código, artigos científicos. Ele aprende padrões — gramática, sintaxe, fatos, raciocínio lógico — tudo representado como padrões estatísticos em texto.
+
+Para ter ideia da escala: os modelos mais avançados foram treinados em trilhões de palavras.
+
+### 2. Fine-tuning com feedback humano
+
+Depois do pré-treinamento, o modelo é refinado com ajuda humana. Avaliadores comparam respostas e indicam quais são melhores. Isso faz com que o modelo aprenda a ser mais útil, seguro e coerente.
+
+O resultado é um sistema que consegue escrever código, explicar conceitos, traduzir textos e muito mais — mas que fundamentalmente está **completando padrões**, não "pensando" como um humano.
+
+## Limitações reais que você precisa conhecer
+
+Entender as limitações dos LLMs é tão importante quanto entender suas capacidades.
+
+### Alucinações
+
+LLMs podem gerar informações incorretas com total confiança. Isso acontece porque o modelo não tem um mecanismo interno de verificação de fatos — ele produz o que estatisticamente parece correto, não o que é factualmente verdadeiro.
+
+Exemplos comuns no desenvolvimento:
+- Inventar funções ou métodos de biblioteca que não existem
+- Citar versões de APIs que nunca existiram
+- Dar nomes errados para parâmetros ou configurações
+- Gerar código que compila mas tem lógica errada
+
+**Para código:** sempre teste. Nunca execute código que você não entende.
+
+### Corte de conhecimento (knowledge cutoff)
+
+Modelos são treinados em dados até uma determinada data. Depois disso, eles não têm acesso a informações novas — a menos que você as forneça no contexto da conversa.
+
+Se você perguntar sobre uma biblioteca lançada depois do corte de conhecimento do modelo, ele pode inventar uma resposta ou dizer que não existe.
+
+### Falta de execução real
+
+Um LLM não roda código para verificar se está correto. Ele gera código que parece plausível baseado em padrões — mas pode conter bugs lógicos sutis que só aparecem quando você executa.
+
+### Dependência do contexto
+
+A qualidade da resposta depende diretamente de como você faz a pergunta. Uma pergunta vaga gera uma resposta genérica. Uma pergunta específica e bem estruturada gera uma resposta muito mais útil.
+
+Essa habilidade — saber formular boas perguntas para uma IA — tem até um nome: **prompt engineering**.
+
+## Tokens: a unidade básica dos LLMs
+
+LLMs não processam palavras — processam **tokens**. Um token é aproximadamente 3-4 caracteres em inglês (um pouco menos eficiente em português).
+
+Por que isso importa para você como desenvolvedor?
+
+- Modelos têm um limite de tokens por conversa (a "janela de contexto") — conversas muito longas podem fazer o modelo "esquecer" o início
+- O custo de usar APIs de IA é calculado por tokens consumidos
+- Contextos muito grandes ficam lentos e caros
+
+## O que LLMs fazem bem para devs
+
+Apesar das limitações, LLMs são genuinamente úteis no desenvolvimento:
+
+| Caso de uso | Por que funciona bem |
+|---|---|
+| Explicar mensagens de erro | Erros seguem padrões bem documentados no texto de treinamento |
+| Documentar código que você escreveu | Transformar código em texto é uma das tarefas mais naturais |
+| Gerar boilerplate | Configurações e estruturas repetitivas têm padrões claros |
+| Explorar conceitos | Você controla o nível de detalhe e o estilo da explicação |
+| Comparar abordagens | Útil quando você já entende o problema e quer ver alternativas |
+
+## O que LLMs fazem mal para devs
+
+| Caso de uso | Por que é arriscado |
+|---|---|
+| Gerar código de segurança | Erros aqui têm consequências graves e são difíceis de detectar |
+| Arquitetura de sistemas | Requer contexto do projeto que o modelo não tem |
+| Bugs sutis de concorrência | A lógica exige execução real, não predição de padrões |
+| Novidades recentes | Pode não ter no treinamento ou ter informação desatualizada |
+
+## Resumo
+
+Um LLM é uma ferramenta estatística extremamente sofisticada, treinada para produzir texto que parece correto. Ele não pensa, não verifica fatos, não executa código — ele completa padrões.
+
+Quando você entende isso, sabe exatamente onde confiar e onde desconfiar. E esse discernimento é o que transforma IA em uma vantagem real para você como desenvolvedor.
+
+Na próxima lição, vamos falar sobre como usar IA no seu dia a dia sem abrir mão do seu próprio raciocínio.

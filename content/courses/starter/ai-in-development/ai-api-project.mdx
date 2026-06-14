@@ -1,0 +1,252 @@
+---
+title: "Projeto: Integrando uma API de IA"
+description: "Aprenda a chamar uma API de IA a partir do TypeScript, adicionando uma funcionalidade de sugestão de prioridade ao seu To-Do List."
+---
+
+Até agora você usou TypeScript para criar lógica, manipular dados e interagir com o sistema de arquivos. Agora vamos dar um passo além: **consumir uma API de IA** para adicionar inteligência ao seu projeto.
+
+A extensão que vamos construir: dado uma lista de tarefas, o sistema vai perguntar a uma IA qual tarefa deve ser priorizada primeiro — e exibir a sugestão no terminal.
+
+## O que você vai aprender
+
+- Como fazer chamadas HTTP com `fetch` no Node.js
+- Como estruturar uma requisição para uma API de IA
+- Como trabalhar com respostas assíncronas em TypeScript
+- Como ler variáveis de ambiente com segurança
+
+## Pré-requisitos
+
+- O projeto To-Do List do Capítulo 6 funcionando
+- Uma chave de API de um provedor de IA (veja abaixo)
+
+## Obtendo uma chave de API
+
+Para este projeto, você pode usar a API da **Anthropic** (Claude) ou da **OpenAI** (ChatGPT). Ambas oferecem créditos gratuitos para novos usuários.
+
+- **Anthropic (Claude):** [console.anthropic.com](https://console.anthropic.com) → API Keys
+- **OpenAI:** [platform.openai.com](https://platform.openai.com) → API Keys
+
+Guarde a chave com cuidado — ela é como uma senha. **Nunca coloque sua chave diretamente no código.**
+
+## Configurando variáveis de ambiente
+
+Crie um arquivo `.env` na raiz do seu projeto To-Do List:
+
+```
+AI_API_KEY=sua_chave_aqui
+```
+
+Adicione `.env` ao seu `.gitignore` para não expor a chave acidentalmente:
+
+```gitignore
+node_modules/
+.env
+```
+
+Instale o pacote `dotenv` para carregar as variáveis:
+
+```bash
+npm install dotenv
+```
+
+## Estrutura do projeto
+
+Vamos criar um novo arquivo `src/ai-suggest.ts` separado do código principal. Isso mantém as responsabilidades isoladas — a lógica de IA não se mistura com a lógica da lista de tarefas.
+
+```
+src/
+  index.ts         ← seu projeto original (não muda)
+  ai-suggest.ts    ← novo arquivo que vamos criar
+```
+
+## Implementando a função de sugestão
+
+Crie o arquivo `src/ai-suggest.ts`:
+
+```typescript
+import "dotenv/config";
+
+interface Tarefa {
+  id: number;
+  descricao: string;
+  concluida: boolean;
+}
+
+async function sugerirPrioridade(tarefas: Tarefa[]): Promise<string> {
+  const apiKey = process.env.AI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("AI_API_KEY não encontrada. Verifique seu arquivo .env");
+  }
+
+  const tarefasPendentes = tarefas
+    .filter((t) => !t.concluida)
+    .map((t) => `- ${t.descricao}`)
+    .join("\n");
+
+  if (!tarefasPendentes) {
+    return "Não há tarefas pendentes para priorizar.";
+  }
+
+  const resposta = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 200,
+      system:
+        "Você é um assistente de produtividade. Quando receber uma lista de tarefas, sugira qual deve ser feita primeiro e explique brevemente o motivo em uma ou duas frases.",
+      messages: [
+        {
+          role: "user",
+          content: `Aqui estão minhas tarefas pendentes:\n${tarefasPendentes}\n\nQual devo priorizar?`,
+        },
+      ],
+    }),
+  });
+
+  if (!resposta.ok) {
+    throw new Error(`Erro na API: ${resposta.status} ${resposta.statusText}`);
+  }
+
+  const dados = await resposta.json();
+  return dados.content[0].text;
+}
+
+async function main() {
+  const tarefasExemplo: Tarefa[] = [
+    { id: 1, descricao: "Estudar TypeScript", concluida: true },
+    { id: 2, descricao: "Fazer exercícios físicos", concluida: false },
+    { id: 3, descricao: "Revisar pull requests do trabalho", concluida: false },
+    { id: 4, descricao: "Ligar para o médico", concluida: false },
+    { id: 5, descricao: "Comprar mantimentos", concluida: false },
+  ];
+
+  console.log("Consultando IA para sugestão de prioridade...\n");
+
+  const sugestao = await sugerirPrioridade(tarefasExemplo);
+
+  console.log("Sugestão da IA:");
+  console.log("─".repeat(40));
+  console.log(sugestao);
+}
+
+main().catch(console.error);
+```
+
+## Entendendo o código
+
+Antes de executar, leia cada parte com atenção.
+
+### Verificação da chave de API
+
+```typescript
+if (!apiKey) {
+  throw new Error("AI_API_KEY não encontrada...");
+}
+```
+
+Nunca assuma que uma variável de ambiente existe. Verificar antes de usar evita erros confusos mais adiante.
+
+### Filtrando tarefas pendentes
+
+```typescript
+const tarefasPendentes = tarefas
+  .filter((t) => !t.concluida)
+  .map((t) => `- ${t.descricao}`)
+  .join("\n");
+```
+
+Aqui você está usando três métodos de array encadeados — os mesmos que aprendeu no Capítulo 4. A IA recebe apenas as tarefas que ainda precisam ser feitas.
+
+### A função assíncrona
+
+```typescript
+async function sugerirPrioridade(tarefas: Tarefa[]): Promise<string>
+```
+
+Chamadas de API são assíncronas — o programa precisa aguardar a resposta pela rede. O `async/await` é a forma moderna de lidar com isso em TypeScript, evitando código complexo com callbacks.
+
+### A requisição HTTP
+
+```typescript
+const resposta = await fetch("https://api.anthropic.com/v1/messages", {
+  method: "POST",
+  headers: { ... },
+  body: JSON.stringify({ ... }),
+});
+```
+
+`fetch` faz uma requisição HTTP. Você envia um `POST` com os dados em JSON e aguarda a resposta. Isso é exatamente o que acontece quando qualquer aplicação se comunica com uma API externa.
+
+### Verificação de erro da resposta
+
+```typescript
+if (!resposta.ok) {
+  throw new Error(`Erro na API: ${resposta.status} ${resposta.statusText}`);
+}
+```
+
+Sempre verifique se a requisição foi bem-sucedida antes de usar a resposta. Erros comuns: chave inválida (401), limite excedido (429), problema no servidor (500).
+
+## Adicionando o script ao package.json
+
+```json
+{
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "ai": "ts-node src/ai-suggest.ts"
+  }
+}
+```
+
+## Executando
+
+```bash
+npm run ai
+```
+
+A saída esperada será algo como:
+
+```
+Consultando IA para sugestão de prioridade...
+
+Sugestão da IA:
+────────────────────────────────────────
+Priorize "Ligar para o médico", pois assuntos de saúde costumam ter
+urgência real e janelas de horário limitadas para agendamento.
+```
+
+## Desafios para evoluir
+
+### Desafio 1: Integrar com o projeto original
+
+Modifique o `src/index.ts` do seu To-Do List para chamar `sugerirPrioridade` depois de exibir a lista de tarefas.
+
+### Desafio 2: Melhorar o prompt
+
+O comportamento da IA muda bastante dependendo do que você escreve no campo `system`. Tente instruções diferentes e observe como as respostas mudam. Por exemplo: peça que a IA explique o raciocínio com mais detalhes, ou que responda sempre em tópicos.
+
+### Desafio 3: Tratamento de erros robusto
+
+Adicione tratamento para casos como: sem internet, chave inválida, limite de uso excedido. Exiba mensagens claras para o usuário em cada situação.
+
+### Desafio 4 (avançado): Modo interativo
+
+Use o módulo `readline` do Node.js para criar um prompt onde o usuário pode digitar tarefas diretamente no terminal e receber a sugestão da IA em tempo real.
+
+## O que você acabou de aprender
+
+Você acabou de:
+- Consumir uma API REST usando `fetch` com TypeScript
+- Trabalhar com funções assíncronas (`async/await`) em um contexto real
+- Usar variáveis de ambiente para guardar credenciais com segurança
+- Tipar uma resposta de API externa com interfaces TypeScript
+
+Mais importante: você usou IA como **ferramenta dentro do seu código** — não como substituto do seu código.
+
+Essa é a diferença entre um desenvolvedor que usa IA e um desenvolvedor que é usado por ela.
