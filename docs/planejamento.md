@@ -27,56 +27,94 @@
 ## 2. Estrutura de Trilhas
 
 ```
-                  ┌──────────────────────────────┐
-                  │           STARTER             │
-                  │  TypeScript, lógica,          │
-                  │  primeiro projeto CLI, IA     │
-                  │          ✅ Pronto             │
-                  └───────────────┬──────────────┘
-                                  │
-                  ┌───────────────┴──────────────┐
-                  │        Escolha da trilha      │
-                  └──────┬────────────────────────┘
-                         │
-         ┌───────────────┴───────────────┐
-         │                               │
-┌────────▼──────────┐         ┌──────────▼────────┐
-│   JÚNIOR FRONT    │         │   JÚNIOR BACK      │
-│  HTML/CSS, React  │         │  NestJS, DB,       │
-│  APIs, Deploy     │         │  Auth, REST APIs   │
-└────────┬──────────┘         └──────────┬─────────┘
-         │                               │
-┌────────▼──────────┐         ┌──────────▼─────────┐
-│    PLENO FRONT    │         │    PLENO BACK       │
-│  ─────────────── │         │  ──────────────── │ │
-│  Núcleo comum:   │         │  Núcleo comum:     │ │
-│  TS avançado,    │◄───────►│  TS avançado,      │ │
-│  JS aprofundado, │ módulos │  JS aprofundado,   │ │
-│  Git, Algoritmos │comprtlh.│  Git, Algoritmos   │ │
-│  ─────────────── │         │  ──────────────── │ │
-│  Especialização: │         │  Especialização:   │ │
-│  React avançado, │         │  NestJS avançado,  │ │
-│  Next.js, Design │         │  DB avançado,      │ │
-│  System, Testes  │         │  Mensageria, Testes│ │
-└────────┬──────────┘         └──────────┬─────────┘
-         │                               │
-┌────────▼──────────┐         ┌──────────▼─────────┐
-│   SÊNIOR FRONT    │         │   SÊNIOR BACK       │
-│  ─────────────── │         │  ──────────────── │ │
-│  Núcleo comum:   │         │  Núcleo comum:     │ │
-│  System Design,  │◄───────►│  System Design,    │ │
-│  Seg. fund.,     │ módulos │  Seg. fund.,       │ │
-│  Observabilidade,│comprtlh.│  Observabilidade,  │ │
-│  Comunicação     │         │  Comunicação       │ │
-│  ─────────────── │         │  ──────────────── │ │
-│  Especialização: │         │  Especialização:   │ │
-│  Micro-frontends,│         │  Microservices,    │ │
-│  Web Vitals,     │         │  Infra, Cache,     │ │
-│  Acessibilidade  │         │  Sistemas distrib. │ │
-└───────────────────┘         └────────────────────┘
+Legenda:
+  ██  Obrigatório (trilha principal)
+  ░░  Complementar — soft skills, IA, carreira (25%, feito no próprio ritmo)
+  ··  Opcional — aluno da outra trilha pode cursar se quiser
+
+
+                    ┌─────────────────────────────┐
+                    │           STARTER            │
+                    │  ██ TypeScript, lógica, OOP  │
+                    │  ██ Rastreador de Gastos CLI  │
+                    │  ░░ Mindset, soft skills      │
+                    │  ██ IA: API Anthropic         │
+                    │          ✅ Pronto            │
+                    └──────────────┬───────────────┘
+                                   │
+                            [Escolha da trilha]
+                                   │
+              ┌────────────────────┴────────────────────┐
+              │                                         │
+   ┌──────────▼──────────┐               ┌─────────────▼──────────┐
+   │    JÚNIOR FRONT     │               │    JÚNIOR BACK         │
+   │  ██ HTML/CSS        │               │  ██ Servidores/HTTP    │
+   │  ██ React + TS      │               │  ██ NestJS + TS        │
+   │  ██ APIs, Auth      │               │  ██ PostgreSQL/Prisma  │
+   │  ██ Testes I        │               │  ██ Auth, REST, Testes │
+   │  ██ Deploy (Vercel) │               │  ██ Deploy (Railway)   │
+   │  ░░ Design, Carreira│  · opcional · │  ░░ Docs, Carreira     │
+   │  ░░ IA júnior       │◄ ─ ─ ─ ─ ─ ►│  ░░ IA júnior          │
+   └──────────┬──────────┘               └─────────────┬──────────┘
+              │                                         │
+              └─────────────────┬───────────────────────┘
+                                │
+                   ┌────────────▼────────────┐
+                   │      NÚCLEO PLENO        │
+                   │  (obrigatório para ambas │
+                   │   as trilhas antes de    │
+                   │   entrar no Pleno)        │
+                   │                          │
+                   │  ██ TypeScript Avançado  │
+                   │  ██ JS aprofundado       │
+                   │  ██ Git — branching      │
+                   │  ██ Algoritmos & Big O   │
+                   │  ██ Docker               │
+                   │  ░░ IA Aplicada em prod. │
+                   └────────────┬────────────┘
+                                │
+              ┌─────────────────┴─────────────────┐
+              │                                   │
+   ┌──────────▼──────────┐           ┌────────────▼──────────┐
+   │    PLENO FRONT      │           │    PLENO BACK         │
+   │  ██ TS em React     │           │  ██ NestJS Avançado   │
+   │  ██ React avançado  │           │  ██ DB Avançado       │
+   │  ██ Next.js         │           │  ██ Mensageria/Cache  │
+   │  ██ Testes II       │           │  ██ Testes II         │
+   │  ░░ Design System   │ ·opcional·│  ░░ Arquitetura APIs  │
+   │  ░░ Coding challs.  │◄─ ─ ─ ─ ►│  ░░ Coding challs.   │
+   └──────────┬──────────┘           └────────────┬──────────┘
+              │                                   │
+              └─────────────────┬─────────────────┘
+                                │
+                   ┌────────────▼────────────┐
+                   │      NÚCLEO SÊNIOR       │
+                   │  (obrigatório para ambas │
+                   │   as trilhas antes de    │
+                   │   entrar no Sênior)       │
+                   │                          │
+                   │  ██ System Design        │
+                   │  ██ Segurança fundamentos│
+                   │  ██ Observabilidade      │
+                   │  ░░ Comunicação Efetiva  │
+                   └────────────┬────────────┘
+                                │
+              ┌─────────────────┴─────────────────┐
+              │                                   │
+   ┌──────────▼──────────┐           ┌────────────▼──────────┐
+   │    SÊNIOR FRONT     │           │    SÊNIOR BACK        │
+   │  ██ Arq. escalável  │           │  ██ Sist. distribuídos│
+   │  ██ Performance     │           │  ██ Performance back  │
+   │  ██ Testes e CI/CD  │           │  ██ Testes e CI/CD    │
+   │  ██ Segurança front │           │  ██ Segurança back    │
+   │  ░░ Acessibilidade  │ ·opcional·│  ██ Infraestrutura    │
+   │  ░░ DX & IA avançada│◄─ ─ ─ ─ ►│  ░░ DX & IA avançada │
+   └─────────────────────┘           └───────────────────────┘
 ```
 
-> Os módulos do "núcleo comum" podem ser cursos/módulos compartilhados entre as duas trilhas — não precisam ser escritos duas vezes.
+> **Núcleo:** módulo escrito uma única vez, consumido por alunos de ambas as trilhas. A especialização (Pleno Front, Pleno Back, etc.) só começa após o núcleo do respectivo nível.
+>
+> **Opcional cross-track:** um aluno do Júnior Front pode opcionalmente cursar módulos do Júnior Back para ampliar a visão — e vice-versa. Não é pré-requisito para avançar.
 
 ---
 
