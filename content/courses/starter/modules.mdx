@@ -1,0 +1,147 @@
+---
+title: Módulos e Organização de Código
+description: "Aprenda a dividir seu código em múltiplos arquivos usando import e export do TypeScript."
+---
+
+À medida que um programa cresce, colocar tudo em um único arquivo se torna um problema. O código fica difícil de ler, de manter e de reutilizar. A solução é dividir em módulos: **arquivos com responsabilidades específicas**.
+
+## O que é um módulo?
+
+Em TypeScript, cada arquivo é um módulo. Um módulo pode **exportar** o que quer compartilhar com outros arquivos e **importar** o que precisa de outros módulos.
+
+```
+src/
+  tipos.ts        ← define interfaces e tipos
+  calculos.ts     ← funções matemáticas
+  index.ts        ← ponto de entrada que usa os outros
+```
+
+## Exportando com `export`
+
+Para tornar uma função, classe, interface ou variável disponível para outros módulos:
+
+```ts
+// src/calculos.ts
+
+export function somar(a: number, b: number): number {
+  return a + b;
+}
+
+export function multiplicar(a: number, b: number): number {
+  return a * b;
+}
+
+export const PI = 3.14159;
+```
+
+Você também pode agrupar exports no final do arquivo:
+
+```ts
+function somar(a: number, b: number): number {
+  return a + b;
+}
+
+function multiplicar(a: number, b: number): number {
+  return a * b;
+}
+
+export { somar, multiplicar };
+```
+
+## Importando com `import`
+
+Para usar o que outro módulo exportou:
+
+```ts
+// src/index.ts
+
+import { somar, multiplicar, PI } from "./calculos";
+
+console.log(somar(2, 3));        // 5
+console.log(multiplicar(4, 5));  // 20
+console.log(PI);                 // 3.14159
+```
+
+O caminho `"./calculos"` é relativo ao arquivo atual. O `./` significa "na mesma pasta".
+
+## Export padrão (`export default`)
+
+Um módulo pode ter um export padrão — usado quando ele exporta uma única coisa principal:
+
+```ts
+// src/calculadora.ts
+
+export default class Calculadora {
+  somar(a: number, b: number): number {
+    return a + b;
+  }
+
+  subtrair(a: number, b: number): number {
+    return a - b;
+  }
+}
+```
+
+Para importar um export padrão, não usamos chaves:
+
+```ts
+// src/index.ts
+
+import Calculadora from "./calculadora";
+
+const calc = new Calculadora();
+console.log(calc.somar(10, 5)); // 15
+```
+
+## Importando de pacotes npm
+
+Quando você instala um pacote com `npm install`, ele vai para `node_modules` e é importado pelo nome — sem o `./`:
+
+```ts
+import "dotenv/config";            // executa o módulo (carrega variáveis de ambiente)
+import { readFileSync } from "fs"; // importação nomeada do módulo nativo do Node.js
+```
+
+A diferença entre `"./algo"` (arquivo local) e `"algo"` (pacote npm ou módulo nativo).
+
+## Exemplo completo: projeto com múltiplos arquivos
+
+```ts
+// src/tipos.ts
+export interface Produto {
+  nome: string;
+  preco: number;
+}
+```
+
+```ts
+// src/formatacao.ts
+import { Produto } from "./tipos";
+
+export function formatarProduto(produto: Produto): string {
+  return `${produto.nome} — R$ ${produto.preco.toFixed(2)}`;
+}
+```
+
+```ts
+// src/index.ts
+import { Produto } from "./tipos";
+import { formatarProduto } from "./formatacao";
+
+const produto: Produto = { nome: "Teclado", preco: 299.9 };
+console.log(formatarProduto(produto)); // Teclado — R$ 299.90
+```
+
+<Callout type="tip">
+Separe código por responsabilidade: tipos em um arquivo, funções utilitárias em outro, lógica principal no index. Essa estrutura escala bem e é o padrão no mercado.
+</Callout>
+
+## Para praticar
+
+1. Crie um arquivo `src/saudacoes.ts` com uma função exportada `saudar(nome: string): string` que retorna `"Olá, {nome}!"`
+2. Crie um arquivo `src/index.ts` que importa e chama essa função
+3. Execute com `ts-node src/index.ts`
+
+---
+
+O projeto do próximo capítulo vai usar múltiplos arquivos com módulos — agora você sabe como conectá-los.

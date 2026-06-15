@@ -1,84 +1,157 @@
 ---
-title: "Planejamento do Projeto: To-Do List no Terminal"
-description: "Vamos planejar nosso primeiro projeto prático: uma lista de tarefas (To-Do List) que rodará no terminal."
+title: "Planejamento do Projeto: Rastreador de Gastos"
+description: "Vamos planejar um rastreador de gastos pessoais em TypeScript — um projeto real para o seu portfólio."
 ---
 
-Chegou o momento mais esperado: aplicar tudo o que você aprendeu em um projeto prático, do zero. Vamos construir uma **Aplicação de Lista de Tarefas (To-Do List)** que funcionará diretamente no seu terminal.
+Com os fundamentos do curso em mãos, é hora de construir algo que vai além de um exercício: um projeto que você pode apresentar como parte do seu portfólio.
 
-Este projeto é perfeito para consolidar seus conhecimentos, pois ele envolve todos os conceitos que vimos: variáveis, tipos, funções, arrays, objetos, classes e a configuração de um ambiente com TypeScript.
+## O projeto
 
-## 1. O Objetivo do Projeto
+**Rastreador de Gastos Pessoais** — uma aplicação de linha de comando (CLI) em TypeScript para registrar e analisar gastos do dia a dia.
 
-Nosso objetivo é criar um script simples, executado via terminal, que permita ao usuário gerenciar uma lista de tarefas. Queremos ser capazes de adicionar, visualizar, completar e remover tarefas.
+Por que esse projeto é bom para um portfólio?
 
-## 2. Definindo as Funcionalidades (Features)
+- Resolve um problema real que qualquer pessoa entende
+- Demonstra domínio de TypeScript, OOP, arrays e módulos
+- Gera saída visual e organizada no terminal com `console.table`
+- Pode ser descrito em uma linha: *"CLI em TypeScript para rastreamento de gastos pessoais"*
+- É extensível: persistência em arquivo, gráficos, orçamento mensal — campo aberto para evoluir
 
-Um bom planejamento começa definindo o que a aplicação fará. Nossas funcionalidades principais serão:
+## Funcionalidades
 
-1.  **Adicionar uma nova tarefa:** O usuário deve poder inserir a descrição de uma nova tarefa.
-2.  **Listar todas as tarefas:** Exibir todas as tarefas cadastradas, mostrando seu ID e se estão concluídas ou não.
-3.  **Marcar uma tarefa como concluída:** O usuário poderá marcar uma tarefa como feita, usando o ID dela.
-4.  **Remover uma tarefa:** Permitir a exclusão de uma tarefa, também via ID.
+1. **Adicionar gasto** — com descrição, valor e categoria
+2. **Listar gastos** — em formato de tabela organizada
+3. **Resumo por categoria** — quanto foi gasto em cada área
+4. **Total gasto** — soma de todos os registros
+5. **Filtrar por categoria** — ver apenas gastos de uma área específica
 
-## 3. Modelando os Dados
+## Modelando os dados
 
-Como vamos representar uma tarefa no nosso código? Uma tarefa tem várias características. Usaremos uma `interface` do TypeScript para definir esse "contrato".
+O primeiro passo é definir os tipos que nosso programa vai manipular.
 
-Uma tarefa terá:
--   `id`: Um número único para identificá-la.
--   `descricao`: O texto da tarefa (uma string).
--   `concluida`: Um booleano (`true` ou `false`) para indicar seu status.
+### O type Categoria
 
-Em TypeScript, isso fica assim:
+Um **union type** garante que apenas categorias válidas sejam usadas — o TypeScript vai acusar erro se você tentar usar uma categoria inexistente:
 
 ```ts
-interface Tarefa {
+type Categoria =
+  | "alimentação"
+  | "transporte"
+  | "moradia"
+  | "lazer"
+  | "saúde"
+  | "outros";
+```
+
+### A interface Gasto
+
+Cada gasto terá:
+- `id` — identificador único gerado automaticamente
+- `descricao` — o que foi gasto
+- `valor` — quanto custou, em reais
+- `categoria` — em qual área se encaixa
+- `data` — quando foi registrado
+
+```ts
+interface Gasto {
   id: number;
   descricao: string;
-  concluida: boolean;
+  valor: number;
+  categoria: Categoria;
+  data: string;
 }
 ```
 
-## 4. Estruturando o Código com uma Classe
+## Arquitetura: separando responsabilidades
 
-Para organizar nossa lógica, usaremos a Programação Orientada a Objetos. Vamos criar uma classe `GerenciadorDeTarefas` que será responsável por todas as operações.
+Vamos dividir o código em três arquivos, cada um com uma responsabilidade clara:
 
-Essa classe terá uma propriedade `private` para armazenar a lista de tarefas, que será um array de objetos `Tarefa`.
+```
+gastos-cli/
+  src/
+    tipos.ts        ← interface Gasto e type Categoria
+    rastreador.ts   ← classe RastreadorDeGastos com toda a lógica
+    index.ts        ← ponto de entrada: cria o rastreador e usa seus métodos
+  package.json
+  tsconfig.json
+```
+
+Essa separação é o padrão profissional. Você vai entender por que ela importa quando o projeto crescer.
+
+## A classe RastreadorDeGastos
+
+A classe central do projeto terá estes métodos:
+
+| Método | O que faz |
+|---|---|
+| `adicionarGasto(...)` | Valida e adiciona um gasto ao array |
+| `listarGastos()` | Exibe todos em formato de tabela |
+| `resumoPorCategoria()` | Mostra total gasto por categoria |
+| `totalGasto()` | Retorna a soma de todos os valores |
+| `filtrarPorCategoria(cat)` | Retorna os gastos de uma categoria |
+
+## Estrutura inicial da classe
 
 ```ts
-class GerenciadorDeTarefas {
-  private tarefas: Tarefa[] = [];
-  private ultimoId: number = 0;
+class RastreadorDeGastos {
+  private gastos: Gasto[] = [];
+  private proximoId: number = 1;
 
-  // Nossos métodos virão aqui...
+  adicionarGasto(descricao: string, valor: number, categoria: Categoria): void {
+    // a implementar
+  }
+
+  listarGastos(): void {
+    // a implementar
+  }
+
+  resumoPorCategoria(): void {
+    // a implementar
+  }
+
+  totalGasto(): number {
+    // a implementar
+  }
+
+  filtrarPorCategoria(categoria: Categoria): Gasto[] {
+    // a implementar
+  }
 }
 ```
 
-Os métodos da classe corresponderão às nossas funcionalidades:
+## O que você vai praticar
 
--   `adicionarTarefa(descricao: string): void`
--   `listarTarefas(): void`
--   `marcarComoConcluida(id: number): void`
--   `removerTarefa(id: number): void`
+Ao construir este projeto, você aplica e revisa:
 
-## 5. Configurando o Ambiente do Projeto
+- **Union types e interfaces** — modelar dados do mundo real com precisão
+- **Classes e encapsulamento** — organizar lógica em uma estrutura coesa
+- **Módulos** — separar responsabilidades com `import`/`export`
+- **Array methods** — `push`, `filter`, `reduce`, `forEach`, `map`
+- **Tratamento de erros** — validar entradas inválidas com `throw`
 
-Antes de começar a codificar, vamos preparar nosso ambiente:
+## Configurando o ambiente
 
-1.  Crie uma nova pasta para o projeto (ex: `todo-list-cli`).
-2.  Dentro dela, inicie um projeto NPM:
-    ```bash
-    npm init -y
-    ```
-3.  Instale as dependências de desenvolvimento:
-    ```bash
-    npm install typescript ts-node nodemon --save-dev
-    ```
-4.  Crie o arquivo `tsconfig.json`:
-    ```bash
-    npx tsc --init
-    ```
-    ...e configure-o com as opções essenciais que aprendemos (`target`, `module`, `strict`, `outDir`, `rootDir`).
-5.  Crie a pasta `src` e, dentro dela, o arquivo `index.ts`.
+1. Crie uma pasta `gastos-cli` e entre nela
+2. Inicie o projeto:
+   ```bash
+   npm init -y
+   ```
+3. Instale as dependências:
+   ```bash
+   npm install --save-dev typescript ts-node @types/node
+   ```
+4. Gere o `tsconfig.json`:
+   ```bash
+   npx tsc --init
+   ```
+5. Crie a pasta `src` com os três arquivos: `tipos.ts`, `rastreador.ts`, `index.ts`
+6. Adicione o script de execução ao `package.json`:
+   ```json
+   {
+     "scripts": {
+       "start": "ts-node src/index.ts"
+     }
+   }
+   ```
 
-Com o planejamento e a estrutura prontos, estamos prontos para começar a codificar. Na próxima página, vamos implementar a classe `GerenciadorDeTarefas` e seus métodos.
+Com o planejamento e o ambiente prontos, vamos implementar a lógica na próxima página.
