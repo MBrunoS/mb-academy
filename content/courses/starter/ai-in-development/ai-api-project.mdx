@@ -1,0 +1,269 @@
+---
+title: "Projeto: Integrando uma API de IA"
+description: "Aprenda a chamar uma API de IA a partir do TypeScript, adicionando análise inteligente de gastos ao seu Rastreador."
+---
+
+Até agora você usou TypeScript para criar lógica, manipular dados e organizar código em módulos. Agora vamos dar um passo além: **consumir uma API de IA** para adicionar inteligência ao projeto que você construiu.
+
+A extensão que vamos criar: o Rastreador de Gastos vai enviar um resumo das despesas para uma IA e receber de volta uma análise financeira personalizada — padrões de consumo identificados, áreas de economia sugeridas, uma prioridade para o próximo mês.
+
+<Callout>
+Esta lição usa conceitos de **Módulos** (`import`/`export`), **Assincronismo** (`async/await`, `fetch`) e **Tratamento de Erros** (`try/catch`). Se precisar revisar algum deles, volte às lições correspondentes no Capítulo 5 antes de continuar.
+</Callout>
+
+## O que você vai aprender
+
+- Como fazer chamadas HTTP com `fetch` no Node.js
+- Como estruturar uma requisição para uma API de IA
+- Como trabalhar com respostas assíncronas em TypeScript
+- Como ler variáveis de ambiente com segurança
+- Como reutilizar tipos de um módulo existente
+
+## Pré-requisitos
+
+- O Rastreador de Gastos do Capítulo 6 funcionando
+- Uma chave de API de um provedor de IA (veja abaixo)
+
+## Obtendo uma chave de API
+
+Para este projeto, você pode usar a API da **Anthropic** (Claude) ou da **OpenAI** (ChatGPT). Ambas oferecem créditos gratuitos para novos usuários.
+
+- **Anthropic (Claude):** [console.anthropic.com](https://console.anthropic.com) → API Keys
+- **OpenAI:** [platform.openai.com](https://platform.openai.com) → API Keys
+
+Guarde a chave com cuidado — ela é como uma senha. **Nunca coloque sua chave diretamente no código.**
+
+## Configurando variáveis de ambiente
+
+Crie um arquivo `.env` na raiz do seu projeto Rastreador de Gastos:
+
+```
+AI_API_KEY=sua_chave_aqui
+```
+
+Adicione `.env` ao seu `.gitignore` para não expor a chave acidentalmente:
+
+```gitignore
+node_modules/
+.env
+```
+
+Instale o pacote `dotenv` para carregar as variáveis:
+
+```bash
+npm install dotenv
+```
+
+## Estrutura do projeto
+
+Vamos adicionar um novo arquivo ao projeto existente. A lógica de IA fica isolada — não mistura com a lógica do rastreador:
+
+```
+src/
+  tipos.ts        ← seus tipos existentes (não muda)
+  rastreador.ts   ← sua classe existente (não muda)
+  index.ts        ← seu ponto de entrada (não muda)
+  ai-analise.ts   ← novo arquivo que vamos criar
+```
+
+## Implementando a análise com IA
+
+Crie o arquivo `src/ai-analise.ts`:
+
+```typescript
+import "dotenv/config";
+import { Gasto, Categoria } from "./tipos";
+
+function formatarResumoParaIA(gastos: Gasto[]): string {
+  if (gastos.length === 0) {
+    return "Nenhum gasto registrado.";
+  }
+
+  const totaisPorCategoria: Record<string, number> = {};
+
+  for (const gasto of gastos) {
+    totaisPorCategoria[gasto.categoria] =
+      (totaisPorCategoria[gasto.categoria] ?? 0) + gasto.valor;
+  }
+
+  const totalGeral = gastos.reduce((acc, g) => acc + g.valor, 0);
+
+  const linhas = Object.entries(totaisPorCategoria).map(
+    ([categoria, total]) =>
+      `- ${categoria}: R$ ${total.toFixed(2)} (${((total / totalGeral) * 100).toFixed(0)}% do total)`
+  );
+
+  return `Total gasto: R$ ${totalGeral.toFixed(2)}\n\nDistribuição por categoria:\n${linhas.join("\n")}`;
+}
+
+export async function analisarGastos(gastos: Gasto[]): Promise<string> {
+  const apiKey = process.env.AI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("AI_API_KEY não encontrada. Verifique seu arquivo .env");
+  }
+
+  const resumo = formatarResumoParaIA(gastos);
+
+  const resposta = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 300,
+      system:
+        "Você é um assistente financeiro pessoal direto e prático. Analise o resumo de gastos fornecido, identifique padrões de consumo, aponte a principal área de economia possível e sugira uma prioridade financeira para o próximo mês. Responda em no máximo 4 frases.",
+      messages: [
+        {
+          role: "user",
+          content: `Aqui está meu resumo de gastos:\n\n${resumo}\n\nO que você observa e o que devo priorizar?`,
+        },
+      ],
+    }),
+  });
+
+  if (!resposta.ok) {
+    throw new Error(`Erro na API: ${resposta.status} ${resposta.statusText}`);
+  }
+
+  const dados = await resposta.json();
+  return dados.content[0].text;
+}
+
+async function main() {
+  const gastosExemplo: Gasto[] = [
+    { id: 1, descricao: "Almoço no restaurante", valor: 45.5, categoria: "alimentação", data: "15/06/2026" },
+    { id: 2, descricao: "Passagem de metrô", valor: 4.4, categoria: "transporte", data: "15/06/2026" },
+    { id: 3, descricao: "Cinema com amigos", valor: 32.0, categoria: "lazer", data: "15/06/2026" },
+    { id: 4, descricao: "Supermercado semanal", valor: 187.3, categoria: "alimentação", data: "15/06/2026" },
+    { id: 5, descricao: "Consulta médica", valor: 250.0, categoria: "saúde", data: "15/06/2026" },
+    { id: 6, descricao: "Uber para o trabalho", valor: 23.7, categoria: "transporte", data: "15/06/2026" },
+  ];
+
+  console.log("Consultando IA para análise financeira...\n");
+
+  try {
+    const analise = await analisarGastos(gastosExemplo);
+    console.log("Análise da IA:");
+    console.log("─".repeat(40));
+    console.log(analise);
+  } catch (erro) {
+    if (erro instanceof Error) {
+      console.log("Erro:", erro.message);
+    }
+  }
+}
+
+main();
+```
+
+## Entendendo o código
+
+Antes de executar, leia cada parte com atenção.
+
+### Reutilizando tipos existentes
+
+```typescript
+import { Gasto, Categoria } from "./tipos";
+```
+
+Você está importando os mesmos tipos que definiu no Capítulo 6. Isso é a prática correta: definir tipos uma vez, usar em vários lugares — sem duplicar código.
+
+### A função auxiliar `formatarResumoParaIA`
+
+```typescript
+function formatarResumoParaIA(gastos: Gasto[]): string {
+```
+
+Ela transforma o array de gastos em um texto estruturado que a IA consegue analisar. Usar `reduce` para calcular o total e `Object.entries` para iterar o resumo por categoria — métodos que você já conhece aplicados em um contexto real.
+
+A separação em função própria tem uma razão: facilita testar e modificar o formato sem mexer na lógica de API.
+
+### Verificação da chave de API
+
+```typescript
+if (!apiKey) {
+  throw new Error("AI_API_KEY não encontrada. Verifique seu arquivo .env");
+}
+```
+
+Nunca assuma que uma variável de ambiente existe. Verificar antes de usar evita erros confusos mais adiante.
+
+### A função assíncrona e a requisição
+
+```typescript
+export async function analisarGastos(gastos: Gasto[]): Promise<string>
+```
+
+A função é exportada — porque no Desafio 1 você vai importá-la no `index.ts`. A requisição com `fetch` segue o mesmo padrão que você aprendeu na aula de assincronismo: `await` para esperar a resposta, verificar `resposta.ok` antes de processar.
+
+### O prompt da IA
+
+O campo `system` define o comportamento do modelo. Repare que ele é específico: diz exatamente o formato da resposta esperada ("no máximo 4 frases") e o tipo de análise. Prompts vagos geram respostas genéricas.
+
+## Adicionando o script ao package.json
+
+```json
+{
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "ai": "ts-node src/ai-analise.ts"
+  }
+}
+```
+
+## Executando
+
+```bash
+npm run ai
+```
+
+A saída esperada será algo como:
+
+```
+Consultando IA para análise financeira...
+
+Análise da IA:
+────────────────────────────────────────
+Seus gastos estão concentrados em saúde (46%) e alimentação (43%),
+o que indica um mês atípico com despesa médica relevante. A alimentação
+fora de casa representa uma oportunidade de economia — o almoço em
+restaurante poderia ser substituído por refeições preparadas em casa
+algumas vezes na semana. Para o próximo mês, priorize criar uma reserva
+de emergência para absorver gastos de saúde sem comprometer outras categorias.
+```
+
+## Desafios para evoluir
+
+### Desafio 1: Integrar com o projeto principal
+
+Importe `analisarGastos` no `src/index.ts` e chame-a após o `resumoPorCategoria()`, passando os gastos reais do rastreador. O aluno que completa esse desafio tem um projeto completo e coerente do início ao fim.
+
+### Desafio 2: Personalizar o prompt por perfil
+
+Crie uma função `analisarComPerfil(gastos: Gasto[], perfil: string)` onde `perfil` pode ser `"estudante"`, `"freelancer"` ou `"CLT"`. Inclua o perfil no prompt e observe como a IA adapta as sugestões.
+
+### Desafio 3: Análise por período
+
+Adicione um campo `mes` à interface `Gasto` e crie uma função que filtra gastos por mês antes de enviar para a IA. Assim o usuário pode pedir "analise meus gastos de maio".
+
+### Desafio 4 (avançado): Histórico de análises
+
+Salve cada análise gerada pela IA em um arquivo `analises.json` com a data e o resumo usado. Permite comparar a evolução dos gastos mês a mês.
+
+## O que você acabou de aprender
+
+Você acabou de:
+- Consumir uma API REST usando `fetch` com TypeScript
+- Trabalhar com funções assíncronas (`async/await`) em um contexto real
+- Usar variáveis de ambiente para guardar credenciais com segurança
+- Reutilizar interfaces de outro módulo do projeto
+- Formatar dados para um prompt de IA de forma estruturada
+
+Mais importante: você usou IA como **ferramenta dentro do seu código** — não como substituto do seu código.
+
+Essa é a diferença entre um desenvolvedor que usa IA e um desenvolvedor que é usado por ela.

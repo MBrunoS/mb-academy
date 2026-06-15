@@ -1,0 +1,171 @@
+---
+title: Assincronismo com async/await
+description: "Entenda o que são operações assíncronas e como usar async/await em TypeScript para lidar com elas."
+---
+
+Até agora, todo o código que você escreveu é **síncrono**: as instruções executam uma após a outra, em ordem, e o programa espera cada uma terminar antes de avançar.
+
+Mas algumas operações demoram — buscar dados de um servidor, ler um arquivo grande, esperar uma resposta externa. Se o programa travasse esperando cada uma delas, seria inútil.
+
+É aí que entra o **assincronismo**.
+
+## O que é código assíncrono?
+
+Imagine uma lanchonete: o atendente anota seu pedido e já chama o próximo cliente. Ele não fica parado esperando sua comida ficar pronta. Quando o pedido fica pronto, ele te avisa.
+
+Código assíncrono funciona assim: você inicia uma operação demorada e continua executando outras coisas. Quando a operação termina, você lida com o resultado.
+
+## Promises: a base do assincronismo
+
+Antes do `async/await`, o assincronismo era feito com **Promises** — objetos que representam um valor que ainda não está disponível, mas estará no futuro.
+
+Uma Promise tem três estados:
+- **pending:** ainda aguardando
+- **fulfilled:** terminou com sucesso (tem um valor)
+- **rejected:** terminou com erro
+
+```ts
+const promessa = new Promise<string>((resolve, reject) => {
+  setTimeout(() => {
+    resolve("Operação concluída!");
+  }, 2000);
+});
+```
+
+## `async/await`: a forma moderna
+
+O `async/await` é uma forma de escrever código assíncrono que **parece síncrono** — mais fácil de ler e escrever.
+
+- **`async`**: marca uma função como assíncrona. Ela sempre retorna uma Promise.
+- **`await`**: pausa a execução dentro de uma função `async` até a Promise terminar.
+
+```ts
+async function buscarDados(): Promise<string> {
+  const resultado = await new Promise<string>((resolve) => {
+    setTimeout(() => resolve("dados recebidos"), 1000);
+  });
+
+  return resultado;
+}
+
+async function main() {
+  console.log("Iniciando...");
+  const dados = await buscarDados();
+  console.log("Resultado:", dados);
+  console.log("Pronto.");
+}
+
+main();
+// Iniciando...
+// (1 segundo de pausa)
+// Resultado: dados recebidos
+// Pronto.
+```
+
+<Callout>
+Você só pode usar `await` dentro de funções marcadas com `async`. Tentar usar `await` fora de uma função `async` gera erro de compilação.
+</Callout>
+
+## `async/await` com `try/catch`
+
+Operações assíncronas podem falhar — a rede pode estar fora, o servidor pode retornar erro. Combine `async/await` com `try/catch`:
+
+```ts
+async function buscarUsuario(id: number): Promise<string> {
+  if (id <= 0) {
+    throw new Error("ID inválido");
+  }
+  return `Usuário ${id}`;
+}
+
+async function main() {
+  try {
+    const usuario = await buscarUsuario(0);
+    console.log(usuario);
+  } catch (erro) {
+    if (erro instanceof Error) {
+      console.log("Erro:", erro.message);
+    }
+  }
+}
+
+main();
+// Saída: Erro: ID inválido
+```
+
+## `fetch`: fazendo requisições HTTP
+
+`fetch` é a função nativa para fazer requisições HTTP. Ela retorna uma Promise — por isso usamos `await`:
+
+```ts
+async function buscarCotacaoDolar(): Promise<void> {
+  try {
+    const resposta = await fetch("https://economia.awesomeapi.com.br/json/last/USD-BRL");
+
+    if (!resposta.ok) {
+      throw new Error(`Erro HTTP: ${resposta.status}`);
+    }
+
+    const dados = await resposta.json();
+    console.log("Cotação do dólar:", dados.USDBRL.bid);
+  } catch (erro) {
+    if (erro instanceof Error) {
+      console.log("Não foi possível buscar a cotação:", erro.message);
+    }
+  }
+}
+
+buscarCotacaoDolar();
+```
+
+Note que `resposta.json()` também retorna uma Promise — precisamos de `await` duas vezes: uma para esperar a resposta chegar, outra para converter o corpo em objeto JavaScript.
+
+## Para praticar
+
+Use a API pública `https://viacep.com.br/ws/01001000/json/` para buscar informações de um CEP.
+
+1. Crie uma função `async` chamada `buscarCEP(cep: string)` que faz a requisição
+2. Exiba o logradouro e a cidade no console
+3. Trate erros de CEPs inválidos
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+interface DadosCEP {
+  logradouro: string;
+  localidade: string;
+  erro?: boolean;
+}
+
+async function buscarCEP(cep: string): Promise<void> {
+  try {
+    const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+
+    if (!resposta.ok) {
+      throw new Error("Erro ao buscar CEP");
+    }
+
+    const dados = (await resposta.json()) as DadosCEP;
+
+    if (dados.erro) {
+      throw new Error("CEP não encontrado");
+    }
+
+    console.log("Logradouro:", dados.logradouro);
+    console.log("Cidade:", dados.localidade);
+  } catch (erro) {
+    if (erro instanceof Error) {
+      console.log("Erro:", erro.message);
+    }
+  }
+}
+
+buscarCEP("01001000");
+```
+
+</details>
+
+---
+
+`async/await` aparece em praticamente todo projeto TypeScript que interaja com APIs, bancos de dados ou arquivos. No Capítulo 7, você vai usar esses conceitos para integrar uma API de IA ao seu projeto.

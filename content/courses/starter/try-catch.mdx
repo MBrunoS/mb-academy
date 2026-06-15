@@ -1,0 +1,175 @@
+---
+title: Tratamento de Erros
+description: "Aprenda a lidar com erros em TypeScript usando try/catch, tornando seus programas mais confiáveis e previsíveis."
+---
+
+Até agora, nossos programas assumem que tudo vai funcionar perfeitamente. Na realidade, erros acontecem: uma operação pode receber um valor inválido, um dado pode estar em formato inesperado, uma leitura pode falhar.
+
+Saber lidar com erros é parte essencial de escrever código profissional.
+
+## Dois tipos de erros
+
+### Erros de compilação (TypeScript)
+
+Detectados antes de rodar o código. Aparecem no seu editor com sublinhado vermelho.
+
+```ts
+let nome: string = 42; // Erro: Type 'number' is not assignable to type 'string'
+```
+
+O TypeScript te protege desses antes mesmo de executar.
+
+### Erros de execução (runtime)
+
+Só aparecem quando o programa está rodando. TypeScript não consegue detectá-los com antecedência.
+
+```ts
+const dados: string | null = null;
+console.log(dados.toUpperCase()); // Erro em tempo de execução: Cannot read properties of null
+```
+
+## O bloco `try/catch`
+
+A estrutura `try/catch` permite tentar executar um código e, caso ele lance um erro, capturá-lo e responder de forma controlada — sem travar o programa.
+
+```ts
+try {
+  // Código que pode gerar um erro
+} catch (erro) {
+  // O que fazer se um erro acontecer
+}
+```
+
+Exemplo prático:
+
+```ts
+function dividir(a: number, b: number): number {
+  if (b === 0) {
+    throw new Error("Divisão por zero não é permitida.");
+  }
+  return a / b;
+}
+
+try {
+  const resultado = dividir(10, 0);
+  console.log("Resultado:", resultado);
+} catch (erro) {
+  if (erro instanceof Error) {
+    console.log("Ocorreu um erro:", erro.message);
+  }
+}
+// Saída: Ocorreu um erro: Divisão por zero não é permitida.
+```
+
+O programa não trava — captura o erro e continua funcionando.
+
+## O `throw`: lançando seus próprios erros
+
+Use `throw new Error(mensagem)` para sinalizar que uma função recebeu dados inválidos:
+
+```ts
+function calcularIdade(anoNascimento: number): number {
+  const anoAtual = new Date().getFullYear();
+
+  if (anoNascimento > anoAtual) {
+    throw new Error("Ano de nascimento não pode ser no futuro.");
+  }
+
+  return anoAtual - anoNascimento;
+}
+
+try {
+  console.log(calcularIdade(2090));
+} catch (erro) {
+  if (erro instanceof Error) {
+    console.log("Erro:", erro.message);
+  }
+}
+// Saída: Erro: Ano de nascimento não pode ser no futuro.
+```
+
+## O bloco `finally`
+
+O `finally` executa sempre — com erro ou sem. Útil para ações de limpeza:
+
+```ts
+try {
+  console.log("Tentando executar...");
+  throw new Error("Algo deu errado");
+} catch (erro) {
+  if (erro instanceof Error) {
+    console.log("Erro capturado:", erro.message);
+  }
+} finally {
+  console.log("Isso sempre executa.");
+}
+// Tentando executar...
+// Erro capturado: Algo deu errado
+// Isso sempre executa.
+```
+
+## Tipando erros em TypeScript
+
+Dentro de um `catch`, o tipo de `erro` é `unknown`. Por isso, sempre verifique antes de acessar propriedades:
+
+```ts
+try {
+  // ...
+} catch (erro) {
+  if (erro instanceof Error) {
+    console.log(erro.message); // Seguro: TypeScript sabe que é um Error
+  } else {
+    console.log("Erro desconhecido:", erro);
+  }
+}
+```
+
+## Quando usar `try/catch`?
+
+Use quando o erro é uma possibilidade real de execução — não um bug que você deveria corrigir. Exemplos: validar entrada do usuário, operações com valores que podem ser inválidos, interação com recursos externos.
+
+Não envolva tudo em `try/catch`. Isso esconde erros que você deveria encontrar e corrigir.
+
+## Para praticar
+
+Crie uma função `analisarTexto(texto: string)` que:
+1. Lance um erro se o texto for uma string vazia
+2. Retorne um objeto `{ palavras: number, caracteres: number }` contando palavras e caracteres
+3. Chame a função dentro de um `try/catch` e trate o erro adequadamente
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+interface AnaliseTexto {
+  palavras: number;
+  caracteres: number;
+}
+
+function analisarTexto(texto: string): AnaliseTexto {
+  if (texto.trim() === "") {
+    throw new Error("O texto não pode estar vazio.");
+  }
+
+  return {
+    palavras: texto.trim().split(/\s+/).length,
+    caracteres: texto.length,
+  };
+}
+
+try {
+  const resultado = analisarTexto("Olá, mundo!");
+  console.log("Palavras:", resultado.palavras);
+  console.log("Caracteres:", resultado.caracteres);
+} catch (erro) {
+  if (erro instanceof Error) {
+    console.log("Erro:", erro.message);
+  }
+}
+```
+
+</details>
+
+---
+
+Com `try/catch` e `throw`, você tem controle sobre o que acontece quando as coisas dão errado. Esse hábito distingue código que funciona apenas em cenários ideais de código que funciona no mundo real.

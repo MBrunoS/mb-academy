@@ -1,0 +1,128 @@
+---
+title: Depurando seu Código
+description: "Aprenda a encontrar e corrigir erros no seu código com técnicas práticas de debugging em TypeScript."
+---
+
+Escrever código que não funciona é completamente normal. O que diferencia um desenvolvedor experiente de um iniciante não é a ausência de erros — é a habilidade de encontrá-los e corrigi-los com eficiência.
+
+Isso tem um nome: **debugging** (depuração).
+
+## Por que bugs acontecem?
+
+Existem três fontes principais de erros:
+
+1. **Erro de sintaxe:** código mal escrito que o TypeScript rejeita antes de rodar
+2. **Erro de lógica:** o código roda, mas faz a coisa errada
+3. **Erro de execução (runtime):** o código roda em alguns casos, mas quebra em outros
+
+O TypeScript resolve muitos erros de sintaxe automaticamente. Os outros dois você precisa encontrar.
+
+## A ferramenta mais simples: `console.log`
+
+O `console.log` é a ferramenta de debugging mais usada no mundo, independente da senioridade do desenvolvedor. A estratégia é simples: imprima valores em pontos estratégicos para ver o que está acontecendo.
+
+```ts
+function calcularDesconto(preco: number, porcentagem: number): number {
+  const desconto = preco * porcentagem; // Bug: faltou dividir por 100
+  const total = preco - desconto;
+  return total;
+}
+
+console.log(calcularDesconto(100, 10)); // Esperado: 90 | Resultado: -900
+```
+
+Para encontrar o bug, adicione `console.log` em cada etapa:
+
+```ts
+function calcularDesconto(preco: number, porcentagem: number): number {
+  console.log("preco:", preco);
+  console.log("porcentagem:", porcentagem);
+
+  const desconto = preco * porcentagem;
+  console.log("desconto calculado:", desconto); // Mostra 1000 — aqui está o bug
+
+  const total = preco - desconto;
+  console.log("total:", total);
+
+  return total;
+}
+```
+
+Ao ver `desconto: 1000`, fica claro que a divisão por 100 estava faltando.
+
+## Lendo mensagens de erro
+
+TypeScript e Node.js geram mensagens com informações úteis. Aprender a lê-las economiza muito tempo.
+
+```
+TypeError: Cannot read properties of undefined (reading 'toUpperCase')
+    at formatarNome (src/index.ts:5:14)
+    at main (src/index.ts:12:3)
+```
+
+O que cada parte diz:
+
+- **`TypeError`** — o tipo do erro
+- **`Cannot read properties of undefined (reading 'toUpperCase')`** — o que aconteceu: chamamos `.toUpperCase()` em algo que é `undefined`
+- **`at formatarNome (src/index.ts:5:14)`** — arquivo, linha e coluna onde o erro ocorreu
+
+Leia a mensagem antes de qualquer outra coisa. Ela quase sempre diz exatamente o que deu errado.
+
+## Erros comuns e o que significam
+
+| Mensagem | Causa comum |
+|---|---|
+| `Cannot read properties of undefined` | Acessar propriedade de variável não inicializada |
+| `X is not a function` | Tentar chamar como função algo que não é função |
+| `Property 'X' does not exist on type 'Y'` | Propriedade que não existe no tipo definido |
+| `Type 'X' is not assignable to type 'Y'` | Tipo incompatível na atribuição |
+| `X is not defined` | Variável usada antes de declarar ou com nome errado |
+
+## A técnica de eliminação
+
+Quando você não sabe onde está o erro, divida o código ao meio e descubra em qual parte o problema está.
+
+```ts
+function processarDados(dados: number[]): number {
+  const filtrados = dados.filter(n => n > 0);               // Etapa 1
+  const dobrados = filtrados.map(n => n * 2);               // Etapa 2
+  const soma = dobrados.reduce((acc, n) => acc + n, 0);    // Etapa 3
+  return soma;
+}
+```
+
+Imprima após cada etapa:
+
+```ts
+console.log("filtrados:", filtrados);
+console.log("dobrados:", dobrados);
+console.log("soma:", soma);
+```
+
+Assim que um resultado parece errado, você achou onde está o bug.
+
+## Usando o TypeScript a seu favor
+
+O TypeScript é um debugger passivo — ele encontra muitos erros antes de você rodar o código. Para aproveitar:
+
+- **Nunca use `any`** — ao tipar tudo corretamente, o TypeScript avisa quando você usa um valor de forma errada
+- **Leia os sublinhados vermelhos** — seu editor mostra erros em tempo real, antes de rodar
+- **Confie nos erros de compilação** — se o TypeScript reclamar, algo está errado
+
+## Uma mentalidade para debugging
+
+Debugging é investigação, não adivinhação. Siga estes passos:
+
+1. **Reproduza o erro** — entenda exatamente quando e como ele acontece
+2. **Leia a mensagem completa** — não vá direto ao Stack Overflow
+3. **Identifique a linha** — a mensagem quase sempre diz onde está
+4. **Inspecione os valores** — use `console.log` para ver o que está lá de fato
+5. **Mude uma coisa por vez** — mudanças múltiplas simultâneas escondem a causa real
+
+<Callout type="warn">
+**Não tente adivinhar.** Debugging eficiente é sistemático. Se você está mudando coisas sem saber por quê, pare e leia o erro com calma.
+</Callout>
+
+---
+
+Debugging é uma habilidade que se desenvolve com prática. Com o tempo, você vai reconhecer erros comuns rapidamente e saber exatamente onde olhar. Por enquanto, tenha paciência: cada bug resolvido te ensina algo que nenhum tutorial consegue.

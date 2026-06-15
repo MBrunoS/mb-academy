@@ -1,189 +1,267 @@
 ---
-title: "Implementando a Lógica do Projeto"
-description: "Vamos escrever o código da nossa aplicação de lista de tarefas, implementando a classe e seus métodos com TypeScript."
+title: "Implementando o Rastreador de Gastos"
+description: "Vamos escrever o código do rastreador de gastos, implementando os três arquivos do projeto com TypeScript."
 ---
 
-Com o planejamento feito, é hora de colocar a mão no código. Vamos implementar a classe `GerenciadorDeTarefas` e toda a lógica para manipular nossas tarefas no arquivo `src/index.ts`.
+Com o planejamento feito, é hora de implementar. Vamos construir os três arquivos do projeto, do mais simples ao mais complexo.
 
-## 1. A Estrutura da Classe
+## 1. Os tipos: `src/tipos.ts`
 
-Primeiro, vamos definir a `interface` para nossa tarefa e a estrutura inicial da nossa classe, conforme planejamos.
+Começamos pelos tipos — a fundação de tudo. Esse arquivo não tem lógica, apenas definições:
 
 ```ts
-// src/index.ts
+// src/tipos.ts
 
-interface Tarefa {
+export type Categoria =
+  | "alimentação"
+  | "transporte"
+  | "moradia"
+  | "lazer"
+  | "saúde"
+  | "outros";
+
+export interface Gasto {
   id: number;
   descricao: string;
-  concluida: boolean;
-}
-
-class GerenciadorDeTarefas {
-  private tarefas: Tarefa[] = [];
-  private ultimoId: number = 0;
-
-  // Métodos da classe virão aqui
+  valor: number;
+  categoria: Categoria;
+  data: string;
 }
 ```
 
-## 2. Implementando os Métodos
+Exportamos tudo para que os outros arquivos possam importar. O union type `Categoria` garante que nenhum arquivo do projeto consiga usar uma categoria inválida — o TypeScript vai acusar erro em tempo de compilação.
 
-Agora, vamos adicionar os métodos um a um dentro da classe `GerenciadorDeTarefas`.
+## 2. A classe: `src/rastreador.ts`
 
-### Adicionar Tarefa
+Aqui está toda a lógica do projeto. Vamos implementar método por método.
 
-Este método receberá a descrição da tarefa, criará um novo objeto `Tarefa` com um ID único e o adicionará ao nosso array `tarefas`.
+### Estrutura inicial
 
 ```ts
-// Dentro da classe GerenciadorDeTarefas
+// src/rastreador.ts
 
-adicionarTarefa(descricao: string): void {
-  this.ultimoId++;
-  const novaTarefa: Tarefa = {
-    id: this.ultimoId,
-    descricao: descricao,
-    concluida: false
+import { Gasto, Categoria } from "./tipos";
+
+export class RastreadorDeGastos {
+  private gastos: Gasto[] = [];
+  private proximoId: number = 1;
+}
+```
+
+### `adicionarGasto`
+
+Valida o valor recebido e cria um novo objeto `Gasto`. Usamos `throw` para rejeitar valores inválidos:
+
+```ts
+adicionarGasto(descricao: string, valor: number, categoria: Categoria): void {
+  if (valor <= 0) {
+    throw new Error("O valor do gasto deve ser maior que zero.");
+  }
+
+  const novoGasto: Gasto = {
+    id: this.proximoId++,
+    descricao,
+    valor,
+    categoria,
+    data: new Date().toLocaleDateString("pt-BR"),
   };
-  this.tarefas.push(novaTarefa);
-  console.log(`Tarefa "${descricao}" adicionada com sucesso!`);
+
+  this.gastos.push(novoGasto);
+  console.log(`✓ "${descricao}" — R$ ${valor.toFixed(2)} adicionado.`);
 }
 ```
 
-### Listar Tarefas
+### `listarGastos`
 
-Este método percorrerá o array `tarefas` e exibirá cada uma no console, formatando a saída para mostrar o status de conclusão.
+Usa `console.table` para exibir os gastos em uma tabela formatada automaticamente no terminal:
 
 ```ts
-// Dentro da classe GerenciadorDeTarefas
-
-listarTarefas(): void {
-  console.log("\n--- Lista de Tarefas ---");
-  if (this.tarefas.length === 0) {
-    console.log("Nenhuma tarefa cadastrada.");
+listarGastos(): void {
+  if (this.gastos.length === 0) {
+    console.log("Nenhum gasto registrado ainda.");
     return;
   }
 
-  this.tarefas.forEach(tarefa => {
-    const status = tarefa.concluida ? "[x]" : "[ ]";
-    console.log(`${status} ${tarefa.id}: ${tarefa.descricao}`);
-  });
-  console.log("----------------------\n");
+  const tabela = this.gastos.map((g) => ({
+    ID: g.id,
+    Descrição: g.descricao,
+    "Valor (R$)": g.valor.toFixed(2),
+    Categoria: g.categoria,
+    Data: g.data,
+  }));
+
+  console.log("\n=== Todos os Gastos ===");
+  console.table(tabela);
 }
 ```
 
-### Marcar como Concluída
+### `resumoPorCategoria`
 
-Este método buscará uma tarefa pelo `id` e, se a encontrar, mudará sua propriedade `concluida` para `true`.
+Agrupa os gastos por categoria usando um objeto como acumulador, depois exibe em tabela:
 
 ```ts
-// Dentro da classe GerenciadorDeTarefas
+resumoPorCategoria(): void {
+  if (this.gastos.length === 0) {
+    console.log("Nenhum gasto registrado ainda.");
+    return;
+  }
 
-marcarComoConcluida(id: number): void {
-  const tarefa = this.tarefas.find(t => t.id === id);
+  const totais: Record<string, number> = {};
 
-  if (tarefa) {
-    tarefa.concluida = true;
-    console.log(`Tarefa "${tarefa.descricao}" marcada como concluída.`);
-  } else {
-    console.log(`Erro: Tarefa com ID ${id} não encontrada.`);
+  for (const gasto of this.gastos) {
+    totais[gasto.categoria] = (totais[gasto.categoria] ?? 0) + gasto.valor;
+  }
+
+  const tabela = Object.entries(totais).map(([categoria, total]) => ({
+    Categoria: categoria,
+    "Total (R$)": total.toFixed(2),
+  }));
+
+  console.log("\n=== Resumo por Categoria ===");
+  console.table(tabela);
+}
+```
+
+### `totalGasto`
+
+Usa `reduce` para somar todos os valores — exatamente o método de array que estudamos:
+
+```ts
+totalGasto(): number {
+  return this.gastos.reduce((acumulador, gasto) => acumulador + gasto.valor, 0);
+}
+```
+
+### `filtrarPorCategoria`
+
+Usa `filter` para retornar apenas os gastos de uma categoria específica:
+
+```ts
+filtrarPorCategoria(categoria: Categoria): Gasto[] {
+  return this.gastos.filter((g) => g.categoria === categoria);
+}
+```
+
+### Código completo: `src/rastreador.ts`
+
+```ts
+// src/rastreador.ts
+
+import { Gasto, Categoria } from "./tipos";
+
+export class RastreadorDeGastos {
+  private gastos: Gasto[] = [];
+  private proximoId: number = 1;
+
+  adicionarGasto(descricao: string, valor: number, categoria: Categoria): void {
+    if (valor <= 0) {
+      throw new Error("O valor do gasto deve ser maior que zero.");
+    }
+
+    const novoGasto: Gasto = {
+      id: this.proximoId++,
+      descricao,
+      valor,
+      categoria,
+      data: new Date().toLocaleDateString("pt-BR"),
+    };
+
+    this.gastos.push(novoGasto);
+    console.log(`✓ "${descricao}" — R$ ${valor.toFixed(2)} adicionado.`);
+  }
+
+  listarGastos(): void {
+    if (this.gastos.length === 0) {
+      console.log("Nenhum gasto registrado ainda.");
+      return;
+    }
+
+    const tabela = this.gastos.map((g) => ({
+      ID: g.id,
+      Descrição: g.descricao,
+      "Valor (R$)": g.valor.toFixed(2),
+      Categoria: g.categoria,
+      Data: g.data,
+    }));
+
+    console.log("\n=== Todos os Gastos ===");
+    console.table(tabela);
+  }
+
+  resumoPorCategoria(): void {
+    if (this.gastos.length === 0) {
+      console.log("Nenhum gasto registrado ainda.");
+      return;
+    }
+
+    const totais: Record<string, number> = {};
+
+    for (const gasto of this.gastos) {
+      totais[gasto.categoria] = (totais[gasto.categoria] ?? 0) + gasto.valor;
+    }
+
+    const tabela = Object.entries(totais).map(([categoria, total]) => ({
+      Categoria: categoria,
+      "Total (R$)": total.toFixed(2),
+    }));
+
+    console.log("\n=== Resumo por Categoria ===");
+    console.table(tabela);
+  }
+
+  totalGasto(): number {
+    return this.gastos.reduce((acc, g) => acc + g.valor, 0);
+  }
+
+  filtrarPorCategoria(categoria: Categoria): Gasto[] {
+    return this.gastos.filter((g) => g.categoria === categoria);
   }
 }
 ```
-*Aqui usamos o método `find()`, que é ótimo para buscar um item específico em um array.*
 
-### Remover Tarefa
+## 3. O ponto de entrada: `src/index.ts`
 
-Este método usará o `filter()` para criar um novo array contendo todas as tarefas, exceto aquela com o `id` que queremos remover.
-
-```ts
-// Dentro da classe GerenciadorDeTarefas
-
-removerTarefa(id: number): void {
-  const tamanhoOriginal = this.tarefas.length;
-  this.tarefas = this.tarefas.filter(t => t.id !== id);
-
-  if (this.tarefas.length < tamanhoOriginal) {
-    console.log(`Tarefa com ID ${id} removida com sucesso.`);
-  } else {
-    console.log(`Erro: Tarefa com ID ${id} não encontrada.`);
-  }
-}
-```
-
-## 3. Juntando Tudo
-
-Agora que a classe está pronta, podemos criar uma instância dela e usar seus métodos para gerenciar nossas tarefas. O código completo do arquivo `src/index.ts` ficará assim:
+O arquivo `index.ts` importa a classe, cria uma instância e usa todos os métodos:
 
 ```ts
 // src/index.ts
 
-interface Tarefa {
-  id: number;
-  descricao: string;
-  concluida: boolean;
-}
+import { RastreadorDeGastos } from "./rastreador";
 
-class GerenciadorDeTarefas {
-  private tarefas: Tarefa[] = [];
-  private ultimoId: number = 0;
+const rastreador = new RastreadorDeGastos();
 
-  adicionarTarefa(descricao: string): void {
-    this.ultimoId++;
-    const novaTarefa: Tarefa = {
-      id: this.ultimoId,
-      descricao: descricao,
-      concluida: false
-    };
-    this.tarefas.push(novaTarefa);
-    console.log(`Tarefa "${descricao}" adicionada com sucesso!`);
-  }
+// Registrando gastos
+rastreador.adicionarGasto("Almoço no restaurante", 45.5, "alimentação");
+rastreador.adicionarGasto("Passagem de metrô", 4.4, "transporte");
+rastreador.adicionarGasto("Cinema com amigos", 32.0, "lazer");
+rastreador.adicionarGasto("Supermercado semanal", 187.3, "alimentação");
+rastreador.adicionarGasto("Consulta médica", 250.0, "saúde");
+rastreador.adicionarGasto("Uber para o trabalho", 23.7, "transporte");
 
-  listarTarefas(): void {
-    console.log("\n--- Lista de Tarefas ---");
-    if (this.tarefas.length === 0) {
-      console.log("Nenhuma tarefa cadastrada.");
-      return;
-    }
-    this.tarefas.forEach(tarefa => {
-      const status = tarefa.concluida ? "[x]" : "[ ]";
-      console.log(`${status} ${tarefa.id}: ${tarefa.descricao}`);
-    });
-    console.log("----------------------\n");
-  }
+// Listando todos
+rastreador.listarGastos();
 
-  marcarComoConcluida(id: number): void {
-    const tarefa = this.tarefas.find(t => t.id === id);
-    if (tarefa) {
-      tarefa.concluida = true;
-      console.log(`Tarefa "${tarefa.descricao}" marcada como concluída.`);
-    } else {
-      console.log(`Erro: Tarefa com ID ${id} não encontrada.`);
-    }
-  }
+// Resumo por categoria
+rastreador.resumoPorCategoria();
 
-  removerTarefa(id: number): void {
-    const tamanhoOriginal = this.tarefas.length;
-    this.tarefas = this.tarefas.filter(t => t.id !== id);
-    if (this.tarefas.length < tamanhoOriginal) {
-      console.log(`Tarefa com ID ${id} removida com sucesso.`);
-    } else {
-      console.log(`Erro: Tarefa com ID ${id} não encontrada.`);
-    }
+// Total geral
+const total = rastreador.totalGasto();
+console.log(`\nTotal gasto: R$ ${total.toFixed(2)}`);
+
+// Filtrando por categoria
+const gastosAlimentacao = rastreador.filtrarPorCategoria("alimentação");
+console.log(
+  `\nGastos com alimentação: ${gastosAlimentacao.length} registro(s)`
+);
+
+// Testando validação de erro
+try {
+  rastreador.adicionarGasto("Gasto inválido", -50, "outros");
+} catch (erro) {
+  if (erro instanceof Error) {
+    console.log(`\nErro capturado: ${erro.message}`);
   }
 }
-
-// --- Execução do nosso programa ---
-const gerenciador = new GerenciadorDeTarefas();
-
-gerenciador.adicionarTarefa("Estudar TypeScript");
-gerenciador.adicionarTarefa("Fazer o projeto prático");
-gerenciador.listarTarefas();
-
-gerenciador.marcarComoConcluida(1);
-gerenciador.listarTarefas();
-
-gerenciador.removerTarefa(2);
-gerenciador.listarTarefas();
 ```
 
-Com o código pronto, a próxima etapa é executá-lo e ver nossa aplicação funcionando. Vamos fazer isso na página seguinte.
+Com os três arquivos prontos, vamos executar o projeto na próxima página.

@@ -1,83 +1,122 @@
 ---
-title: "Executando e Refinando o Projeto"
-description: "Vamos executar nossa aplicação de lista de tarefas e ver como podemos melhorá-la com novas funcionalidades."
+title: "Executando e Evoluindo o Projeto"
+description: "Execute o rastreador de gastos e descubra como evoluí-lo com novos desafios."
 ---
 
-Com nosso código TypeScript pronto, é hora de ver a mágica acontecer. Vamos executar nossa aplicação de To-Do List no terminal.
+Com os três arquivos implementados, é hora de rodar o projeto e ver o resultado.
 
-## Executando o Projeto
+## Executando
 
-Se você seguiu os passos de configuração do ambiente e implementação, agora pode rodar o projeto facilmente. Abra o terminal na raiz do seu projeto e execute o script `start` que configuramos no `package.json`:
+Na raiz do projeto, execute:
 
 ```bash
 npm start
 ```
 
-Este comando usa o `ts-node` para compilar e executar o arquivo `src/index.ts` em memória. A saída no seu terminal deverá ser algo assim:
+A saída no terminal será algo assim:
 
 ```
-Tarefa "Estudar TypeScript" adicionada com sucesso!
-Tarefa "Fazer o projeto prático" adicionada com sucesso!
+✓ "Almoço no restaurante" — R$ 45.50 adicionado.
+✓ "Passagem de metrô" — R$ 4.40 adicionado.
+✓ "Cinema com amigos" — R$ 32.00 adicionado.
+✓ "Supermercado semanal" — R$ 187.30 adicionado.
+✓ "Consulta médica" — R$ 250.00 adicionado.
+✓ "Uber para o trabalho" — R$ 23.70 adicionado.
 
---- Lista de Tarefas ---
-[ ] 1: Estudar TypeScript
-[ ] 2: Fazer o projeto prático
-----------------------
+=== Todos os Gastos ===
+┌─────────┬────┬────────────────────────┬────────────┬──────────────┬────────────┐
+│ (index) │ ID │ Descrição              │ Valor (R$) │ Categoria    │ Data       │
+├─────────┼────┼────────────────────────┼────────────┼──────────────┼────────────┤
+│ 0       │ 1  │ 'Almoço no restaurante'│ '45.50'    │ 'alimentação'│ 15/06/2026 │
+│ 1       │ 2  │ 'Passagem de metrô'    │ '4.40'     │ 'transporte' │ 15/06/2026 │
+│ 2       │ 3  │ 'Cinema com amigos'    │ '32.00'    │ 'lazer'      │ 15/06/2026 │
+│ 3       │ 4  │ 'Supermercado semanal' │ '187.30'   │ 'alimentação'│ 15/06/2026 │
+│ 4       │ 5  │ 'Consulta médica'      │ '250.00'   │ 'saúde'      │ 15/06/2026 │
+│ 5       │ 6  │ 'Uber para o trabalho' │ '23.70'    │ 'transporte' │ 15/06/2026 │
+└─────────┴────┴────────────────────────┴────────────┴──────────────┴────────────┘
 
-Tarefa "Estudar TypeScript" marcada como concluída.
+=== Resumo por Categoria ===
+┌─────────┬──────────────┬────────────┐
+│ (index) │ Categoria    │ Total (R$) │
+├─────────┼──────────────┼────────────┤
+│ 0       │ 'alimentação'│ '232.80'   │
+│ 1       │ 'transporte' │ '28.10'    │
+│ 2       │ 'lazer'      │ '32.00'    │
+│ 3       │ 'saúde'      │ '250.00'   │
+└─────────┴──────────────┴────────────┘
 
---- Lista de Tarefas ---
-[x] 1: Estudar TypeScript
-[ ] 2: Fazer o projeto prático
-----------------------
+Total gasto: R$ 542.90
 
-Tarefa com ID 2 removida com sucesso.
+Gastos com alimentação: 2 registro(s)
 
---- Lista de Tarefas ---
-[x] 1: Estudar TypeScript
-----------------------
+Erro capturado: O valor do gasto deve ser maior que zero.
 ```
 
-Parabéns! Você acabou de construir e executar seu primeiro projeto completo com TypeScript, aplicando todos os conceitos fundamentais do curso.
+Parabéns — você construiu um projeto TypeScript completo, com módulos, classes, tipagem estrita e tratamento de erros.
 
-## Desafios para Evoluir o Projeto
+## Revisando o que você usou
 
-Uma aplicação de verdade nunca está "terminada". Que tal usar seu conhecimento para adicionar novas funcionalidades? Aqui estão alguns desafios:
+Cada conceito do curso aparece neste projeto:
 
-### Desafio 1: Evitar Tarefas Duplicadas
+| Conceito | Onde aparece |
+|---|---|
+| **Interfaces e union types** | `Gasto` e `Categoria` em `tipos.ts` |
+| **Classes e encapsulamento** | `RastreadorDeGastos` com propriedades `private` |
+| **Módulos** | `import`/`export` entre os três arquivos |
+| **Array methods** | `push`, `filter`, `map`, `reduce`, `forEach` |
+| **Tratamento de erros** | `throw` em `adicionarGasto`, `try/catch` em `index.ts` |
+| **TypeScript strictness** | O compilador impede categorias inválidas em tempo de compilação |
 
-Modifique o método `adicionarTarefa` para que ele não permita adicionar uma tarefa com a mesma descrição de uma já existente. Antes de adicionar, verifique se já existe uma tarefa com aquela descrição no array `tarefas`.
+## Desafios para evoluir
 
-<details>
-<summary>Dica</summary>
-Você pode usar o método `some()` ou `find()` do array para verificar a existência da tarefa.
-</details>
+Este projeto tem bastante espaço para crescer. Cada desafio abaixo é uma funcionalidade real que tornaria o projeto mais valioso no portfólio.
 
-### Desafio 2: Editar a Descrição de uma Tarefa
+### Desafio 1: Definir um orçamento mensal
 
-Crie um novo método `editarTarefa(id: number, novaDescricao: string): void`. Ele deve encontrar a tarefa pelo `id` e, se existir, atualizar sua propriedade `descricao`.
+Adicione um método `definirOrcamento(valor: number): void` e um método `verificarOrcamento(): void` que exibe quanto do orçamento já foi usado e quanto resta.
 
-### Desafio 3: Limpar Todas as Tarefas
+### Desafio 2: Gasto mais caro por categoria
 
-Adicione um método `limparTarefas(): void` que esvazie o array `tarefas`, removendo todos os itens de uma só vez.
+Crie um método `gastoDominantePorCategoria(): void` que, para cada categoria com gastos, exibe o item de maior valor. Use `Math.max` e `filter`.
 
-### Desafio 4 (Avançado): Salvar e Carregar Tarefas
+### Desafio 3: Persistência em arquivo
 
-Atualmente, as tarefas são perdidas toda vez que o script termina. Para torná-lo mais útil, você pode:
+Atualmente os dados são perdidos quando o programa termina. Adicione:
+- `salvarGastos()`: converte o array para JSON e grava em `gastos.json` usando o módulo `fs` do Node.js
+- `carregarGastos()`: lê o arquivo na inicialização da classe e restaura os dados
 
-1.  **Salvar:** Criar um método `salvarTarefas()` que converta o array `tarefas` para uma string JSON (`JSON.stringify()`) e a salve em um arquivo local (ex: `tarefas.json`) usando o módulo `fs` (File System) do Node.js.
-2.  **Carregar:** Modificar o construtor da classe para que ele tente ler o arquivo `tarefas.json` (`fs.readFileSync()`), converter a string JSON de volta para um array (`JSON.parse()`) e carregar as tarefas salvas quando a aplicação iniciar.
+Este é o desafio mais complexo, mas torna a aplicação genuinamente útil.
 
-Este último desafio é mais complexo, mas é um excelente exercício para aprender a interagir com o sistema de arquivos e persistir dados.
+### Desafio 4: Remover um gasto
 
-## Conclusão do Projeto
+Implemente `removerGasto(id: number): void` que encontra o gasto pelo ID e o remove do array. Use `filter` — o mesmo padrão que você viu no curso.
 
-Este projeto de To-Do List, embora simples, é uma demonstração poderosa de como os conceitos que você aprendeu se conectam para criar algo funcional. Você usou:
+### Desafio 5 (aberto): Torne-o seu
 
--   **TypeScript** para tipagem (`interface`, `class`, tipos de variáveis).
--   **POO** para organizar a lógica (`GerenciadorDeTarefas`).
--   **Arrays e seus métodos** (`push`, `forEach`, `find`, `filter`) para gerenciar os dados.
--   **Funções** (métodos da classe) para encapsular comportamentos.
--   **Node.js e NPM** para gerenciar o ambiente e executar o código.
+Adicione algo que faça sentido para você — metas por categoria, alertas de gastos excessivos, exportação para CSV, ou uma categoria personalizada. Esse tipo de personalização é o que faz um projeto de portfólio se destacar.
 
-Sinta-se à vontade para experimentar, adicionar suas próprias funcionalidades e usar este projeto como base para o seu portfólio. O mais importante na jornada de um desenvolvedor é **continuar construindo**.
+## Colocando no portfólio
+
+Para publicar este projeto no GitHub:
+
+1. Inicie o repositório Git dentro da pasta do projeto:
+   ```bash
+   git init
+   git add .
+   git commit -m "feat: rastreador de gastos pessoais em TypeScript"
+   ```
+2. Crie um repositório no GitHub e faça o push
+3. Escreva um `README.md` descrevendo o que o projeto faz, como rodar e quais conceitos ele demonstra
+
+Um projeto bem documentado conta mais do que dez projetos sem descrição.
+
+## Conclusão do projeto
+
+Este rastreador de gastos demonstra — de forma concreta e verificável — que você sabe:
+
+- Modelar dados do mundo real com TypeScript
+- Organizar código em módulos com responsabilidades distintas
+- Manipular arrays com os métodos mais usados no dia a dia
+- Lidar com erros de forma controlada
+
+De agora em diante, é só evoluir.
