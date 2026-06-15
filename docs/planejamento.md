@@ -16,9 +16,9 @@
 
 - **Projeto incremental por capítulo.** O aluno não aprende conceitos isolados e aplica no final. Cada capítulo adiciona uma camada ao projeto em construção. Checkpoints de código inicial são fornecidos por capítulo para que um bloqueio num capítulo anterior não impeça o progresso.
 
-- **Trilha dupla: principal (75%) + complementar (25%).** A trilha principal é técnica e obrigatória. A trilha complementar cobre design, soft skills, metodologias, preparação para entrevistas e IA — conteúdo diversificado que forma o desenvolvedor completo, não apenas o programador. As duas trilhas são independentes em timing; alinhamento visual não implica sincronização.
+- **Trilha dupla: obrigatória (≈75%) + opcional (≈25%).** A trilha **obrigatória** é o núcleo técnico que o aluno precisa dominar. A trilha **opcional** (também chamada *complementar*) cobre design, soft skills, metodologias, preparação para entrevistas e aprofundamentos de IA — conteúdo que forma o desenvolvedor completo, não apenas o programador. "Opcional" significa que não bloqueia a progressão de nível, não que seja descartável. Cada curso rotula seus módulos como **Obrigatório** ou **Opcional**.
 
-- **IA como fio condutor, não como apêndice.** IA aparece em todos os níveis, escalando com a maturidade do aluno: ferramenta de aprendizado (Starter) → ferramenta de trabalho (Júnior) → integração em produto (Pleno) → arquitetura e workflows avançados (Sênior). Nunca é opcional nem ignorada.
+- **IA como fio condutor, não como apêndice.** IA aparece em todos os níveis, escalando com a maturidade do aluno: ferramenta de aprendizado (Starter) → ferramenta de trabalho (Júnior) → integração em produto (Pleno) → arquitetura e workflows avançados (Sênior). Está sempre presente e nunca é ignorada — obrigatória onde é estrutural (capítulo de IA do Starter) e na trilha opcional nos aprofundamentos dos níveis seguintes.
 
 - **Trilhas espelhadas em todos os níveis.** Front-end e back-end são trilhas paralelas e independentes do Júnior ao Sênior. Um sênior front-end e um sênior back-end compartilham um núcleo de conhecimento comum, mas têm especializações distintas e igualmente profundas. Não existe um "ponto de convergência obrigatório" — o aluno aprofunda sua especialidade em todos os níveis, com liberdade de transitar entre trilhas se quiser.
 
@@ -28,93 +28,65 @@
 
 ```
 Legenda:
-  ██  Obrigatório (trilha principal)
-  ░░  Complementar — soft skills, IA, carreira (25%, feito no próprio ritmo)
-  ··  Opcional — aluno da outra trilha pode cursar se quiser
+  ██  Obrigatório
+  ░░  Opcional (complementar: soft skills, IA, carreira, deep-dives)
+  (c) Módulo compartilhado entre as duas trilhas — escrito uma vez, cursado por ambas
 
 
-                    ┌─────────────────────────────┐
-                    │           STARTER            │
-                    │  ██ TypeScript, lógica, OOP  │
-                    │  ██ Rastreador de Gastos CLI  │
+                    ┌──────────────────────────────┐
+                    │            STARTER            │
+                    │  ██ TypeScript, lógica, POO   │
+                    │  ██ Projeto: Rastreador (CLI) │
+                    │  ██ IA: API da Anthropic      │
                     │  ░░ Mindset, soft skills      │
-                    │  ██ IA: API Anthropic         │
-                    │          ✅ Pronto            │
-                    └──────────────┬───────────────┘
-                                   │
+                    │           ✅ Pronto           │
+                    └───────────────┬──────────────┘
+                                    │
                             [Escolha da trilha]
-                                   │
-              ┌────────────────────┴────────────────────┐
-              │                                         │
-   ┌──────────▼──────────┐               ┌─────────────▼──────────┐
-   │    JÚNIOR FRONT     │               │    JÚNIOR BACK         │
-   │  ██ HTML/CSS        │               │  ██ Servidores/HTTP    │
-   │  ██ React + TS      │               │  ██ NestJS + TS        │
-   │  ██ APIs, Auth      │               │  ██ PostgreSQL/Prisma  │
-   │  ██ Testes I        │               │  ██ Auth, REST, Testes │
-   │  ██ Deploy (Vercel) │               │  ██ Deploy (Railway)   │
-   │  ░░ Design, Carreira│  · opcional · │  ░░ Docs, Carreira     │
-   │  ░░ IA júnior       │◄ ─ ─ ─ ─ ─ ►│  ░░ IA júnior          │
-   └──────────┬──────────┘               └─────────────┬──────────┘
-              │                                         │
-              └─────────────────┬───────────────────────┘
-                                │
-                   ┌────────────▼────────────┐
-                   │      NÚCLEO PLENO        │
-                   │  (obrigatório para ambas │
-                   │   as trilhas antes de    │
-                   │   entrar no Pleno)        │
-                   │                          │
-                   │  ██ TypeScript Avançado  │
-                   │  ██ JS aprofundado       │
-                   │  ██ Git — branching      │
-                   │  ██ Algoritmos & Big O   │
-                   │  ██ Docker               │
-                   │  ░░ IA Aplicada em prod. │
-                   └────────────┬────────────┘
-                                │
-              ┌─────────────────┴─────────────────┐
-              │                                   │
-   ┌──────────▼──────────┐           ┌────────────▼──────────┐
-   │    PLENO FRONT      │           │    PLENO BACK         │
-   │  ██ TS em React     │           │  ██ NestJS Avançado   │
-   │  ██ React avançado  │           │  ██ DB Avançado       │
-   │  ██ Next.js         │           │  ██ Mensageria/Cache  │
-   │  ██ Testes II       │           │  ██ Testes II         │
-   │  ░░ Design System   │ ·opcional·│  ░░ Arquitetura APIs  │
-   │  ░░ Coding challs.  │◄─ ─ ─ ─ ►│  ░░ Coding challs.   │
-   └──────────┬──────────┘           └────────────┬──────────┘
-              │                                   │
-              └─────────────────┬─────────────────┘
-                                │
-                   ┌────────────▼────────────┐
-                   │      NÚCLEO SÊNIOR       │
-                   │  (obrigatório para ambas │
-                   │   as trilhas antes de    │
-                   │   entrar no Sênior)       │
-                   │                          │
-                   │  ██ System Design        │
-                   │  ██ Segurança fundamentos│
-                   │  ██ Observabilidade      │
-                   │  ░░ Comunicação Efetiva  │
-                   └────────────┬────────────┘
-                                │
-              ┌─────────────────┴─────────────────┐
-              │                                   │
-   ┌──────────▼──────────┐           ┌────────────▼──────────┐
-   │    SÊNIOR FRONT     │           │    SÊNIOR BACK        │
-   │  ██ Arq. escalável  │           │  ██ Sist. distribuídos│
-   │  ██ Performance     │           │  ██ Performance back  │
-   │  ██ Testes e CI/CD  │           │  ██ Testes e CI/CD    │
-   │  ██ Segurança front │           │  ██ Segurança back    │
-   │  ░░ Acessibilidade  │ ·opcional·│  ██ Infraestrutura    │
-   │  ░░ DX & IA avançada│◄─ ─ ─ ─ ►│  ░░ DX & IA avançada │
-   └─────────────────────┘           └───────────────────────┘
+                                    │
+            ┌───────────────────────┴───────────────────────┐
+            │                                               │
+ ┌──────────▼───────────┐                       ┌───────────▼──────────┐
+ │     JÚNIOR FRONT     │                       │     JÚNIOR BACK      │
+ │ ██ HTML/CSS          │                       │ ██ Servidores/HTTP   │
+ │ ██ React + TS        │                       │ ██ NestJS + TS       │
+ │ ██ APIs, Auth        │                       │ ██ PostgreSQL/Prisma │
+ │ ██ Testes I, Deploy  │                       │ ██ Auth, REST, Deploy│
+ │ ░░ Design, IA, Carr. │◄── opcional cursar ──►│ ░░ Docs, IA, Carreira│
+ └──────────┬───────────┘    a outra trilha     └───────────┬──────────┘
+            │                                               │
+ ┌──────────▼───────────┐                       ┌───────────▼──────────┐
+ │     PLENO FRONT      │                       │     PLENO BACK      │
+ │ ██ TS avançado   (c) │                       │ ██ TS avançado   (c) │
+ │ ██ JS aprofundado(c) │                       │ ██ JS aprofundado(c) │
+ │ ██ Git branching (c) │                       │ ██ Git branching (c) │
+ │ ██ Algoritmos    (c) │                       │ ██ Algoritmos    (c) │
+ │ ██ Docker        (c) │                       │ ██ Docker        (c) │
+ │ ██ React avç./Next   │                       │ ██ NestJS avançado   │
+ │ ██ Testes II (front) │                       │ ██ DB avç., Mensag.  │
+ │ ░░ IA aplicada   (c) │                       │ ░░ IA aplicada   (c) │
+ │ ░░ Design System     │                       │ ░░ Arquitetura APIs  │
+ │ ░░ Coding challenges │                       │ ░░ Coding challenges │
+ └──────────┬───────────┘                       └───────────┬──────────┘
+            │                                               │
+ ┌──────────▼───────────┐                       ┌───────────▼──────────┐
+ │     SÊNIOR FRONT     │                       │     SÊNIOR BACK     │
+ │ ██ System Design (c) │                       │ ██ System Design (c) │
+ │ ██ Segurança fnd.(c) │                       │ ██ Segurança fnd.(c) │
+ │ ██ Observabilid. (c) │                       │ ██ Observabilid. (c) │
+ │ ██ Arq. escalável    │                       │ ██ Sist. distribuídos│
+ │ ██ Performance       │                       │ ██ Performance back  │
+ │ ██ Testes/CI, Seg.   │                       │ ██ Testes/CI, Seg.   │
+ │                      │                       │ ██ Infraestrutura    │
+ │ ░░ Comunicação ef.(c)│                       │ ░░ Comunicação ef.(c)│
+ │ ░░ Acessibilidade    │                       │ ░░ Documentação/RFCs │
+ │ ░░ DX & IA avançada  │                       │ ░░ DX & IA avançada  │
+ └──────────────────────┘                       └──────────────────────┘
 ```
 
-> **Núcleo:** módulo escrito uma única vez, consumido por alunos de ambas as trilhas. A especialização (Pleno Front, Pleno Back, etc.) só começa após o núcleo do respectivo nível.
+> **Compartilhado `(c)`:** módulo idêntico nas duas trilhas, escrito uma única vez. A marcação é independente de ser Obrigatório (██) ou Opcional (░░) — um módulo pode ser compartilhado *e* obrigatório (ex.: TypeScript Avançado) ou compartilhado *e* opcional (ex.: IA Aplicada).
 >
-> **Opcional cross-track:** um aluno do Júnior Front pode opcionalmente cursar módulos do Júnior Back para ampliar a visão — e vice-versa. Não é pré-requisito para avançar.
+> **Cursar a outra trilha é opcional:** um aluno do Júnior Front pode cursar módulos do Júnior Back para ampliar a visão — e vice-versa. Nunca é pré-requisito para avançar de nível.
 
 ---
 
@@ -122,7 +94,9 @@ Legenda:
 
 > **Objetivo:** Zero → consegue pensar como programador e escrever TypeScript funcional.
 
-### Trilha Principal
+> O Starter é trilha única (ainda sem divisão front/back). Quase tudo é obrigatório; apenas a recursão é marcada como opcional.
+
+### Conteúdo do Curso
 | Módulo | Conteúdo |
 |---|---|
 | Mercado Dev | Por que programar, áreas, tendências, mindset, soft skills, oportunidades, senioridade. Inclui seção sobre declarações sensacionalistas de IA ("código está resolvido") com análise honesta e contextualizada. |
@@ -146,7 +120,7 @@ Legenda:
 
 > **Projeto incremental:** Dashboard web de finanças pessoais em React, evoluindo o tema do Starter para a web. Consome uma API pública. Ao final, é publicado no Vercel com URL real.
 
-### Trilha Principal (75%)
+### Obrigatório
 
 | Módulo | Conteúdo-chave |
 |---|---|
@@ -157,7 +131,7 @@ Legenda:
 | Introdução a Testes | Pirâmide de testes, diferenças entre ferramentas (Jest, Vitest, Cypress, Playwright), estrutura dos testes, o que testar/não testar |
 | Deploy | GitHub Pages, Vercel, domínio e DNS |
 
-### Trilha Complementar (25%)
+### Opcional (complementar)
 
 | Módulo | Conteúdo-chave |
 |---|---|
@@ -177,7 +151,7 @@ Legenda:
 
 > **Projeto incremental:** API REST de finanças pessoais em NestJS + PostgreSQL, espelhando o tema do projeto front-end. Ao final, é publicada no Railway com URL real e documentação Swagger.
 
-### Trilha Principal (75%)
+### Obrigatório
 
 | Módulo | Conteúdo-chave |
 |---|---|
@@ -190,7 +164,7 @@ Legenda:
 | Introdução a Testes Back-end | Testes unitários (Jest), testes de integração, testando endpoints, mocks e stubs |
 | Deploy | Railway, Render ou similar; variáveis de ambiente em produção; Docker básico |
 
-### Trilha Complementar (25%)
+### Opcional (complementar)
 
 | Módulo | Conteúdo-chave |
 |---|---|
@@ -204,60 +178,59 @@ Legenda:
 
 ## 6. Pleno
 
-O Pleno mantém as duas trilhas paralelas. Existe um **núcleo compartilhado** — módulos que qualquer desenvolvedor pleno deve dominar independente de especialização — e uma **especialização** por trilha.
+O Pleno mantém as duas trilhas paralelas. Cada trilha tem seus módulos **Obrigatórios** e **Opcionais**. Alguns módulos são **compartilhados** entre as duas trilhas (marcados com *(compartilhado)*) — são escritos uma única vez e cursados por alunos de ambas.
 
 > **Pré-requisito:** Júnior Front-end (para trilha front) ou Júnior Back-end (para trilha back).
 
-### 6a. Núcleo Compartilhado Pleno
-
-Estes módulos são os mesmos nas duas trilhas. Podem ser um curso único consumido por alunos de ambas as trilhas.
-
-| Módulo | Conteúdo-chave |
-|---|---|
-| TypeScript Avançado | Configuração avançada, inferência, type alias, union, intersection, narrowing e type guards, any/unknown/never, generics, classes, tipos avançados (indexed, conditional, template literal) |
-| Aprofundando em JavaScript | Higher Order Functions, closures, `this` e `new`, event loop e macro/microtask queues, assincronismo por baixo dos panos, iteradores, funções geradoras |
-| Git — Branching e Convenções | Branches, merge, rebase, git flow, conventional commits |
-| Estruturas de Dados e Algoritmos | Análise assintótica (Big O), algoritmos (busca binária, ordenação, listas encadeadas), pilhas e filas, hashmap, árvores |
-| Docker | Introdução prática: containers, imagens, volumes, compose para dev local |
-| IA Aplicada em Produto | Integração de LLMs em features reais (streaming, function calling básico), custo e latência, avaliando qualidade de respostas |
-
-### 6b. Pleno Front-end
+### 6a. Pleno Front-end
 
 > **Projeto incremental:** Dashboard de finanças em Next.js com autenticação, banco de dados, design system próprio e testes. Evolução direta do projeto do Júnior Front.
 
-#### Trilha Principal (75%)
+#### Obrigatório
 
 | Módulo | Conteúdo-chave |
 |---|---|
+| TypeScript Avançado *(compartilhado)* | Configuração avançada, inferência, type alias, union, intersection, narrowing e type guards, any/unknown/never, generics, classes, tipos avançados (indexed, conditional, template literal) |
+| Aprofundando em JavaScript *(compartilhado)* | Higher Order Functions, closures, `this` e `new`, event loop e macro/microtask queues, assincronismo por baixo dos panos, iteradores, funções geradoras |
+| Git — Branching e Convenções *(compartilhado)* | Branches, merge, rebase, git flow, conventional commits |
+| Estruturas de Dados e Algoritmos *(compartilhado)* | Análise assintótica (Big O), algoritmos (busca binária, ordenação, listas encadeadas), pilhas e filas, hashmap, árvores |
+| Docker *(compartilhado)* | Introdução prática: containers, imagens, volumes, compose para dev local |
 | TypeScript em React | TS aplicado em componentes, hooks tipados, generic components, discriminated unions em props |
 | Dominando React | Gerenciamento de estado (Redux), formulários e validações (Zod, RHF), fetch de dados (React Query), composição, re-renderização e otimizações, HOC |
 | Construindo Apps com Next.js | Estrutura (layout, page), shadcn/ui, server e client components, static vs SSR vs CSR, server actions, autenticação (NextAuth, middleware), streaming (loading, Suspense), tratando erros |
 | Testes II (Front) | Testando componentes (Testing Library, jest-dom), Storybook, TDD, visual regression |
 
-#### Trilha Complementar (25%)
+#### Opcional (complementar)
 
 | Módulo | Conteúdo-chave |
 |---|---|
+| IA Aplicada em Produto *(compartilhado)* | Integração de LLMs em features reais (streaming, function calling básico), custo e latência, avaliando qualidade de respostas |
 | Design System | O que é e benefícios, estrutura (componentes, estilos, tokens), bibliotecas e padrões |
 | Coding Challenges | Leetcode: padrões de questões para entrevistas técnicas |
 
-### 6c. Pleno Back-end
+### 6b. Pleno Back-end
 
 > **Projeto incremental:** API de finanças em NestJS evoluída, com autenticação completa, banco de dados otimizado, cache e testes abrangentes. Evolução direta do projeto do Júnior Back.
 
-#### Trilha Principal (75%)
+#### Obrigatório
 
 | Módulo | Conteúdo-chave |
 |---|---|
+| TypeScript Avançado *(compartilhado)* | Mesmo módulo do Pleno Front — inferência, generics, narrowing, tipos avançados |
+| Aprofundando em JavaScript *(compartilhado)* | Mesmo módulo do Pleno Front — closures, event loop, assincronismo, geradores |
+| Git — Branching e Convenções *(compartilhado)* | Branches, merge, rebase, git flow, conventional commits |
+| Estruturas de Dados e Algoritmos *(compartilhado)* | Big O, algoritmos, estruturas de dados |
+| Docker *(compartilhado)* | Containers, imagens, volumes, compose para dev local |
 | NestJS Avançado | Guards, interceptors e pipes avançados, módulos dinâmicos, websockets, noções de microservices com NestJS |
 | Bancos de Dados Avançados | Queries complexas, índices e performance, relacionamentos avançados, transactions, connection pooling |
 | Mensageria e Cache | Redis (cache, sessions, filas), introdução a message queues (BullMQ ou similar) |
 | Testes II (Back) | Testes de integração com banco real, e2e de API, mocking de dependências externas, TDD no back |
 
-#### Trilha Complementar (25%)
+#### Opcional (complementar)
 
 | Módulo | Conteúdo-chave |
 |---|---|
+| IA Aplicada em Produto *(compartilhado)* | Function calling em APIs, custo e latência, avaliando qualidade de respostas |
 | Arquitetura de APIs | Versionamento, backwards compatibility, rate limiting, API gateway básico |
 | Coding Challenges | Leetcode: padrões de questões para entrevistas técnicas (mesmo conteúdo do front) |
 
@@ -265,59 +238,58 @@ Estes módulos são os mesmos nas duas trilhas. Podem ser um curso único consum
 
 ## 7. Sênior
 
-O Sênior mantém as trilhas paralelas com **núcleo compartilhado** e **especialização** por trilha.
+O Sênior mantém as trilhas paralelas, cada uma com módulos **Obrigatórios** e **Opcionais**. Módulos *(compartilhados)* são escritos uma vez e cursados pelas duas trilhas.
 
-> **Nota pedagógica:** O que é aprendível (arquitetura, performance, segurança, system design) está na trilha principal. O que é construído com experiência (comunicação, autoridade, julgamento) está na trilha complementar — o curso sinaliza o caminho, não finge entregar a senioridade em si.
+> **Nota pedagógica:** O que é aprendível (arquitetura, performance, segurança, system design) está no Obrigatório. O que é construído com experiência (comunicação, autoridade, julgamento) está no Opcional — o curso sinaliza o caminho, não finge entregar a senioridade em si.
 
 > **Pré-requisito:** Pleno Front-end (para trilha front) ou Pleno Back-end (para trilha back).
 
-### 7a. Núcleo Compartilhado Sênior
-
-| Módulo | Conteúdo-chave |
-|---|---|
-| System Design | Princípios de design de sistemas: escalabilidade, disponibilidade, consistência; CAP theorem; trade-offs de arquitetura |
-| Segurança — Fundamentos | OWASP Top 10, autenticação e autorização em escala, princípio do menor privilégio, threat modeling básico |
-| Observabilidade | Monitoramento, logging estruturado, distributed tracing, alertas, SLOs/SLAs |
-| Comunicação Efetiva | Modelos mentais claros, feedbacks assertivos, "pelo que vale a pena brigar", construindo autoridade técnica, liderança sem cargo |
-
-### 7b. Sênior Front-end
+### 7a. Sênior Front-end
 
 > **Projeto:** Evolução do dashboard para arquitetura escalável — micro-frontends ou feature-sliced, CI/CD completo, auditoria de acessibilidade, análise de Web Vitals.
 
-#### Trilha Principal (75%)
+#### Obrigatório
 
 | Módulo | Conteúdo-chave |
 |---|---|
+| System Design *(compartilhado)* | Princípios de design de sistemas: escalabilidade, disponibilidade, consistência; CAP theorem; trade-offs de arquitetura |
+| Segurança — Fundamentos *(compartilhado)* | OWASP Top 10, autenticação e autorização em escala, princípio do menor privilégio, threat modeling básico |
+| Observabilidade *(compartilhado)* | Monitoramento, logging estruturado, distributed tracing, alertas, SLOs/SLAs |
 | Arquitetando Aplicações Front Escaláveis | Monorepo vs multi-repo, micro-frontends, Modular/Feature-Sliced Design, clean architecture no front, padrões de renderização |
 | Análise de Performance Front | Web Vitals, Core Web Vitals, profiler, lazy load, tree-shaking, CDN, bundle analysis |
 | Testes e Qualidade Front | Configuração de projeto, Playwright e2e, visual regression, lefthook, MSW, CI/CD front |
 | Segurança Front | XSS e CSP, CSRF no cliente, sanitização de inputs, sub-resource integrity |
 
-#### Trilha Complementar (25%)
+#### Opcional (complementar)
 
 | Módulo | Conteúdo-chave |
 |---|---|
+| Comunicação Efetiva *(compartilhado)* | Modelos mentais claros, feedbacks assertivos, "pelo que vale a pena brigar", construindo autoridade técnica, liderança sem cargo |
 | Acessibilidade | Avaliando acessibilidade, WCAG, ferramentas (axe, Lighthouse), testes de acessibilidade automatizados |
 | Developer Experience & IA Avançada | Setup produtivo (dotfiles, snippets, automações), RAG e agents em produto front, workflows de dev assistido por IA |
 
-### 7c. Sênior Back-end
+### 7b. Sênior Back-end
 
 > **Projeto:** Evolução da API para sistema distribuído — decomposição em serviços, mensageria, observabilidade completa, load testing.
 
-#### Trilha Principal (75%)
+#### Obrigatório
 
 | Módulo | Conteúdo-chave |
 |---|---|
+| System Design *(compartilhado)* | Mesmo módulo do Sênior Front — escalabilidade, CAP, trade-offs de arquitetura |
+| Segurança — Fundamentos *(compartilhado)* | OWASP Top 10, autenticação e autorização em escala, menor privilégio, threat modeling |
+| Observabilidade *(compartilhado)* | Monitoramento, logging estruturado, distributed tracing, alertas, SLOs/SLAs |
 | Arquitetando Sistemas Distribuídos | Microservices vs monolito (trade-offs reais), event-driven architecture, CQRS e Event Sourcing básico, saga pattern |
 | Performance Back-end | Query optimization (EXPLAIN, índices avançados), caching strategies (CDN, Redis, cache invalidation), connection pooling, profiling |
 | Testes e Qualidade Back | Load testing (k6 ou similar), chaos engineering básico, contract testing, CI/CD back, pipelines de qualidade |
 | Segurança Back | SQL injection e mitigações, rate limiting e throttling, proteção de endpoints, auditoria e compliance básico |
 | Infraestrutura | Docker avançado, Kubernetes introdução, provedores cloud (AWS/GCP/Azure básico), IaC introdução |
 
-#### Trilha Complementar (25%)
+#### Opcional (complementar)
 
 | Módulo | Conteúdo-chave |
 |---|---|
+| Comunicação Efetiva *(compartilhado)* | Mesmo módulo do Sênior Front — feedbacks, autoridade técnica, liderança sem cargo |
 | Developer Experience & IA Avançada | RAG e agents em produto back-end, LLMs em pipelines de dados, workflows de dev assistido por IA no back |
 | Documentação e Evangelismo Técnico | RFCs, ADRs, comunicação de decisões arquiteturais, documentação que dura |
 
@@ -329,10 +301,10 @@ A IA escala com a maturidade do aluno em ambas as trilhas:
 
 | Nível | Front-end | Back-end | Trilha |
 |---|---|---|---|
-| **Starter** | Como LLMs funcionam, uso responsável, integração com API da Anthropic no projeto CLI | ← mesmo conteúdo | Principal |
-| **Júnior** | Entender erros de CSS/React, Copilot com responsabilidade | Entender erros de DB/NestJS, gerar migrações com supervisão | Complementar |
-| **Pleno** | Streaming de respostas LLM em UI, function calling em componentes | Function calling em APIs, custo/latência, avaliação de qualidade | Complementar (núcleo compartilhado) |
-| **Sênior** | RAG em produto front, agents, workflows de dev | LLMs em pipelines de dados, agents no back, decisões arquiteturais envolvendo IA | Complementar |
+| **Starter** | Como LLMs funcionam, uso responsável, integração com API da Anthropic no projeto CLI | ← mesmo conteúdo | Obrigatório |
+| **Júnior** | Entender erros de CSS/React, Copilot com responsabilidade | Entender erros de DB/NestJS, gerar migrações com supervisão | Opcional |
+| **Pleno** | Streaming de respostas LLM em UI, function calling em componentes | Function calling em APIs, custo/latência, avaliação de qualidade | Opcional (compartilhado) |
+| **Sênior** | RAG em produto front, agents, workflows de dev | LLMs em pipelines de dados, agents no back, decisões arquiteturais envolvendo IA | Opcional |
 
 ---
 
@@ -388,9 +360,9 @@ O aluno carrega o *mesmo produto* ao longo de toda a plataforma, vendo-o crescer
 ### A construir (ordem sugerida)
 1. **Júnior Front-end** — maior impacto imediato, público mais amplo, feedback visual motiva mais rápido
 2. **Júnior Back-end** — espelho do front, aproveita o TypeScript já ensinado, NestJS como progressão natural do OOP do Starter
-3. **Núcleo Pleno** (TypeScript avançado, JS aprofundado, Git, Algoritmos, Docker, IA) — módulo compartilhado, escrito uma vez
-4. **Pleno Front-end** e **Pleno Back-end** — em paralelo ou sequencialmente
-5. **Núcleo Sênior** (System Design, Segurança fundamentos, Observabilidade, Comunicação)
+3. **Módulos compartilhados do Pleno** (TypeScript avançado, JS aprofundado, Git, Algoritmos, Docker, IA aplicada) — escritos uma vez, reutilizados nas duas trilhas Pleno
+4. **Pleno Front-end** e **Pleno Back-end** — em paralelo ou sequencialmente, reaproveitando os módulos compartilhados
+5. **Módulos compartilhados do Sênior** (System Design, Segurança fundamentos, Observabilidade, Comunicação Efetiva)
 6. **Sênior Front-end** e **Sênior Back-end**
 
 ### Decisões abertas (a resolver antes de cada curso)
