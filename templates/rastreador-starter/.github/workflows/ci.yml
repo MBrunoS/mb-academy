@@ -1,0 +1,21 @@
+# A "esteira" da Systema Corp: roda a cada push e em todo Pull Request.
+# Verde = passou. Vermelho = o PR fica reprovado com o erro exato pra corrigir.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  esteira:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Testes
+        run: npm test

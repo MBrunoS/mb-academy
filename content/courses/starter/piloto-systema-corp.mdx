@@ -1,0 +1,98 @@
+---
+title: "Seu primeiro dia na Systema Corp"
+description: "Piloto da camada narrativa: você entra como estagiário, herda um módulo do Antecessor e abre seu primeiro Pull Request."
+---
+
+<Callout type="info" title="Isto é um piloto">
+  Esta página é uma **demonstração de tom** da camada narrativa descrita em `docs/narrativa.md` — não faz parte oficial do currículo ainda. Serve pra você *sentir* como a história, o conteúdo e o fluxo GitHub-nativo se encaixam. Tudo é pulável: quem quer só o código ignora os blocos do Antecessor.
+</Callout>
+
+Você passou no processo seletivo. Bem-vindo ao programa de formação da **Systema Corp**.
+
+No seu primeiro dia, ninguém te entrega um projeto em branco — não é assim que funciona no mundo real. Você recebe acesso a um sistema que **já existe**, começado por alguém do time que seguiu outro rumo na empresa. O pessoal aqui chama essa pessoa só de **"A."**, o Antecessor.
+
+Seu acesso ainda é de **estagiário**: por enquanto, você lê mais do que escreve. E ler código que não é seu é, talvez, a habilidade mais subestimada da profissão.
+
+## O sistema que você herdou
+
+O produto é um **Rastreador de Gastos**. A. deixou a fundação pronta — os tipos, a estrutura, os contratos. Repare na organização: nada está quebrado. Está **inacabado de propósito**.
+
+```ts
+// src/tipos.ts  ·  deixado pronto por A.
+export type Categoria =
+  | "alimentação"
+  | "transporte"
+  | "moradia"
+  | "lazer"
+  | "saúde"
+  | "outros";
+
+export interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+  categoria: Categoria;
+  data: string;
+}
+```
+
+<Bilhete>
+  *"Defini os tipos antes de qualquer lógica, de propósito. Quando os tipos estão certos, o resto quase se escreve sozinho — o compilador vira seu copiloto. Confia: você vai sentir isso já na primeira task. — A."*
+</Bilhete>
+
+E a classe principal, com o método que falta:
+
+```ts
+// src/rastreador.ts
+import { Gasto, Categoria } from "./tipos";
+
+export class RastreadorDeGastos {
+  private gastos: Gasto[] = [];
+  private proximoId: number = 1;
+
+  // TODO(você): implemente este método.
+  adicionarGasto(descricao: string, valor: number, categoria: Categoria): void {
+    throw new Error("Ainda não implementado");
+  }
+
+  listar(): Gasto[] {
+    return this.gastos;
+  }
+}
+```
+
+## Sua primeira task
+
+No board do time (estilo Jira/Linear — na prática, as **Issues** do repositório), te espera o primeiro ticket:
+
+> **Issue #1 — Permitir registrar um gasto** · `nível:estágio` · `dificuldade:1`
+>
+> Implemente `adicionarGasto`. Um gasto válido entra na lista com um `id` sequencial. Valor menor ou igual a zero é rejeitado.
+> **Critério de aceite:** os testes em `rastreador.test.ts` passam na esteira (CI).
+
+<Bilhete titulo="Dica do Antecessor" de="A.">
+  *"Não esquenta com o `id` — eu já deixei o `proximoId` ali pra você. Pega o valor, valida, monta o objeto `Gasto` seguindo o tipo, e empurra pra lista. Um método, poucas linhas. E sim: escreva o `throw` pro valor inválido antes de tudo — falhar cedo é elegante."*
+</Bilhete>
+
+## O fluxo: como o trabalho acontece de verdade
+
+Aqui não tem "clicar em concluir". O trabalho segue o fluxo real de qualquer time de software — e o GitHub é o seu ambiente:
+
+1. **Pegue seu repositório.** No projeto real, é um clique em **"Use this template"** no repo da Systema Corp. (Neste piloto, o esqueleto está em [`templates/rastreador-starter/`](https://github.com/MBrunoS/forja-academy/tree/main/templates/rastreador-starter).)
+2. **Abra uma branch:** `git checkout -b feat/adicionar-gasto`.
+3. **Implemente** o método e rode os testes localmente: `npm test`.
+4. **Commit e push**, e **abra um Pull Request**.
+5. **A esteira (CI) roda sozinha** — `typecheck` + testes. Verde = passou. Vermelho = o PR fica reprovado com o erro exato pra você corrigir.
+6. **A. revisa seu PR.** Sim, o Antecessor comenta o seu código — na prática, uma revisão automática que olha o *diff* que você escreveu:
+
+<Bilhete titulo="Revisão de A. no seu PR" de="A.">
+  *"Funciona, e os testes passaram — bom trabalho. Só um detalhe: você validou o valor no fim do método. Sobe esse `if` pra primeira linha. Quem lê o código entende a regra antes de se perder na lógica. Aprovado. 👍"*
+</Bilhete>
+
+7. **Merge.** E o merge **destranca a próxima Issue** — a #2 já aparece no seu board, com o próximo bilhete de A. Você avança a história *fazendo o trabalho*, não juntando pontos.
+
+## Por que isso importa
+
+Repare no que aconteceu: você **não debugou um código quebrado** nem assistiu a uma aula passiva. Você leu um código bem-feito, entendeu a intenção de quem veio antes, e **entregou** — exatamente como num time de verdade. A escolha de A. (tipos primeiro, falhar cedo) virou a própria lição.
+
+É esse o contrato: o conteúdo te ensina, a história te segura, e o fluxo é o do mundo real. Bem-vindo à Systema Corp. A #2 te espera.
