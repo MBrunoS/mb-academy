@@ -262,6 +262,10 @@ describe("ListaDeGastos", () => {
 
 Repare no padrão: **renderizar** o componente (`render`), **buscar** um elemento na tela do jeito que um usuário o encontraria (`screen.getByText`, `screen.getByRole`), opcionalmente **simular uma interação** (`userEvent.click`), e **verificar** o resultado (`expect`). É a mesma estrutura Arrange-Act-Assert de sempre, só que agora agindo sobre uma interface renderizada em vez de uma função isolada.
 
+<Callout>
+  O matcher `toBeInTheDocument()` não vem no Vitest por padrão — ele é adicionado pelo pacote `@testing-library/jest-dom`, configurado uma única vez no projeto (geralmente em um arquivo de setup dos testes). Se você tentar usá-lo sem essa configuração, o Vitest vai reclamar que o matcher não existe. Isso é um detalhe de configuração do projeto, não algo que você precisa resolver a cada teste.
+</Callout>
+
 `vi.fn()` merece uma palavra à parte: ele cria uma **função falsa** (um *mock*) que registra como e quantas vezes foi chamada, sem executar nenhuma lógica de verdade. É assim que testamos se um componente chamou corretamente uma função que recebeu como prop, sem precisar de uma implementação real por trás dela.
 
 Isso é só a ponta do iceberg de testar componentes React — o suficiente para você reconhecer o padrão e escrever testes simples. Você vai aprofundar bastante esse assunto no curso Pleno, com testes mais elaborados de formulários, efeitos assíncronos e Storybook.

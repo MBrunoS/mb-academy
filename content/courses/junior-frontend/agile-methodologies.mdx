@@ -1,0 +1,178 @@
+---
+title: Metodologias Ágeis
+description: "Entenda o vocabulário, as ferramentas e o fluxo de trabalho que você vai encontrar em qualquer time de desenvolvimento ágil."
+---
+
+No seu primeiro dia em um time de desenvolvimento, é bem provável que você ouça frases como "isso entra no próximo sprint", "abre um ticket pra isso" ou "vamos discutir na daily de amanhã" — e ninguém vai parar para explicar o que cada termo significa, porque para o time isso é vocabulário básico do dia a dia. Este capítulo existe para que você não precise descobrir esse vocabulário sozinho, sob pressão, na sua primeira semana de trabalho.
+
+**Metodologias ágeis** são hoje a forma dominante de organizar o trabalho em times de software. Não são um conjunto de regras técnicas — são uma forma de organizar pessoas, prioridades e comunicação para lidar com um fato inevitável: requisitos mudam, e times que fingem que não mudam entregam software que ninguém queria mais no final.
+
+## De onde vem o "ágil"
+
+Em 2001, um grupo de desenvolvedores publicou o **Manifesto Ágil**, resumindo alguns valores que preferem:
+
+- **Indivíduos e interações** mais que processos e ferramentas
+- **Software funcionando** mais que documentação extensa
+- **Colaboração com o cliente** mais que negociação de contratos
+- **Responder a mudanças** mais que seguir um plano fixo
+
+Isso não significa "documentação e processos não importam" — significa que, quando um conflita com o outro, o time prioriza entregar valor de forma iterativa e se adaptar, em vez de seguir um plano rígido feito meses antes de qualquer código existir. Scrum e Kanban são os dois frameworks mais usados para colocar esses valores em prática no dia a dia.
+
+## Scrum e Kanban
+
+<Tabs items={['Scrum', 'Kanban']}>
+<Tab value="Scrum">
+
+O Scrum organiza o trabalho em ciclos de tempo fixo chamados **sprints** (geralmente de uma a quatro semanas). No início de cada sprint, o time decide o que vai ser feito; no final, entrega e revisa o resultado.
+
+Papéis comuns:
+- **Product Owner (PO)** — decide o que é prioridade, representa as necessidades do negócio/cliente
+- **Scrum Master** — facilita o processo, remove bloqueios, garante que as cerimônias aconteçam
+- **Time de desenvolvimento** — quem constrói o que foi priorizado
+
+O ritmo é previsível: sempre sabe-se quando um ciclo começa e termina, o que ajuda no planejamento de longo prazo.
+
+</Tab>
+<Tab value="Kanban">
+
+O Kanban não trabalha com ciclos fixos — o trabalho flui continuamente por um quadro dividido em colunas (tipicamente algo como "A fazer", "Em andamento", "Em revisão", "Concluído"). Cada tarefa é um cartão que se move da esquerda para a direita conforme avança.
+
+Um conceito central é o **limite de trabalho em progresso (WIP limit)**: cada coluna tem um número máximo de tarefas permitidas ao mesmo tempo, o que força o time a terminar o que já começou antes de pegar mais trabalho novo, em vez de abrir dez tarefas em paralelo e não terminar nenhuma.
+
+Kanban costuma se encaixar bem em times de suporte, manutenção, ou qualquer contexto onde as prioridades mudam com muita frequência para caber em ciclos fixos.
+
+</Tab>
+</Tabs>
+
+Na prática, muitos times usam uma combinação dos dois — sprints com prazo fixo, mas visualizados num quadro Kanban. Isso costuma ser chamado de **Scrumban**. Não se prenda demais ao nome do framework: o que importa é entender o vocabulário e o fluxo, porque cada empresa adapta isso à sua própria realidade.
+
+## O vocabulário que você vai ouvir todo dia
+
+| Termo | O que significa na prática |
+|---|---|
+| **Sprint** | Um ciclo de tempo fixo (ex: 2 semanas) em que o time se compromete a entregar um conjunto de tarefas definido no início do ciclo |
+| **Backlog** | A lista de tudo que ainda precisa ser feito no projeto, ordenada por prioridade — nem tudo no backlog vira tarefa imediatamente |
+| **Ticket / Issue** | Uma unidade de trabalho registrada em uma ferramenta (uma funcionalidade, um bug, uma tarefa técnica), com descrição, responsável e status |
+| **Daily (ou daily standup)** | Reunião curta e diária (10-15 min) onde cada pessoa do time diz o que fez, o que vai fazer e se está bloqueada em algo |
+| **Review (ou Sprint Review)** | Reunião ao final do sprint onde o time apresenta o que foi entregue, geralmente com uma demonstração funcionando |
+| **Retrospective (ou Retro)** | Reunião ao final do sprint focada no processo do time em si: o que funcionou bem, o que travou, o que mudar no próximo ciclo |
+| **Board / Quadro** | A representação visual do fluxo de trabalho, com colunas representando o status de cada tarefa |
+| **Story points** | Uma unidade relativa (não é hora nem dia) usada para estimar o esforço de uma tarefa comparada a outras |
+
+<Callout type="tip">
+Não confunda **Daily** com uma reunião de status para o gestor. O objetivo real da daily é o time se sincronizar entre si — identificar bloqueios cedo é mais importante do que "reportar progresso".
+</Callout>
+
+## Ferramentas do dia a dia
+
+O vocabulário acima é implementado, na prática, em alguma ferramenta de gestão de tarefas. Você não precisa dominar nenhuma delas antes de começar a trabalhar — cada empresa treina a equipe na ferramenta que usa — mas vale conhecer o panorama:
+
+| Ferramenta | Panorama rápido |
+|---|---|
+| **Jira** | A mais robusta e configurável, muito usada em empresas médias/grandes. Suporta Scrum, Kanban, relatórios avançados, e se integra com praticamente tudo. Pode parecer complexa no início. |
+| **Trello** | Quadros Kanban simples e visuais, baseados no conceito de cartões e listas. Ótimo para times pequenos ou projetos pessoais, menos indicado para processos complexos. |
+| **ClickUp** | Uma ferramenta "tudo em um" — tarefas, documentos, metas, chat — tentando substituir várias ferramentas separadas. Times pequenos e médios costumam adotar por essa flexibilidade. |
+| **GitHub Projects** | Um quadro Kanban integrado diretamente ao repositório GitHub. Como cada cartão pode ser vinculado a issues e pull requests do próprio repositório, é uma escolha comum para times pequenos, projetos open source, e times que já vivem dentro do GitHub no dia a dia. |
+
+Nenhuma delas muda o vocabulário ou o processo — são apenas interfaces diferentes para as mesmas ideias de sprint, backlog e ticket.
+
+## Da tarefa ambígua ao código
+
+Essa é a parte mais prática deste capítulo, e a que mais impacto tem no seu dia a dia real: como transformar um ticket — que raramente é tão claro quanto você gostaria — em código.
+
+### Lendo um ticket com atenção
+
+Um ticket bem escrito tem contexto, critérios de aceite claros e, idealmente, algum link (design, print, outro ticket relacionado). Na prática, muitos tickets não são assim. Veja um exemplo comum:
+
+> **Título:** Botão de login não funciona direito
+> **Descrição:** Usuários reportaram que às vezes o botão de entrar não faz nada quando clicado.
+
+Isso é o suficiente para você abrir o editor e sair codando? Não. "Às vezes" e "não faz nada" escondem informação importante que falta.
+
+### Fazendo as perguntas certas antes de codar
+
+Antes de tocar em uma linha de código, vale esclarecer:
+
+- Em qual navegador, dispositivo ou fluxo isso foi observado?
+- "Não faz nada" significa nenhuma resposta visual, ou aparece um erro no console/no servidor?
+- Acontece sempre, ou só em situações específicas (ex: depois de digitar a senha errada, ou com a internet lenta)?
+- Existe algum print, vídeo ou log do problema?
+- Qual é o comportamento esperado quando funciona corretamente?
+
+Isso não é burocracia — é o que separa horas de trabalho investigativo às cegas de uma correção direcionada. Se você já leu o capítulo de comunicação nas soft skills do Starter, isso é a mesma habilidade aplicada a tarefas técnicas: perguntar cedo custa muito menos do que entregar a coisa errada.
+
+<Callout type="warn">
+Nunca assuma o comportamento esperado de um ticket ambíguo. Uma suposição errada, defendida com confiança, é pior do que uma pergunta "óbvia demais" — ela custa retrabalho, revisão extra e, às vezes, a confiança do time em delegar tarefas maiores para você.
+</Callout>
+
+### Quebrando uma tarefa grande em passos menores
+
+Depois de esclarecer o contexto, divida o trabalho em passos concretos. Para o ticket do botão de login, uma quebra razoável seria:
+
+1. Reproduzir o bug localmente, seguindo os passos relatados
+2. Investigar a causa (console do navegador, logs, `DevTools`)
+3. Implementar a correção
+4. Adicionar ou atualizar um teste que cubra esse caso
+5. Abrir o Pull Request explicando o problema e a solução
+
+Tarefas grandes e vagas ("arruma o login") são difíceis de estimar e fáceis de travar. Tarefas pequenas e concretas ("reproduzir o bug", "corrigir a validação do formulário") você consegue completar, testar e entregar uma de cada vez — e isso te dá uma sensação de progresso real em vez de ficar preso num problema enorme e indefinido.
+
+### Conectando com o fluxo de branch, commit e PR
+
+Você já viu no Starter como criar branches e fazer commits com Git. No dia a dia com tickets, esse fluxo ganha um padrão:
+
+```bash
+git checkout -b fix/JIRA-123-botao-login-sem-resposta
+```
+
+Commits referenciando o ticket, para quem revisar o histórico depois entender o contexto:
+
+```bash
+git commit -m "fix: corrige botão de login que não respondia ao clique (JIRA-123)"
+```
+
+E o Pull Request, ao ser aberto, geralmente referencia o ticket na descrição — muitas ferramentas até fecham o ticket automaticamente quando o PR é mesclado, se a referência estiver correta. O ciclo completo fica assim: **ticket esclarecido → branch → commits → PR → revisão → merge → ticket move para "Concluído" no quadro.**
+
+## Para praticar
+
+Leia o ticket abaixo como se você fosse a pessoa responsável por resolvê-lo:
+
+> **Título:** Melhorar carregamento da lista de transações
+> **Descrição:** A lista está lenta quando tem muitos itens. Precisa ficar mais rápida.
+
+Escreva:
+1. Três perguntas de esclarecimento que você faria antes de começar a codar
+2. Uma quebra da tarefa em 3-4 passos menores
+3. O nome de branch e a mensagem do primeiro commit que você usaria
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+**Perguntas de esclarecimento:**
+- "Lenta" significa o tempo de carregamento inicial da tela, ou a rolagem/interação depois que os dados já chegaram?
+- Quantos itens, aproximadamente, um usuário real costuma ter na lista quando o problema aparece?
+- Existe algum ambiente ou dado específico onde dá pra reproduzir isso, ou uma ferramenta de medição de performance já usada pelo time (ex: Lighthouse, React DevTools Profiler)?
+
+**Quebra em passos menores:**
+1. Reproduzir o problema com uma quantidade grande de itens e medir o tempo de carregamento atual
+2. Identificar o gargalo (requisição de rede lenta? renderização de todos os itens de uma vez? re-renders desnecessários?)
+3. Implementar a melhoria (ex: paginação, virtualização de lista, ou memoização de componentes)
+4. Medir novamente e confirmar que o tempo melhorou de forma perceptível
+
+**Branch e commit:**
+
+```bash
+git checkout -b perf/JIRA-456-lista-transacoes-lenta
+```
+
+```bash
+git commit -m "perf: adiciona paginação na lista de transações para reduzir tempo de carregamento (JIRA-456)"
+```
+
+Note que a solução técnica (paginação, virtualização, memoização) só aparece depois de investigar a causa — nunca antes. Um ticket que diz apenas "está lenta" não te diz qual dessas três é a resposta certa; só investigar o comportamento real revela isso.
+
+</details>
+
+---
+
+Metodologias ágeis não são um conjunto de regras que você "aprende e aplica" de forma mecânica — são a linguagem comum que o time usa para se organizar. Quanto mais cedo esse vocabulário deixar de ser estranho para você, mais rápido você consegue focar no que realmente importa: entender bem o problema antes de resolvê-lo.

@@ -1,0 +1,357 @@
+---
+title: Autenticação
+description: "Entenda o fluxo de login, o que é um JWT, onde guardar o token com segurança e como proteger rotas que exigem um usuário autenticado."
+---
+
+Até aqui, toda API que você consumiu neste módulo respondia da mesma forma para qualquer pessoa que fizesse a requisição. Mas a maioria dos produtos reais precisa saber **quem** está pedindo os dados: seus gastos não deveriam aparecer para outra pessoa, e ninguém deveria conseguir editar um dashboard que não é o seu. É aqui que entra a **autenticação** — o processo de identificar o usuário — e, junto dela, a necessidade de proteger essa identificação contra os problemas de segurança que você acabou de estudar no capítulo anterior.
+
+## O fluxo típico de login
+
+Na grande maioria das aplicações web, o login segue um fluxo com quatro passos bem definidos:
+
+1. O usuário preenche um **formulário** com credenciais (normalmente e-mail e senha).
+2. O front-end envia essas credenciais em uma requisição `POST` para o servidor.
+3. O servidor **valida** as credenciais (confere se o e-mail existe e se a senha bate com o hash guardado no banco de dados).
+4. Se as credenciais forem válidas, o servidor responde com um **token** — uma credencial temporária que o front-end vai usar para se identificar em requisições futuras, sem precisar reenviar a senha toda vez.
+
+Em código, o formulário de login e a chamada correspondente costumam se parecer com isto:
+
+```tsx
+import { useState } from "react";
+
+interface RespostaLogin {
+  token: string;
+}
+
+async function login(email: string, senha: string): Promise<string> {
+  const resposta = await fetch("https://api.forja.dev/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, senha }),
+  });
+
+  if (resposta.status === 401) {
+    throw new Error("E-mail ou senha incorretos.");
+  }
+
+  if (!resposta.ok) {
+    throw new Error(`Erro ao fazer login: ${resposta.status}`);
+  }
+
+  const dados: RespostaLogin = await resposta.json();
+  return dados.token;
+}
+
+function FormularioDeLogin() {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState<string | null>(null);
+
+  async function handleSubmit(evento: React.FormEvent) {
+    evento.preventDefault();
+    setErro(null);
+
+    try {
+      const token = await login(email, senha);
+      localStorage.setItem("token", token);
+      // Aqui normalmente redirecionamos para a área logada.
+    } catch (erro) {
+      if (erro instanceof Error) {
+        setErro(erro.message);
+      }
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="E-mail"
+      />
+      <input
+        type="password"
+        value={senha}
+        onChange={(e) => setSenha(e.target.value)}
+        placeholder="Senha"
+      />
+      <button type="submit">Entrar</button>
+      {erro && <p>{erro}</p>}
+    </form>
+  );
+}
+```
+
+Note que este componente não faz nada radicalmente novo: é a mesma combinação de `useState`, `fetch` e tratamento de erro por status code que você já pratica desde o início do módulo. A única novidade é **o que fazemos com o token** depois de recebê-lo — que é justamente o assunto das próximas seções.
+
+## O que é um JWT
+
+O formato de token mais comum no mercado é o **JWT** (*JSON Web Token*). Ele é uma string composta por três partes, separadas por pontos, cada uma delas codificada em Base64URL:
+
+```
+header.payload.signature
+```
+
+Um JWT de verdade se parece com isto (quebrado em linhas só para leitura):
+
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+.eyJzdWIiOiIxMjM0NSIsIm5vbWUiOiJBbmEiLCJpYXQiOjE3MjAwMDAwMDAsImV4cCI6MTcyMDAwMzYwMH0
+.4f8f2a9c1e7b3d5f6a8c0b2d4e6f8a1c3e5b7d9f
+```
+
+Cada parte tem um papel específico:
+
+- **Header**: metadados sobre o próprio token, como o algoritmo de assinatura usado. Decodificado, algo como `{"alg":"HS256","typ":"JWT"}`.
+- **Payload**: as informações de fato — chamadas de *claims*. Costuma conter coisas como o identificador do usuário (`sub`), nome, papel/permissão, e datas de emissão (`iat`) e expiração (`exp`). Decodificado, algo como `{"sub":"12345","nome":"Ana","iat":1720000000,"exp":1720003600}`.
+- **Signature**: uma assinatura criptográfica, gerada pelo servidor usando uma chave secreta que **só ele conhece**. É o que garante que ninguém conseguiu alterar o header ou o payload no caminho.
+
+<Callout type="warn">
+  O header e o payload de um JWT **não são criptografados** — apenas codificados em Base64URL, o que é trivialmente reversível. Qualquer pessoa com o token em mãos consegue ler seu conteúdo. **Nunca coloque dados sensíveis** (senhas, números de cartão, informações privadas que não deveriam vazar) dentro do payload de um JWT.
+</Callout>
+
+## Decodificar não é validar
+
+Como o payload de um JWT é só Base64URL, é perfeitamente possível decodificá-lo no front-end, sem nenhuma biblioteca especial:
+
+```ts
+function decodificarPayload(token: string): Record<string, unknown> | null {
+  try {
+    const payloadBase64 = token.split(".")[1];
+    return JSON.parse(atob(payloadBase64));
+  } catch {
+    return null;
+  }
+}
+```
+
+<Callout>
+  Esse exemplo usa `atob`, que decodifica Base64 "puro" — mas o JWT usa uma variação chamada Base64URL, que substitui alguns caracteres (`+` por `-`, `/` por `_`) para ser seguro em URLs. Na prática, muitos tokens funcionam com `atob` direto, mas para um decodificador robusto (ou se o token tiver esses caracteres), é mais seguro usar uma biblioteca testada como `jwt-decode`, em vez de reimplementar essa conversão manualmente.
+</Callout>
+
+Isso é útil para fins de **interface** — por exemplo, mostrar o nome do usuário logado sem precisar fazer uma nova requisição, ou verificar se o `exp` já passou para decidir se vale a pena nem tentar uma chamada autenticada. Mas é fundamental entender o limite dessa prática: **decodificar não é a mesma coisa que validar**.
+
+Qualquer pessoa pode pegar um JWT, editar o payload manualmente e gerar uma nova string Base64URL — ela não teria uma assinatura válida, mas o front-end, sozinho, não tem como saber disso, porque **verificar a assinatura exige a chave secreta**, que só o servidor possui. Por isso:
+
+- O front-end pode **ler** o payload para exibir informação ou tomar decisões de interface (mostrar ou esconder um botão, por exemplo).
+- O front-end **nunca** deve tratar esses dados como prova de identidade ou permissão. Toda decisão que realmente importa (acesso a um dado sensível, permissão para uma ação) precisa ser **revalidada pelo servidor** a cada requisição, verificando a assinatura do token com a chave secreta.
+
+Pense nisso como um crachá de visitante: você pode ler o nome impresso nele, mas isso não prova que a pessoa é quem o crachá diz — quem confirma isso de verdade é a recepção, checando o cadastro.
+
+## Onde guardar o token
+
+Depois que o front-end recebe o token, ele precisa ser guardado em algum lugar entre um recarregamento de página e outro. As duas opções mais comuns têm trade-offs diferentes, e não existe uma resposta universalmente "certa" — a escolha depende do contexto do projeto:
+
+<Tabs items={['localStorage', 'Cookie httpOnly']}>
+  <Tab value="localStorage">
+    ```ts
+    localStorage.setItem("token", token);
+    // ...
+    const token = localStorage.getItem("token");
+    ```
+
+    - **Vantagem**: simples de usar, totalmente controlado pelo seu código JavaScript.
+    - **Risco**: fica acessível a **qualquer script** que rode na página — incluindo um script malicioso injetado por uma vulnerabilidade de **XSS** (a mesma que você estudou no capítulo anterior). Se um atacante conseguir rodar JavaScript na sua página, ele consegue ler `localStorage` e roubar o token.
+  </Tab>
+  <Tab value="Cookie httpOnly">
+    ```
+    // Definido pelo servidor, na resposta do login — o front-end não
+    // escreve esse cookie diretamente:
+    Set-Cookie: token=abc123; HttpOnly; Secure; SameSite=Strict
+    ```
+
+    - **Vantagem**: com a flag `HttpOnly`, o cookie **não pode ser lido por JavaScript** — mesmo um script malicioso via XSS não consegue acessá-lo diretamente. O navegador anexa o cookie automaticamente em requisições para o domínio correspondente.
+    - **Risco**: como o navegador envia o cookie **automaticamente**, isso abre espaço para **CSRF** (*Cross-Site Request Forgery*) — um site malicioso pode induzir o navegador da vítima a fazer uma requisição para a sua API, e o cookie vai junto sem que o usuário perceba. Mitigar isso exige configurações adicionais, como o atributo `SameSite` e tokens específicos de CSRF.
+  </Tab>
+</Tabs>
+
+Em resumo: `localStorage` é vulnerável a XSS, cookies `httpOnly` são vulneráveis a CSRF (sem as proteções adicionais). Nenhuma opção é magicamente segura por si só — a segurança real vem de tratar bem a vulnerabilidade que a opção escolhida introduz (sanitizar entradas para evitar XSS, ou configurar `SameSite`/tokens CSRF para mitigar CSRF). Este é um assunto onde equipes diferentes tomam decisões diferentes de forma legítima; o importante, neste momento da sua jornada, é entender **por que** cada abordagem tem o risco que tem.
+
+## Anexando o token em requisições autenticadas
+
+Uma vez com o token guardado, o padrão para se identificar em requisições futuras é enviar um cabeçalho `Authorization`, no formato `Bearer <token>`:
+
+```ts
+async function buscarGastos(): Promise<unknown> {
+  const token = localStorage.getItem("token");
+
+  const resposta = await fetch("https://api.forja.dev/gastos", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (resposta.status === 401) {
+    throw new Error("Sessão expirada. Faça login novamente.");
+  }
+
+  if (!resposta.ok) {
+    throw new Error(`Erro ao buscar gastos: ${resposta.status}`);
+  }
+
+  return resposta.json();
+}
+```
+
+Repetir `Authorization: Bearer ${token}` manualmente em toda chamada é repetitivo e fácil de esquecer. Lembra do interceptor de axios que você viu no capítulo anterior? Esse é exatamente o lugar ideal para usá-lo:
+
+```ts
+import axios from "axios";
+
+export const api = axios.create({
+  baseURL: "https://api.forja.dev",
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+```
+
+Com essa instância configurada uma única vez, toda chamada feita através de `api.get(...)`, `api.post(...)` etc. já leva o token automaticamente, sem repetir essa lógica em cada componente que consome a API.
+
+## Rotas protegidas: redirecionando quem não está autenticado
+
+A última peça é impedir que um usuário não autenticado sequer veja telas que dependem de dados privados, como o próprio dashboard de gastos. A ideia é sempre a mesma, independente de qual biblioteca de rotas seu projeto usa: um componente "guarda" verifica se existe uma sessão válida antes de renderizar o conteúdo protegido, e redireciona caso contrário.
+
+```tsx
+import { useEffect, useState } from "react";
+
+interface RotaProtegidaProps {
+  children: React.ReactNode;
+}
+
+function RotaProtegida({ children }: RotaProtegidaProps) {
+  const [verificando, setVerificando] = useState(true);
+  const [autenticado, setAutenticado] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setAutenticado(Boolean(token));
+    setVerificando(false);
+  }, []);
+
+  if (verificando) {
+    return <p>Verificando sessão...</p>;
+  }
+
+  if (!autenticado) {
+    window.location.replace("/login");
+    return null;
+  }
+
+  return <>{children}</>;
+}
+```
+
+E o uso, envolvendo qualquer tela que exija autenticação:
+
+```tsx
+function App() {
+  return (
+    <RotaProtegida>
+      <DashboardDeGastos />
+    </RotaProtegida>
+  );
+}
+```
+
+Esse exemplo verifica apenas **se existe um token**, o que já resolve o caso mais básico. Uma versão mais completa validaria também o `exp` do token (usando a decodificação que vimos antes, só para fins de interface) para evitar mostrar uma tela protegida por um segundo antes de descobrir que a sessão expirou. E, como sempre, essa verificação no front-end é sobre **experiência do usuário** — a proteção que realmente importa continua sendo o servidor rejeitar qualquer requisição sem um token válido e assinado corretamente.
+
+<Callout type="warn">
+  Uma rota "protegida" apenas no front-end não é, de fato, segura sozinha — ela só evita que um usuário desatento veja uma tela que não devia. Alguém com conhecimento técnico pode acessar o HTML, o JavaScript, ou chamar a API diretamente, ignorando completamente a sua interface. A proteção de verdade é sempre o backend recusando qualquer requisição sem um token válido — a rota protegida no front-end existe para dar uma boa experiência, não para ser a linha de defesa.
+</Callout>
+
+## Para praticar
+
+**Cenário:** O dashboard de finanças precisa de um fluxo completo de login: guardar o token, anexá-lo automaticamente nas chamadas à API, e impedir o acesso de quem não está autenticado.
+
+**Requisitos:**
+
+1. Implemente uma função `login(email: string, senha: string): Promise<string>` que faça `POST` para `"https://api.forja.dev/auth/login"` e retorne o token recebido, lançando um erro com a mensagem `"E-mail ou senha incorretos."` especificamente quando o status for `401`.
+2. Implemente uma função `estaAutenticado(): boolean` que verifique se existe um token salvo em `localStorage`.
+3. Implemente uma função `logout(): void` que remova o token de `localStorage`.
+4. Implemente uma função `buscarComToken(url: string)` que faça um `GET` para a `url` recebida, anexando o cabeçalho `Authorization: Bearer <token>` (lido de `localStorage`), e lance um erro com a mensagem `"Sessão expirada."` quando o status for `401`.
+5. Escreva um componente `RotaProtegida` que use `estaAutenticado()` para decidir entre renderizar `children` ou redirecionar para `"/login"`.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+interface RespostaLogin {
+  token: string;
+}
+
+async function login(email: string, senha: string): Promise<string> {
+  const resposta = await fetch("https://api.forja.dev/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, senha }),
+  });
+
+  if (resposta.status === 401) {
+    throw new Error("E-mail ou senha incorretos.");
+  }
+
+  if (!resposta.ok) {
+    throw new Error(`Erro ao fazer login: ${resposta.status}`);
+  }
+
+  const dados: RespostaLogin = await resposta.json();
+  localStorage.setItem("token", dados.token);
+  return dados.token;
+}
+
+function estaAutenticado(): boolean {
+  return Boolean(localStorage.getItem("token"));
+}
+
+function logout(): void {
+  localStorage.removeItem("token");
+}
+
+async function buscarComToken(url: string): Promise<unknown> {
+  const token = localStorage.getItem("token");
+
+  const resposta = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (resposta.status === 401) {
+    throw new Error("Sessão expirada.");
+  }
+
+  if (!resposta.ok) {
+    throw new Error(`Erro na requisição: ${resposta.status}`);
+  }
+
+  return resposta.json();
+}
+```
+
+```tsx
+interface RotaProtegidaProps {
+  children: React.ReactNode;
+}
+
+function RotaProtegida({ children }: RotaProtegidaProps) {
+  if (!estaAutenticado()) {
+    window.location.replace("/login");
+    return null;
+  }
+
+  return <>{children}</>;
+}
+```
+
+</details>
+
+---
+
+Com este capítulo, você fecha o quarto módulo do curso: você sabe consumir uma API de ponta a ponta, lidar com erros de rede e de servidor, entender e reagir a um erro de CORS, evitar as vulnerabilidades mais comuns de front-end, e autenticar um usuário com um fluxo real de login e token. É exatamente o que falta para transformar o Rastreador de Gastos em uma aplicação de verdade. No próximo capítulo, antes de partir para o projeto final, vamos garantir que tudo isso continue funcionando com o tempo — com uma introdução a testes automatizados.

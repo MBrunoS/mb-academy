@@ -1,0 +1,160 @@
+---
+title: IA no Desenvolvimento Júnior
+description: "Aplique o uso responsável de IA que você aprendeu no Starter aos bugs de CSS, componentes React e ferramentas como o GitHub Copilot."
+---
+
+Lá no Starter, você aprendeu uma regra que vale a pena carregar para todo o resto da sua carreira: **se você não consegue explicar cada linha do código, ele não é seu.** Você também viu a diferença entre usar IA como ferramenta de explicação (modo aprendizado) e usar IA como acelerador de trabalho já dominado (modo produção).
+
+Este capítulo não repete esses conceitos — ele os aplica ao dia a dia concreto de um front-end júnior: erros de CSS que não fazem sentido à primeira vista, componentes React que se comportam de um jeito estranho, e a tentação constante de aceitar tudo que o GitHub Copilot sugere.
+
+## IA para entender erros de CSS e React
+
+CSS tem uma característica frustrante para quem está começando: o navegador raramente te dá uma mensagem de erro. O layout simplesmente fica errado, e você precisa descobrir por quê. React, por outro lado, costuma te dar mensagens de erro e *warnings* — mas nem sempre elas são intuitivas na primeira leitura.
+
+Nos dois casos, a IA é uma ferramenta poderosa — desde que você peça **explicação**, não apenas **correção**.
+
+Veja um bug de CSS comum: um card com layout flexível, onde o texto de um item estoura a largura do container mesmo com `overflow: hidden` no pai.
+
+```css
+.card {
+  display: flex;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.card-descricao {
+  white-space: nowrap;
+}
+```
+
+Um prompt fraco: *"conserta esse CSS, o texto tá vazando do card."* Você provavelmente recebe uma correção (algo como adicionar `min-width: 0` no filho) sem entender por que o problema acontecia — e vai tropeçar exatamente no mesmo bug na próxima tela que usar flexbox.
+
+Um prompt melhor: *"Tenho um container com `display: flex` e um filho de texto longo que estoura a largura do card mesmo com `overflow: hidden` no pai. Por que isso acontece em flexbox, antes de me dizer como corrigir?"*
+
+A explicação que você recebe do segundo prompt revela algo que vale a pena guardar: itens flex têm, por padrão, um `min-width: auto`, que impede que eles encolham além do tamanho do próprio conteúdo — por isso o texto "empurra" o container para fora, ignorando o `overflow: hidden` do pai. Uma vez que você entende esse comportamento, reconhece o mesmo bug instantaneamente da próxima vez, em vez de precisar perguntar de novo.
+
+O mesmo vale para erros de React. Um warning como este é comum:
+
+```
+Warning: Each child in a list should have a unique "key" prop.
+```
+
+Em vez de colar o warning e pedir "resolve isso", descreva o que você já entende e peça o porquê:
+
+> "Esse warning aparece quando renderizo uma lista com `.map()`. Sei que preciso de uma prop `key`, mas não entendo por que o React exige isso — o que ele faz com essa informação internamente?"
+
+A resposta te ensina sobre o processo de **reconciliação** do React: a `key` é o que permite ao React identificar quais itens de uma lista mudaram, foram adicionados ou removidos entre renderizações, em vez de recriar a lista inteira do zero a cada atualização. Esse entendimento serve para qualquer lista que você for renderizar no resto da carreira — bem mais valioso do que só copiar `key={index}` sem saber por quê (que, inclusive, tem suas próprias armadilhas quando a lista muda de ordem).
+
+## Depurando um componente que não se comporta como esperado
+
+Existe uma diferença importante entre **pedir a resposta pronta** e **pedir para a IA te ajudar a entender o que está acontecendo**. Essa diferença fica muito clara quando um componente React não se comporta como você espera — um dos tipos de bug mais comuns e mais confusos para quem está aprendendo.
+
+Veja um componente com um bug clássico de estado desatualizado:
+
+```tsx
+function Contador() {
+  const [contador, setContador] = useState(0);
+
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      setContador(contador + 1);
+    }, 1000);
+
+    return () => clearInterval(intervalo);
+  }, []);
+
+  return <p>Contador: {contador}</p>;
+}
+```
+
+O comportamento esperado é o contador subir a cada segundo. Na prática, ele vai de `0` para `1` e trava ali para sempre.
+
+**Pedir a resposta pronta** soa assim: *"esse contador não incrementa direito, conserta pra mim."* Você provavelmente recebe o código corrigido usando a forma funcional de atualização (`setContador((c) => c + 1)`), cola no seu projeto, funciona — e você não sabe explicar por que a versão anterior não funcionava nem por que a nova funciona. Da próxima vez que esse mesmo padrão aparecer em outro componente, você vai precisar perguntar de novo.
+
+**Pedir para entender** soa assim: *"Esse componente deveria incrementar o contador a cada segundo usando `setInterval` dentro de um `useEffect` com array de dependências vazio, mas ele trava em 1. Antes de me dar a correção, me ajuda a entender o que está acontecendo com o valor de `contador` dentro desse `setInterval`?"*
+
+Essa segunda pergunta leva a uma explicação sobre **closures** e o modelo de renderização do React: como o array de dependências vazio faz o efeito rodar só uma vez, a função passada para `setInterval` "captura" o valor de `contador` daquela primeira renderização (que era `0`) e nunca enxerga os valores atualizados depois disso — por isso o incremento sempre acontece a partir do mesmo `0 + 1`, e nunca avança. Entendendo isso, você mesmo chega à correção (usar a forma funcional de atualização, que sempre recebe o valor mais recente) e — mais importante — reconhece esse padrão de "estado preso" na próxima vez que aparecer, em qualquer componente, sem precisar de ajuda externa.
+
+Isso é exatamente o que você já praticou no capítulo de debugging do Starter: usar `console.log` para inspecionar valores antes de concluir qualquer coisa. A IA não substitui essa investigação — ela pode acelerar o entendimento *depois* que você já tentou observar o comportamento, ou quando você trava de verdade.
+
+<Callout type="tip">
+Uma boa pergunta de debug para IA quase sempre tem três partes: o que o código deveria fazer, o que ele faz de fato, e o que você já tentou ou observou (um `console.log`, um valor inesperado no DevTools). Quanto mais contexto real você fornece, menos a resposta depende de suposições genéricas.
+</Callout>
+
+## Usando o GitHub Copilot com responsabilidade
+
+Ferramentas como o **GitHub Copilot** funcionam de um jeito diferente do ChatGPT ou Claude: elas sugerem código *enquanto você digita*, direto no editor. Isso é extremamente conveniente — e exatamente por isso, mais fácil de usar sem pensar.
+
+A regra prática é simples de enunciar, mas exige disciplina para seguir: **só aceite uma sugestão quando você entende o que ela faz — ou escreveria algo muito parecido sozinho.**
+
+O risco de ignorar essa regra não é abstrato. Ele se acumula silenciosamente:
+
+- Você aceita uma sugestão de `useEffect` com uma lista de dependências que "parece certa" porque o Copilot escreveu, sem entender por que aquelas dependências específicas foram escolhidas
+- Semanas depois, esse mesmo trecho quebra em produção, e você não sabe por onde começar a investigar — porque nunca foi, de fato, seu código
+- Em um code review, um colega pergunta "por que você fez dessa forma?" e a resposta sincera seria "o Copilot sugeriu"
+- Seu crescimento como desenvolvedor(a) desacelera, porque padrões que você deveria estar internalizando (como funciona um closure, quando usar `useMemo`, como estruturar um formulário controlado) nunca chegam a ser realmente aprendidos — só copiados
+
+Nada disso significa que você deve desligar o Copilot. Significa usá-lo de forma seletiva:
+
+- **Aceite sem hesitar** para boilerplate óbvio: imports, tipos repetitivos, JSX repetitivo que segue um padrão que você já domina
+- **Leia com atenção antes de aceitar** qualquer sugestão que envolva lógica de estado, efeitos colaterais, ou regras de negócio — exatamente os pontos onde bugs sutis se escondem
+- **Pare e pergunte** (para a IA, para a documentação, ou para alguém do time) sempre que uma sugestão "funciona" mas você não sabe explicar por quê
+
+<Callout type="warn">
+IA é ferramenta de aprendizado, não muleta. Um júnior que acumula código que não sabe explicar não está economizando tempo — está adiando um problema para o momento (geralmente um incidente em produção, ou uma entrevista técnica) em que não vai ter a IA disponível para tapar o buraco.
+</Callout>
+
+## Para praticar
+
+O componente abaixo gera o seguinte warning no console:
+
+```
+Warning: Each child in a list should have a unique "key" prop.
+```
+
+```tsx
+function ListaTarefas({ tarefas }: { tarefas: string[] }) {
+  return (
+    <ul>
+      {tarefas.map((tarefa) => (
+        <li>{tarefa}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+Escreva dois prompts que você daria para uma IA a respeito desse warning:
+1. Um prompt "fraco", que só pede a correção pronta
+2. Um prompt "forte", que pede entendimento antes da correção
+
+Depois, explique em uma frase o que você esperaria aprender com a resposta do prompt forte que não aprenderia com o fraco.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+**Prompt fraco:**
+> "Corrige esse warning de key no React."
+
+**Prompt forte:**
+> "Esse componente gera o warning 'Each child in a list should have a unique key prop' quando eu uso `.map()` para renderizar uma lista. Antes de me dar a correção, explica pra que serve essa prop `key` internamente no React — o que ele faz com ela?"
+
+**O que se aprende com o prompt forte:** a explicação revela que a `key` é usada pelo processo de reconciliação do React para identificar cada item da lista entre renderizações — sem ela (ou com uma key instável, como o índice do array em listas que podem reordenar), o React pode confundir quais itens mudaram, duplicar estado entre eles incorretamente, ou re-renderizar a lista inteira de forma ineficiente. Esse entendimento te ensina a reconhecer, em qualquer lista futura, quando um índice é uma key aceitável (lista estática, que nunca reordena) e quando você precisa de um identificador estável (como um `id` vindo dos dados) — o prompt fraco só teria te dado `key={tarefa}` ou `key={index}` sem esse critério.
+
+```tsx
+function ListaTarefas({ tarefas }: { tarefas: string[] }) {
+  return (
+    <ul>
+      {tarefas.map((tarefa, index) => (
+        <li key={`${tarefa}-${index}`}>{tarefa}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+</details>
+
+---
+
+Você vai carregar essa mesma postura em relação à IA por toda a sua trilha na Forja Academy — no Pleno, ela aparece integrada ao produto; no Sênior, em arquitetura e workflows inteiros. A base continua sendo a mesma que você construiu desde o Starter: a IA acelera quem já sabe pensar, e atrasa — de forma disfarçada — quem tenta usá-la no lugar de pensar.
