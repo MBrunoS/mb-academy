@@ -143,28 +143,27 @@ Pense nisso como um crachá de visitante: você pode ler o nome impresso nele, m
 
 Depois que o front-end recebe o token, ele precisa ser guardado em algum lugar entre um recarregamento de página e outro. As duas opções mais comuns têm trade-offs diferentes, e não existe uma resposta universalmente "certa" — a escolha depende do contexto do projeto:
 
-<Tabs items={['localStorage', 'Cookie httpOnly']}>
-  <Tab value="localStorage">
-    ```ts
-    localStorage.setItem("token", token);
-    // ...
-    const token = localStorage.getItem("token");
-    ```
+### `localStorage`
 
-    - **Vantagem**: simples de usar, totalmente controlado pelo seu código JavaScript.
-    - **Risco**: fica acessível a **qualquer script** que rode na página — incluindo um script malicioso injetado por uma vulnerabilidade de **XSS** (a mesma que você estudou no capítulo anterior). Se um atacante conseguir rodar JavaScript na sua página, ele consegue ler `localStorage` e roubar o token.
-  </Tab>
-  <Tab value="Cookie httpOnly">
-    ```
-    // Definido pelo servidor, na resposta do login — o front-end não
-    // escreve esse cookie diretamente:
-    Set-Cookie: token=abc123; HttpOnly; Secure; SameSite=Strict
-    ```
+```ts
+localStorage.setItem("token", token);
+// ...
+const token = localStorage.getItem("token");
+```
 
-    - **Vantagem**: com a flag `HttpOnly`, o cookie **não pode ser lido por JavaScript** — mesmo um script malicioso via XSS não consegue acessá-lo diretamente. O navegador anexa o cookie automaticamente em requisições para o domínio correspondente.
-    - **Risco**: como o navegador envia o cookie **automaticamente**, isso abre espaço para **CSRF** (*Cross-Site Request Forgery*) — um site malicioso pode induzir o navegador da vítima a fazer uma requisição para a sua API, e o cookie vai junto sem que o usuário perceba. Mitigar isso exige configurações adicionais, como o atributo `SameSite` e tokens específicos de CSRF.
-  </Tab>
-</Tabs>
+- **Vantagem**: simples de usar, totalmente controlado pelo seu código JavaScript.
+- **Risco**: fica acessível a **qualquer script** que rode na página — incluindo um script malicioso injetado por uma vulnerabilidade de **XSS** (a mesma que você estudou no capítulo anterior). Se um atacante conseguir rodar JavaScript na sua página, ele consegue ler `localStorage` e roubar o token.
+
+### Cookie `httpOnly`
+
+```
+// Definido pelo servidor, na resposta do login — o front-end não
+// escreve esse cookie diretamente:
+Set-Cookie: token=abc123; HttpOnly; Secure; SameSite=Strict
+```
+
+- **Vantagem**: com a flag `HttpOnly`, o cookie **não pode ser lido por JavaScript** — mesmo um script malicioso via XSS não consegue acessá-lo diretamente. O navegador anexa o cookie automaticamente em requisições para o domínio correspondente.
+- **Risco**: como o navegador envia o cookie **automaticamente**, isso abre espaço para **CSRF** (*Cross-Site Request Forgery*) — um site malicioso pode induzir o navegador da vítima a fazer uma requisição para a sua API, e o cookie vai junto sem que o usuário perceba. Mitigar isso exige configurações adicionais, como o atributo `SameSite` e tokens específicos de CSRF.
 
 Em resumo: `localStorage` é vulnerável a XSS, cookies `httpOnly` são vulneráveis a CSRF (sem as proteções adicionais). Nenhuma opção é magicamente segura por si só — a segurança real vem de tratar bem a vulnerabilidade que a opção escolhida introduz (sanitizar entradas para evitar XSS, ou configurar `SameSite`/tokens CSRF para mitigar CSRF). Este é um assunto onde equipes diferentes tomam decisões diferentes de forma legítima; o importante, neste momento da sua jornada, é entender **por que** cada abordagem tem o risco que tem.
 

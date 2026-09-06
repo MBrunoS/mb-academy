@@ -11,62 +11,52 @@ CSS é, na essência, um conjunto de **regras**: cada regra escolhe um ou mais e
 
 Antes de escrever qualquer regra, você precisa decidir **onde** ela vai morar. Existem três formas de aplicar CSS a um HTML, e é importante entender as diferenças entre elas.
 
-<Tabs items={['Inline', 'Interno', 'Externo']}>
-  <Tab value="Inline">
-    O estilo é escrito diretamente no atributo `style` de um elemento específico:
+### Inline
 
-    ```html
-    <p style="color: green; font-weight: bold;">Saldo: R$ 1.240,00</p>
-    ```
+O estilo é escrito diretamente no atributo `style` de um elemento específico:
 
-    Funciona, mas afeta **apenas aquele elemento** — não há reaproveitamento
-    nenhum. Se você tiver 20 parágrafos parecidos, precisa repetir o mesmo
-    `style` em cada um. Use isso só para testes rápidos ou casos muito
-    pontuais.
-  </Tab>
-  <Tab value="Interno">
-    O estilo fica dentro de uma tag `<style>`, no `<head>` do próprio
-    documento HTML:
+```html
+<p style="color: green; font-weight: bold;">Saldo: R$ 1.240,00</p>
+```
 
-    ```html
-    <head>
-      <style>
-        p {
-          color: green;
-          font-weight: bold;
-        }
-      </style>
-    </head>
-    ```
+Funciona, mas afeta **apenas aquele elemento** — não há reaproveitamento nenhum. Se você tiver 20 parágrafos parecidos, precisa repetir o mesmo `style` em cada um. Use isso só para testes rápidos ou casos muito pontuais.
 
-    Já afeta todos os elementos daquele tipo na página inteira, mas o estilo
-    fica preso a esse arquivo HTML específico — se você tiver várias páginas,
-    precisa copiar o bloco `<style>` em cada uma delas.
-  </Tab>
-  <Tab value="Externo">
-    O estilo fica em um arquivo `.css` separado, vinculado ao HTML por meio de
-    um `<link>` no `<head>`:
+### Interno
 
-    ```html
-    <head>
-      <link rel="stylesheet" href="estilos.css" />
-    </head>
-    ```
+O estilo fica dentro de uma tag `<style>`, no `<head>` do próprio documento HTML:
 
-    ```css
-    /* estilos.css */
+```html
+<head>
+  <style>
     p {
       color: green;
       font-weight: bold;
     }
-    ```
+  </style>
+</head>
+```
 
-    Essa é a abordagem recomendada para qualquer projeto real: o mesmo arquivo
-    `.css` pode ser reaproveitado em várias páginas do site, o navegador
-    consegue guardá-lo em cache (carregando mais rápido em visitas
-    seguintes), e o código fica organizado — HTML em um lugar, CSS em outro.
-  </Tab>
-</Tabs>
+Já afeta todos os elementos daquele tipo na página inteira, mas o estilo fica preso a esse arquivo HTML específico — se você tiver várias páginas, precisa copiar o bloco `<style>` em cada uma delas.
+
+### Externo
+
+O estilo fica em um arquivo `.css` separado, vinculado ao HTML por meio de um `<link>` no `<head>`:
+
+```html
+<head>
+  <link rel="stylesheet" href="estilos.css" />
+</head>
+```
+
+```css
+/* estilos.css */
+p {
+  color: green;
+  font-weight: bold;
+}
+```
+
+Essa é a abordagem recomendada para qualquer projeto real: o mesmo arquivo `.css` pode ser reaproveitado em várias páginas do site, o navegador consegue guardá-lo em cache (carregando mais rápido em visitas seguintes), e o código fica organizado — HTML em um lugar, CSS em outro.
 
 <Callout type="tip">
   A partir de agora, sempre que possível, use CSS externo. É o padrão que você

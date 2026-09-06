@@ -357,16 +357,14 @@ Repare como `PainelFinanceiro` ficou simples: ele não sabe nada sobre `localSto
 
 </details>
 
-<Accordions type="single">
-  <Accordion title="Referência rápida: qual hook usar quando?">
-    - **`useState`** — guardar um valor que, quando muda, deve atualizar a tela.
-    - **`useEffect`** — sincronizar o componente com algo fora do React (API, `localStorage`, eventos globais, timers).
-    - **`useMemo`** — evitar recalcular um valor caro em renderizações onde suas dependências não mudaram.
-    - **`useCallback`** — manter a mesma referência de uma função entre renderizações, geralmente para não quebrar a otimização de um componente filho com `React.memo`.
-    - **`useRef`** — acessar um elemento do DOM diretamente, ou guardar um valor mutável que não deve causar re-renderização.
-    - **Custom hook (`use*`)** — extrair e reutilizar qualquer combinação dos hooks acima, quando a mesma lógica aparece (ou está prestes a aparecer) em mais de um componente.
-  </Accordion>
-</Accordions>
+**Referência rápida: qual hook usar quando?**
+
+- **`useState`** — guardar um valor que, quando muda, deve atualizar a tela.
+- **`useEffect`** — sincronizar o componente com algo fora do React (API, `localStorage`, eventos globais, timers).
+- **`useMemo`** — evitar recalcular um valor caro em renderizações onde suas dependências não mudaram.
+- **`useCallback`** — manter a mesma referência de uma função entre renderizações, geralmente para não quebrar a otimização de um componente filho com `React.memo`.
+- **`useRef`** — acessar um elemento do DOM diretamente, ou guardar um valor mutável que não deve causar re-renderização.
+- **Custom hook (`use*`)** — extrair e reutilizar qualquer combinação dos hooks acima, quando a mesma lógica aparece (ou está prestes a aparecer) em mais de um componente.
 
 ---
 

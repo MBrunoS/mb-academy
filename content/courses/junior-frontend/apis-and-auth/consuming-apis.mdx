@@ -157,33 +157,32 @@ npm install axios
 
 Compare os dois, buscando a lista de gastos:
 
-<Tabs items={['fetch', 'axios']}>
-  <Tab value="fetch">
-    ```ts
-    async function buscarGastos() {
-      const resposta = await fetch("https://api.forja.dev/gastos");
+**Com `fetch`:**
 
-      if (!resposta.ok) {
-        throw new Error(`Erro HTTP: ${resposta.status}`);
-      }
+```ts
+async function buscarGastos() {
+  const resposta = await fetch("https://api.forja.dev/gastos");
 
-      return resposta.json();
-    }
-    ```
-  </Tab>
-  <Tab value="axios">
-    ```ts
-    import axios from "axios";
+  if (!resposta.ok) {
+    throw new Error(`Erro HTTP: ${resposta.status}`);
+  }
 
-    async function buscarGastos() {
-      const resposta = await axios.get("https://api.forja.dev/gastos");
-      return resposta.data;
-      // Se o servidor responder 4xx ou 5xx, o axios já lança
-      // uma exceção sozinho — não é preciso checar o status manualmente.
-    }
-    ```
-  </Tab>
-</Tabs>
+  return resposta.json();
+}
+```
+
+**Com `axios`:**
+
+```ts
+import axios from "axios";
+
+async function buscarGastos() {
+  const resposta = await axios.get("https://api.forja.dev/gastos");
+  return resposta.data;
+  // Se o servidor responder 4xx ou 5xx, o axios já lança
+  // uma exceção sozinho — não é preciso checar o status manualmente.
+}
+```
 
 Um dos usos mais práticos do axios é criar uma **instância configurada uma única vez**, com uma URL base e interceptors, para reaproveitar em todo o projeto:
 
