@@ -1,0 +1,343 @@
+---
+title: Escrevendo Testes na Prática
+description: "Aprenda a estrutura de um teste automatizado e escreva seus primeiros testes para funções e componentes React."
+---
+
+Você já sabe por que testes automatizados importam e já reconhece o panorama de ferramentas — Jest, Vitest, Cypress, Playwright — e onde cada uma se encaixa na pirâmide de testes. Chegou a hora de escrever testes de verdade. Vamos usar o **Vitest** nos exemplos, mas lembre-se: a API é praticamente idêntica à do Jest, então tudo que você aprender aqui se transfere quase sem esforço.
+
+## Anatomia de um teste automatizado
+
+Todo teste, independente da ferramenta, segue uma estrutura parecida. Vamos começar pelas três peças que você vai ver em praticamente todo arquivo de teste: `describe`, `it` (ou `test`) e `expect`.
+
+```ts
+import { describe, it, expect } from "vitest";
+
+describe("calcularTotalGastos", () => {
+  it("soma corretamente os valores de uma lista de gastos", () => {
+    // ainda vamos preencher isso
+  });
+});
+```
+
+- **`describe`** agrupa testes relacionados sob um nome descritivo — geralmente o nome da função, do componente ou da funcionalidade sendo testada. Ele existe só para organização; não é obrigatório, mas ajuda muito a manter arquivos de teste legíveis conforme eles crescem.
+- **`it`** (ou `test`, que funciona de forma idêntica — `it` só lê melhor em inglês, como em "it soma corretamente...") declara **um caso de teste individual**. Cada `it` deve verificar uma única coisa, com um nome que descreve o comportamento esperado, não a implementação.
+- **`expect`** é onde a verificação de fato acontece — você vai ver ele em detalhe na próxima seção.
+
+<Callout>
+  Dê nomes descritivos aos seus testes. `it("funciona")` não diz nada quando o teste falhar meses depois. `it("retorna 0 quando a lista de gastos está vazia")` te diz exatamente o que quebrou, sem precisar abrir o código do teste.
+</Callout>
+
+### O padrão Arrange-Act-Assert
+
+Dentro de cada `it`, a prática mais comum é organizar o código em três passos, conhecidos como **Arrange-Act-Assert** (organizar, agir, verificar):
+
+1. **Arrange (organizar):** prepare os dados e o cenário necessário para o teste — crie a lista de gastos, instancie o componente, monte o objeto de entrada.
+2. **Act (agir):** execute a ação que você quer testar — chame a função, dispare o evento, renderize o componente.
+3. **Assert (verificar):** confira se o resultado é o esperado, usando `expect`.
+
+```ts
+it("soma corretamente os valores de uma lista de gastos", () => {
+  // Arrange
+  const gastos = [
+    { id: 1, descricao: "Mercado", valor: 250, categoria: "Alimentação" },
+    { id: 2, descricao: "Uber", valor: 30, categoria: "Transporte" },
+  ];
+
+  // Act
+  const total = calcularTotalGastos(gastos);
+
+  // Assert
+  expect(total).toBe(280);
+});
+```
+
+Esse padrão não é uma regra imposta pelo Vitest ou pelo Jest — é uma convenção que a comunidade adotou porque torna qualquer teste fácil de ler, mesmo por quem nunca viu aquele código antes. Vale a pena adotar desde o seu primeiro teste.
+
+## `expect` e os matchers mais comuns
+
+`expect` recebe o valor que você quer verificar, e você encadeia um **matcher** — um método que descreve a verificação — para comparar esse valor com o esperado. Os mais usados no dia a dia:
+
+### `toBe`: igualdade exata (valores primitivos)
+
+Use `toBe` para comparar números, strings, booleanos — valores primitivos, onde a comparação é feita por identidade/valor exato.
+
+```ts
+expect(2 + 2).toBe(4);
+expect("Forja".toUpperCase()).toBe("FORJA");
+expect(calcularTotalGastos([])).toBe(0);
+```
+
+### `toEqual`: igualdade estrutural (objetos e arrays)
+
+Objetos e arrays são comparados por **referência** em JavaScript, não por conteúdo — então `toBe` não serve para eles (dois objetos com os mesmos valores nunca são "o mesmo objeto"). Para isso existe `toEqual`, que compara o **conteúdo** recursivamente.
+
+```ts
+const gastos = [
+  { id: 2, descricao: "Uber", valor: 30, categoria: "Transporte" },
+];
+
+// toBe falharia aqui, mesmo com os valores idênticos
+expect(filtrarGastosPorCategoria(todosOsGastos, "Transporte")).toEqual(gastos);
+```
+
+<Callout type="warn">
+  Um erro comum de quem está começando é usar `toBe` para comparar objetos ou arrays e ficar confuso com o teste falhando mesmo quando os valores "parecem iguais" no console. Regra prática: primitivos usam `toBe`; objetos e arrays usam `toEqual`.
+</Callout>
+
+### `toThrow`: verificar se uma função lança um erro
+
+Quando uma função deveria lançar um erro em uma situação inválida, você verifica isso envolvendo a chamada em uma função anônima (senão o erro aconteceria durante a preparação do teste, e não durante o `expect`):
+
+```ts
+function registrarGasto(valor: number): void {
+  if (valor <= 0) {
+    throw new Error("O valor do gasto deve ser maior que zero.");
+  }
+  // ... lógica de registro
+}
+
+it("lança um erro quando o valor do gasto é inválido", () => {
+  expect(() => registrarGasto(-10)).toThrow("O valor do gasto deve ser maior que zero.");
+});
+```
+
+Existem dezenas de outros matchers (`toBeTruthy`, `toContain`, `toHaveLength`, `toBeGreaterThan`, entre outros), mas `toBe`, `toEqual` e `toThrow` já cobrem a grande maioria das situações que você vai encontrar no início.
+
+## Testando uma função pura, do início ao fim
+
+Vamos testar uma função completa, do jeito que você faria no projeto do curso. Primeiro, o código sendo testado — imagine que ele vive em um arquivo `financas.ts`:
+
+```ts
+// financas.ts
+export type Gasto = {
+  id: number;
+  descricao: string;
+  valor: number;
+  categoria: string;
+};
+
+export function calcularTotalGastos(gastos: Gasto[]): number {
+  return gastos.reduce((total, gasto) => total + gasto.valor, 0);
+}
+
+export function filtrarGastosPorCategoria(
+  gastos: Gasto[],
+  categoria: string
+): Gasto[] {
+  return gastos.filter((gasto) => gasto.categoria === categoria);
+}
+```
+
+Agora, o arquivo de teste — por convenção, chamado `financas.test.ts`, vivendo ao lado do arquivo original:
+
+```ts
+// financas.test.ts
+import { describe, it, expect } from "vitest";
+import { calcularTotalGastos, filtrarGastosPorCategoria } from "./financas";
+
+const gastosDeExemplo = [
+  { id: 1, descricao: "Mercado", valor: 250, categoria: "Alimentação" },
+  { id: 2, descricao: "Uber", valor: 30, categoria: "Transporte" },
+  { id: 3, descricao: "Netflix", valor: 45, categoria: "Assinaturas" },
+];
+
+describe("calcularTotalGastos", () => {
+  it("soma o valor de todos os gastos da lista", () => {
+    const total = calcularTotalGastos(gastosDeExemplo);
+    expect(total).toBe(325);
+  });
+
+  it("retorna 0 quando a lista de gastos está vazia", () => {
+    expect(calcularTotalGastos([])).toBe(0);
+  });
+});
+
+describe("filtrarGastosPorCategoria", () => {
+  it("retorna apenas os gastos da categoria informada", () => {
+    const resultado = filtrarGastosPorCategoria(gastosDeExemplo, "Transporte");
+
+    expect(resultado).toEqual([
+      { id: 2, descricao: "Uber", valor: 30, categoria: "Transporte" },
+    ]);
+  });
+
+  it("retorna um array vazio quando nenhuma categoria corresponde", () => {
+    const resultado = filtrarGastosPorCategoria(gastosDeExemplo, "Viagem");
+    expect(resultado).toEqual([]);
+  });
+});
+```
+
+Repare que testamos, de propósito, **casos de borda**: uma lista vazia, uma categoria que não existe. São exatamente essas situações — não o "caminho feliz" óbvio — que mais escondem bugs, e que testes automatizados capturam sem esforço extra depois de escritos uma vez.
+
+Para rodar esses testes, o comando típico em um projeto configurado com Vitest é:
+
+```bash
+npx vitest run
+```
+
+E para rodar em modo *watch* (reexecutando a cada alteração de arquivo, útil enquanto você programa):
+
+```bash
+npx vitest
+```
+
+## Um passo além: testando um componente React
+
+Testar funções puras é o ponto de partida ideal, porque não envolve nenhuma peça extra: entrada, saída, comparação. Mas seu dashboard de finanças é feito de **componentes**, e eventualmente você vai querer testar se eles renderizam e reagem a interações corretamente. Para isso, a ferramenta padrão do ecossistema React é a **Testing Library** (`@testing-library/react`), usada em conjunto com o Vitest ou o Jest.
+
+A filosofia da Testing Library é simples e vale a pena guardar: **teste o componente da forma como um usuário o experimenta**, buscando elementos pelo texto ou papel que aparecem na tela — nunca por detalhes internos de implementação, como nomes de variáveis de estado.
+
+Imagine este componente simples, em `ListaDeGastos.tsx`:
+
+```tsx
+// ListaDeGastos.tsx
+import type { Gasto } from "./financas";
+
+type ListaDeGastosProps = {
+  gastos: Gasto[];
+  onRemover: (id: number) => void;
+};
+
+export function ListaDeGastos({ gastos, onRemover }: ListaDeGastosProps) {
+  if (gastos.length === 0) {
+    return <p>Nenhum gasto registrado ainda.</p>;
+  }
+
+  return (
+    <ul>
+      {gastos.map((gasto) => (
+        <li key={gasto.id}>
+          {gasto.descricao}: R$ {gasto.valor.toFixed(2)}
+          <button onClick={() => onRemover(gasto.id)}>Remover</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+E um teste que renderiza o componente, confere o que aparece na tela e simula um clique:
+
+```tsx
+// ListaDeGastos.test.tsx
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { ListaDeGastos } from "./ListaDeGastos";
+
+describe("ListaDeGastos", () => {
+  it("exibe a descrição e o valor de cada gasto", () => {
+    const gastos = [
+      { id: 1, descricao: "Mercado", valor: 250, categoria: "Alimentação" },
+    ];
+
+    render(<ListaDeGastos gastos={gastos} onRemover={() => {}} />);
+
+    expect(screen.getByText(/Mercado/)).toBeInTheDocument();
+    expect(screen.getByText(/R\$ 250.00/)).toBeInTheDocument();
+  });
+
+  it("mostra uma mensagem quando não há gastos", () => {
+    render(<ListaDeGastos gastos={[]} onRemover={() => {}} />);
+
+    expect(screen.getByText("Nenhum gasto registrado ainda.")).toBeInTheDocument();
+  });
+
+  it("chama onRemover com o id correto ao clicar em Remover", async () => {
+    const onRemover = vi.fn();
+    const gastos = [
+      { id: 1, descricao: "Mercado", valor: 250, categoria: "Alimentação" },
+    ];
+
+    render(<ListaDeGastos gastos={gastos} onRemover={onRemover} />);
+
+    const botaoRemover = screen.getByRole("button", { name: /remover/i });
+    await userEvent.click(botaoRemover);
+
+    expect(onRemover).toHaveBeenCalledWith(1);
+  });
+});
+```
+
+Repare no padrão: **renderizar** o componente (`render`), **buscar** um elemento na tela do jeito que um usuário o encontraria (`screen.getByText`, `screen.getByRole`), opcionalmente **simular uma interação** (`userEvent.click`), e **verificar** o resultado (`expect`). É a mesma estrutura Arrange-Act-Assert de sempre, só que agora agindo sobre uma interface renderizada em vez de uma função isolada.
+
+`vi.fn()` merece uma palavra à parte: ele cria uma **função falsa** (um *mock*) que registra como e quantas vezes foi chamada, sem executar nenhuma lógica de verdade. É assim que testamos se um componente chamou corretamente uma função que recebeu como prop, sem precisar de uma implementação real por trás dela.
+
+Isso é só a ponta do iceberg de testar componentes React — o suficiente para você reconhecer o padrão e escrever testes simples. Você vai aprofundar bastante esse assunto no curso Pleno, com testes mais elaborados de formulários, efeitos assíncronos e Storybook.
+
+## O que vale a pena testar (e o que não vale)
+
+Com o padrão em mãos, surge uma pergunta importante: você deveria testar **absolutamente tudo**? Não. Escrever testes tem um custo — tempo para escrever e tempo para manter — e usar esse tempo nos lugares certos é tão importante quanto saber escrever o teste em si.
+
+**Vale a pena testar:**
+
+- **Lógica de negócio**: cálculos, regras, transformações de dados — como `calcularTotalGastos` ou `filtrarGastosPorCategoria`. É aqui que bugs mais afetam o usuário e mais se escondem.
+- **Casos de borda**: listas vazias, valores negativos, categorias inexistentes, números muito grandes. São as situações que o "caminho feliz" não cobre e que mais frequentemente escondem erros.
+- **Comportamentos importantes da interface**: "o total é atualizado quando um gasto é removido", "uma mensagem de erro aparece quando o formulário é enviado vazio".
+
+**Geralmente não compensa testar:**
+
+- **Detalhes de implementação**: o nome de uma variável de estado interna, a estrutura exata de classes CSS, ou *como* um componente é construído por dentro. Testes que travam nesses detalhes quebram toda vez que você refatora o código sem mudar nenhum comportamento real — o que te ensina a ignorar testes falhando, o pior hábito possível.
+- **Bibliotecas de terceiros**: você não precisa testar se o `useState` do React funciona, ou se o Axios realmente faz requisições HTTP. Isso já foi testado extensivamente por quem manteve essas bibliotecas — confie nelas e foque seus testes no código que **você** escreveu.
+- **Código trivial sem lógica**: um componente que só recebe uma prop e a exibe em um parágrafo, sem nenhuma condição ou cálculo, raramente justifica um teste dedicado — o risco de bug ali é próximo de zero.
+
+<Callout type="tip">
+  Uma boa pergunta para decidir se vale a pena testar algo: "se essa lógica quebrar, eu ficaria sabendo rápido, e isso importaria para o usuário?". Se a resposta é sim para as duas partes, escreva o teste.
+</Callout>
+
+## Para praticar
+
+O dashboard de finanças pessoais precisa de uma nova função utilitária: calcular quanto do orçamento mensal já foi gasto, em percentual.
+
+**Cenário:** crie e teste uma função `calcularPercentualGasto` que recebe o total já gasto e o orçamento mensal, e retorna o percentual já consumido.
+
+**Requisitos:**
+
+1. Crie uma função `calcularPercentualGasto(totalGasto: number, orcamento: number): number` que retorna o percentual de `totalGasto` em relação a `orcamento` (por exemplo, gasto de `50` com orçamento de `200` deve retornar `25`, representando 25%).
+2. Se `orcamento` for `0`, a função deve retornar `0` em vez de gerar um erro de divisão por zero.
+3. Escreva um arquivo de teste com Vitest, usando `describe` e `it`, cobrindo pelo menos três casos: um cálculo comum, o caso de orçamento igual a `0`, e o caso em que o gasto ultrapassa o orçamento (percentual acima de 100).
+4. Use o matcher `toBe` em todas as verificações.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+// orcamento.ts
+export function calcularPercentualGasto(
+  totalGasto: number,
+  orcamento: number
+): number {
+  if (orcamento === 0) {
+    return 0;
+  }
+
+  return (totalGasto / orcamento) * 100;
+}
+```
+
+```ts
+// orcamento.test.ts
+import { describe, it, expect } from "vitest";
+import { calcularPercentualGasto } from "./orcamento";
+
+describe("calcularPercentualGasto", () => {
+  it("calcula o percentual gasto corretamente", () => {
+    expect(calcularPercentualGasto(50, 200)).toBe(25);
+  });
+
+  it("retorna 0 quando o orçamento é 0", () => {
+    expect(calcularPercentualGasto(50, 0)).toBe(0);
+  });
+
+  it("retorna um valor acima de 100 quando o gasto ultrapassa o orçamento", () => {
+    expect(calcularPercentualGasto(300, 200)).toBe(150);
+  });
+});
+```
+
+</details>
+
+---
+
+Você agora entende a pirâmide de testes, sabe quando escolher Jest, Vitest, Cypress ou Playwright, e já escreveu testes reais para funções e para um componente React. É uma base pequena em volume, mas sólida — e vai crescer bastante nos próximos capítulos, quando o dashboard de finanças pessoais ganhar sua própria suíte de testes antes de ir para produção no Capítulo 6.

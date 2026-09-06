@@ -1,0 +1,125 @@
+---
+title: Ferramentas de Teste
+description: "Conheça a pirâmide de testes e compare Jest, Vitest, Cypress e Playwright para escolher a ferramenta certa em cada situação."
+---
+
+No capítulo anterior você entendeu *por que* testar código automaticamente resolve um problema real: teste manual não escala, e regressões silenciosas são caras. Agora é hora de entender *como* o mundo dos testes se organiza — porque "testar" não é uma coisa só. Existem diferentes níveis de teste, cada um verificando uma coisa diferente, e diferentes ferramentas especializadas em cada nível.
+
+## A pirâmide de testes
+
+Um jeito clássico de organizar esse assunto é através da **pirâmide de testes**: um modelo mental que divide os testes em três camadas, empilhadas por volume e por tipo de garantia que oferecem.
+
+```
+        /\
+       /  \      Testes E2E (poucos)
+      /----\
+     /      \    Testes de Integração (alguns)
+    /--------\
+   /          \  Testes Unitários (muitos)
+  /------------\
+```
+
+A ideia da pirâmide é dupla: quanto mais alto o nível, **mais realista** é o teste (mais perto de como um usuário de verdade experimenta o sistema) — mas também **mais lento, mais caro de manter e mais frágil**. Por isso, a recomendação geral é escrever **muitos** testes na base, **alguns** no meio, e **poucos** no topo.
+
+### Testes unitários (a base)
+
+Um teste unitário verifica **uma unidade isolada** de código — geralmente uma função, um método ou um componente pequeno — sem depender de outras partes do sistema (banco de dados, rede, outros componentes). Se a função depende de algo externo, esse algo é substituído por uma versão falsa (um *mock*) só para o teste.
+
+Por exemplo: testar se uma função `calcularTotalGastos` soma corretamente os valores de uma lista de gastos é um teste unitário. Ele não abre um navegador, não faz requisição de rede, não renderiza nada — só chama a função com uma entrada conhecida e confere a saída.
+
+**Vantagens:** são extremamente rápidos (rodam centenas em segundos), fáceis de escrever, e quando falham, apontam exatamente onde está o problema, porque testam uma coisa isolada por vez.
+
+**Limitação:** não garantem que as peças realmente funcionam bem **juntas**. Você pode ter cem testes unitários passando e ainda assim ter uma tela quebrada, porque o problema está na forma como os componentes se conectam.
+
+### Testes de integração (o meio)
+
+Um teste de integração verifica se **múltiplas unidades funcionam corretamente em conjunto**. Por exemplo: testar se um componente de formulário de novo gasto realmente atualiza a lista de gastos na tela depois que o usuário preenche os campos e clica em salvar — isso envolve o formulário, a validação, o estado compartilhado e a lista, todos trabalhando juntos.
+
+Também entram aqui testes que verificam a integração do seu código com serviços externos simulados, como testar se uma função que consome uma API trata corretamente uma resposta de erro (usando uma API falsa só para o teste).
+
+**Vantagens:** capturam bugs que testes unitários isolados não veem, porque testam a colaboração real entre partes do sistema.
+
+**Limitação:** são mais lentos que testes unitários e um pouco mais trabalhosos de escrever e manter, já que envolvem mais peças em movimento.
+
+### Testes end-to-end (o topo)
+
+Testes **end-to-end** (ou "E2E", "de ponta a ponta") simulam um usuário real usando a aplicação **completa**, rodando de verdade em um navegador: abrem a página, clicam em botões, preenchem formulários, navegam entre telas, e conferem o resultado final na interface — exatamente como uma pessoa faria.
+
+Por exemplo: um teste E2E do dashboard de finanças poderia abrir a aplicação, fazer login, adicionar um gasto novo pelo formulário, e verificar se ele aparece na lista e se o total foi atualizado corretamente na tela — tudo isso rodando a aplicação real, do início ao fim.
+
+**Vantagens:** é o nível que mais se aproxima da experiência real do usuário, e o único que pega problemas de integração entre front-end, back-end, rede e navegador ao mesmo tempo.
+
+**Limitação:** são os testes mais lentos (segundos a minutos por teste, contra milissegundos de um teste unitário), mais caros de manter (pequenas mudanças na interface podem quebrar vários testes E2E) e mais frágeis (dependem de tempo de carregamento, rede, e do estado de um sistema inteiro rodando).
+
+<Callout>
+Nenhuma camada substitui a outra. Um projeto saudável tem uma base grande de testes unitários rápidos, uma camada de integração cobrindo os fluxos mais importantes, e poucos testes E2E cobrindo os caminhos críticos (como login e o fluxo principal do produto) — não a aplicação inteira.
+</Callout>
+
+## Comparando as ferramentas mais usadas
+
+Com os três níveis em mente, vamos falar das ferramentas concretas que o ecossistema React e TypeScript usa para escrever cada tipo de teste.
+
+### Jest: o pioneiro
+
+O **Jest** foi criado pelo Facebook e, por muitos anos, foi a escolha padrão para testar aplicações JavaScript e React. Ele é um framework "tudo incluso": traz executor de testes, biblioteca de asserções (`expect`) e sistema de mocks numa coisa só, o que reduz a necessidade de configurar várias ferramentas separadas.
+
+Jest é usado principalmente para **testes unitários e de integração**. Ele continua extremamente popular — é o padrão em projetos criados com Create React App e ainda é a escolha de muitas empresas grandes — mas seu motor de execução (baseado em Node.js com transpilação via Babel) tende a ficar mais lento conforme o projeto cresce, especialmente em modo *watch* (rodando testes automaticamente a cada mudança de arquivo).
+
+### Vitest: o mais rápido, nascido do Vite
+
+O **Vitest** é uma alternativa mais recente, construída para se integrar nativamente com o [Vite](https://vitejs.dev) (a ferramenta de build que muitos projetos modernos usam). Por reaproveitar o mesmo motor de transformação do Vite, ele costuma ser **muito mais rápido** que o Jest, principalmente no modo *watch*, onde os testes reexecutam quase instantaneamente após qualquer alteração.
+
+A boa notícia é que a API do Vitest foi desenhada para ser **quase idêntica à do Jest** — `describe`, `it`, `expect` e a maioria dos matchers funcionam exatamente da mesma forma. Isso significa que o conhecimento que você constrói com um se transfere quase inteiramente para o outro. Por isso, para o restante deste módulo, os exemplos vão usar Vitest.
+
+Assim como o Jest, Vitest é a ferramenta certa para **testes unitários e de integração** — não para testes end-to-end.
+
+### Cypress e Playwright: testes end-to-end em navegadores de verdade
+
+Tanto Jest quanto Vitest rodam em Node.js, simulando um ambiente de navegador o suficiente para testar componentes isoladamente — mas eles não abrem um navegador real. Para testes **end-to-end**, você precisa de uma ferramenta que controle um navegador de verdade, clicando, digitando e navegando como um usuário faria.
+
+**Cypress** foi uma das primeiras ferramentas a tornar isso acessível para desenvolvedores front-end, com um diferencial forte de experiência: ele abre um painel visual que mostra, passo a passo, cada comando executado durante o teste, permitindo "viajar no tempo" entre os estados da aplicação para depurar falhas. Isso tornou o Cypress muito popular para quem está começando com testes E2E.
+
+**Playwright**, criado pela Microsoft, é a alternativa mais recente e vem ganhando espaço como escolha padrão em projetos novos. Suas principais vantagens são rodar testes em **múltiplos motores de navegador** (Chromium, Firefox e WebKit — o motor usado pelo Safari) a partir do mesmo código de teste, uma execução em paralelo mais rápida, e mecanismos de espera automática que reduzem testes instáveis (os chamados testes *flaky*, que às vezes passam e às vezes falham sem nenhuma mudança no código).
+
+Nenhuma das duas é "melhor" de forma absoluta — muitas equipes usam Cypress pela experiência de depuração visual, e cada vez mais equipes novas escolhem Playwright pela cobertura de navegadores e velocidade. O importante, neste momento da sua jornada, é reconhecer os dois nomes e saber que ambos resolvem o mesmo problema: testes E2E em um navegador real.
+
+## Qual ferramenta usar quando
+
+Juntando tudo:
+
+| Camada da pirâmide | O que verifica | Ferramentas típicas | Velocidade |
+|---|---|---|---|
+| Unitário | Uma função ou componente isolado | Jest, Vitest | Muito rápida (milissegundos) |
+| Integração | Várias unidades trabalhando juntas | Jest, Vitest (+ Testing Library) | Rápida (ainda em Node, sem navegador real) |
+| End-to-end | O sistema completo, do ponto de vista do usuário | Cypress, Playwright | Lenta (segundos a minutos, navegador real) |
+
+<Callout type="tip">
+Como regra prática: comece sempre pela pergunta "o que exatamente eu quero garantir?". Se a resposta é "essa função calcula o valor certo", é teste unitário. Se é "esses componentes conversam direito entre si", é integração. Se é "o usuário consegue completar essa tarefa inteira no sistema real", é E2E.
+</Callout>
+
+## Para praticar
+
+Você está construindo o dashboard de finanças pessoais do projeto do curso. A seguir estão quatro partes do sistema que precisam de testes.
+
+**Cenário:** para cada item abaixo, decida qual camada da pirâmide de testes (unitário, integração ou end-to-end) faz mais sentido, e qual ferramenta você usaria.
+
+**Requisitos:**
+
+1. Uma função `calcularTotalGastos(gastos)` que soma o valor de uma lista de gastos e retorna o total.
+2. O fluxo completo do usuário fazendo login, indo até a tela de dashboard e vendo seus gastos carregados — passando pela autenticação real do sistema.
+3. Um formulário de "novo gasto" que, ao ser preenchido e enviado, deve atualizar a lista de gastos exibida na tela (sem sair da tela nem depender de um navegador real rodando o sistema completo).
+4. Uma função `formatarMoeda(valor)` que recebe um número e devolve uma string formatada como `"R$ 250,00"`.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+1. **Teste unitário**, com Jest ou Vitest. `calcularTotalGastos` é uma função pura e isolada — não depende de nada externo, então testá-la sozinha, com listas de entrada conhecidas, é suficiente e rápido.
+2. **Teste end-to-end**, com Cypress ou Playwright. Esse cenário envolve várias telas, autenticação real e navegação — exatamente o tipo de fluxo completo que só um teste E2E, rodando num navegador de verdade, consegue validar com confiança.
+3. **Teste de integração**, com Vitest e Testing Library. Aqui várias peças (formulário, validação, estado da lista) precisam ser verificadas trabalhando juntas, mas não é necessário abrir um navegador real nem testar o sistema inteiro — um ambiente simulado de componentes já é suficiente.
+4. **Teste unitário**, com Jest ou Vitest. Assim como `calcularTotalGastos`, `formatarMoeda` é uma função pura isolada: mesma entrada, mesma saída, sem dependências externas.
+
+</details>
+
+---
+
+Agora que você já sabe **em que camada** escrever cada tipo de teste e **quais ferramentas** usar em cada uma, é hora de sair da teoria. No próximo capítulo, você vai escrever seus primeiros testes de verdade — entendendo a estrutura de um teste, os principais comandos de verificação, e como testar tanto uma função pura quanto um componente React.

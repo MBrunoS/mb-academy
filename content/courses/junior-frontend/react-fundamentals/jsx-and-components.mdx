@@ -1,0 +1,263 @@
+---
+title: JSX e Componentes
+description: "Aprenda a sintaxe do JSX e crie seus primeiros componentes React tipados com TypeScript."
+---
+
+Agora que você entende por que o React existe, é hora de escrever o primeiro pedaço de interface de verdade. Tudo em React começa com dois conceitos que andam juntos: **JSX**, a sintaxe usada para descrever a UI, e **componentes**, as unidades reutilizáveis que a organizam. Vamos construir, ao longo deste capítulo, as primeiras peças do dashboard de finanças que vai crescer com você até o Capítulo 6.
+
+## O que é JSX
+
+JSX (JavaScript XML) é uma extensão de sintaxe que permite escrever algo que parece HTML diretamente dentro do seu código TypeScript. Não é uma linguagem nova — é "açúcar sintático" que o compilador (o mesmo Next.js/bundler que você já configurou) transforma em chamadas de função JavaScript comuns por trás dos panos.
+
+```tsx
+const elemento = <h1>Olá, Forja Academy!</h1>;
+```
+
+Apesar da aparência, existem diferenças importantes entre JSX e HTML puro:
+
+- **Um único elemento raiz.** Um bloco JSX precisa retornar um único elemento "pai" (ou um Fragment, que veremos adiante).
+- **`className` em vez de `class`.** Como `class` é uma palavra reservada em JavaScript, o JSX usa `className` para aplicar classes CSS.
+- **Atributos em camelCase.** Eventos e atributos que em HTML são `onclick` ou `tabindex` viram `onClick` e `tabIndex` em JSX.
+- **Expressões entre chaves `{}`.** Qualquer expressão TypeScript válida — uma variável, uma conta, uma chamada de função — pode ser inserida no meio do JSX usando chaves.
+
+```tsx
+const nomeUsuario = "Marina";
+const totalGasto = 245.9;
+
+const saudacao = (
+  <div className="cartao">
+    <p>Olá, {nomeUsuario}!</p>
+    <p>Você já gastou R$ {totalGasto.toFixed(2)} este mês.</p>
+  </div>
+);
+```
+
+Tudo dentro das chaves é avaliado como TypeScript comum. Isso significa que você pode colocar qualquer expressão ali — mas não comandos como `if` ou `for` diretamente (isso é resolvido com técnicas que veremos no próximo capítulo, sobre renderização condicional e listas).
+
+<Callout>
+  JSX não aceita mais de um elemento raiz retornado sem um "envelope". Se
+  precisar retornar dois elementos irmãos sem adicionar uma `div` extra ao
+  DOM, use um **Fragment**: `<>...</>`. Ele agrupa elementos sem gerar
+  nenhuma tag real na página renderizada.
+</Callout>
+
+## Criando seu primeiro componente
+
+Um **componente** em React é, na essência, uma função TypeScript que retorna JSX. Por convenção, o nome do componente começa com letra maiúscula (PascalCase) — isso é o que diferencia, para o React, uma tag de componente (`<CartaoGasto />`) de uma tag HTML nativa (`<div />`). Arquivos que contêm JSX usam a extensão `.tsx` em vez de `.ts`.
+
+Vamos criar o primeiro componente do nosso dashboard: um cartão que exibe um único gasto.
+
+```tsx
+function CartaoGasto() {
+  return (
+    <div className="cartao-gasto">
+      <p>Almoço no restaurante</p>
+      <strong>R$ 45,50</strong>
+    </div>
+  );
+}
+```
+
+Para usar esse componente em outra parte da aplicação, você o "renderiza" como se fosse uma tag:
+
+```tsx
+function App() {
+  return (
+    <div>
+      <h2>Meus gastos</h2>
+      <CartaoGasto />
+    </div>
+  );
+}
+```
+
+O componente `CartaoGasto` funciona, mas tem um problema óbvio: os dados ("Almoço no restaurante", "R$ 45,50") estão **fixos** dentro dele. Se quisermos usar esse mesmo componente para exibir gastos diferentes, precisamos de uma forma de passar dados de fora para dentro. É para isso que existem as **props**.
+
+## Props: dados de fora para dentro
+
+Props (abreviação de "properties") são a forma como um componente pai passa dados para um componente filho — de forma parecida com argumentos de uma função. Em TypeScript, começamos definindo o formato esperado dessas props com uma `interface` ou `type`:
+
+```tsx
+type Categoria =
+  | "alimentação"
+  | "transporte"
+  | "moradia"
+  | "lazer"
+  | "saúde"
+  | "outros";
+
+interface CartaoGastoProps {
+  descricao: string;
+  valor: number;
+  categoria: Categoria;
+}
+
+function CartaoGasto({ descricao, valor, categoria }: CartaoGastoProps) {
+  return (
+    <div className="cartao-gasto">
+      <p>{descricao}</p>
+      <span>{categoria}</span>
+      <strong>R$ {valor.toFixed(2)}</strong>
+    </div>
+  );
+}
+```
+
+Repare que recebemos as props já **desestruturadas** diretamente no parâmetro da função — esse é o padrão mais comum em componentes React. Agora, cada vez que usarmos `<CartaoGasto />`, podemos (e devemos) passar valores diferentes:
+
+```tsx
+function App() {
+  return (
+    <div>
+      <h2>Meus gastos</h2>
+      <CartaoGasto
+        descricao="Almoço no restaurante"
+        valor={45.5}
+        categoria="alimentação"
+      />
+      <CartaoGasto
+        descricao="Passagem de metrô"
+        valor={4.4}
+        categoria="transporte"
+      />
+    </div>
+  );
+}
+```
+
+Note a diferença de sintaxe: `descricao="..."` usa aspas porque é uma string literal, enquanto `valor={45.5}` usa chaves porque é uma expressão TypeScript (um número). Essa mesma distinção — aspas para strings literais, chaves para qualquer outra expressão — vale para qualquer prop.
+
+Se o TypeScript reclamar que uma prop obrigatória não foi passada, ou que o tipo está errado (por exemplo, passar `categoria="viagem"`, que não existe no union type `Categoria`), é exatamente esse o benefício de tipar props: o erro aparece **antes** de o código rodar, direto no seu editor.
+
+## Props opcionais e valores padrão
+
+Nem toda prop precisa ser obrigatória. Assim como em funções, podemos marcar uma prop como opcional com `?` e, dentro do componente, atribuir um valor padrão via desestruturação:
+
+```tsx
+interface CartaoGastoProps {
+  descricao: string;
+  valor: number;
+  categoria: Categoria;
+  pago?: boolean; // opcional — nem todo gasto precisa informar isso
+}
+
+function CartaoGasto({
+  descricao,
+  valor,
+  categoria,
+  pago = false, // valor padrão caso a prop não seja passada
+}: CartaoGastoProps) {
+  return (
+    <div className="cartao-gasto">
+      <p>{descricao}</p>
+      <span>{categoria}</span>
+      <strong>R$ {valor.toFixed(2)}</strong>
+      {pago && <span className="selo-pago">Pago</span>}
+    </div>
+  );
+}
+```
+
+Assim, `<CartaoGasto descricao="Aluguel" valor={1200} categoria="moradia" pago />` exibe o selo, enquanto omitir a prop `pago` mantém o padrão `false`. (A expressão `{pago && <span>...}` é uma técnica de renderização condicional que vamos explorar em detalhes no próximo capítulo.)
+
+## Composição de componentes e `children`
+
+Um dos maiores ganhos do modelo de componentes é a **composição**: construir componentes complexos combinando componentes menores e mais simples, da mesma forma que você combina funções pequenas para montar uma lógica maior.
+
+Vamos criar um componente genérico `Cartao`, que serve de "moldura" reutilizável para qualquer conteúdo — não só gastos:
+
+```tsx
+import type { ReactNode } from "react";
+
+interface CartaoProps {
+  titulo: string;
+  children: ReactNode;
+}
+
+function Cartao({ titulo, children }: CartaoProps) {
+  return (
+    <div className="cartao">
+      <h3>{titulo}</h3>
+      {children}
+    </div>
+  );
+}
+```
+
+A prop especial `children` representa **tudo que é colocado entre as tags de abertura e fechamento** do componente ao usá-lo — é assim que o React permite compor conteúdo aninhado, igual você faz com tags HTML comuns como `<div>...</div>`.
+
+```tsx
+function ResumoMensal() {
+  return (
+    <Cartao titulo="Resumo do mês">
+      <p>Total gasto: R$ 245,90</p>
+      <p>Maior categoria: alimentação</p>
+    </Cartao>
+  );
+}
+```
+
+Aqui, o parágrafo com o total e o parágrafo com a maior categoria são passados como `children` para `Cartao`, que não sabe (nem precisa saber) o que está renderizando dentro de si — apenas empresta sua "moldura" visual. Esse padrão de composição é o que permite montar interfaces complexas a partir de peças pequenas e independentes, exatamente como você fazia com funções puras no Starter.
+
+<Callout type="warn">
+  Um erro comum ao começar com JSX é tentar controlar fluxo com `if`/`for`
+  diretamente dentro do bloco retornado, como em HTML com um template engine.
+  Isso não funciona — JSX aceita apenas **expressões**, não **comandos**. Uma
+  chamada de função, um ternário, um `&&`: tudo bem. Um `if` solto dentro do
+  `return (...)`: erro de sintaxe. Vamos ver as alternativas corretas no
+  próximo capítulo.
+</Callout>
+
+## Para praticar
+
+Vamos criar um segundo componente que reaproveita o `Cartao` genérico construído neste capítulo, aplicando composição e props opcionais.
+
+**Cenário:** O dashboard precisa de um cartão de resumo que destaque um valor total, com uma cor de destaque configurável.
+
+**Requisitos:**
+
+1. Crie uma interface `CartaoResumoProps` com `titulo: string`, `valor: number` e `corDestaque?: string` (opcional).
+2. Crie o componente `CartaoResumo`, que usa o valor padrão `"#2563eb"` para `corDestaque` caso a prop não seja informada.
+3. Dentro do componente, formate `valor` como moeda, exibindo `R$ ` seguido de `valor.toFixed(2)`.
+4. Utilize o componente `Cartao` (criado neste capítulo) para envolver o conteúdo, passando `titulo` adiante e o valor formatado como `children`, estilizado com a cor de destaque usando o atributo `style={{ color: corDestaque }}`.
+5. Renderize dois `CartaoResumo`: um informando `corDestaque="#16a34a"` e outro sem informar nada (usando o padrão azul).
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```tsx
+interface CartaoResumoProps {
+  titulo: string;
+  valor: number;
+  corDestaque?: string;
+}
+
+function CartaoResumo({
+  titulo,
+  valor,
+  corDestaque = "#2563eb",
+}: CartaoResumoProps) {
+  return (
+    <Cartao titulo={titulo}>
+      <strong style={{ color: corDestaque }}>R$ {valor.toFixed(2)}</strong>
+    </Cartao>
+  );
+}
+
+function App() {
+  return (
+    <div>
+      <CartaoResumo titulo="Receita do mês" valor={3800} corDestaque="#16a34a" />
+      <CartaoResumo titulo="Total gasto" valor={1245.9} />
+    </div>
+  );
+}
+```
+
+O primeiro `CartaoResumo` recebe `corDestaque="#16a34a"` (verde) explicitamente. O segundo omite a prop, e o valor padrão `"#2563eb"` (azul) definido na desestruturação é usado automaticamente — sem precisar de nenhum `if` para isso.
+
+</details>
+
+---
+
+Você acabou de escrever seus primeiros componentes React tipados: entendeu a sintaxe do JSX, criou componentes funcionais, definiu props com `interface`, usou valores padrão e compôs componentes com `children`. Isso é o esqueleto de qualquer interface React. No próximo capítulo, vamos dar vida a esses componentes: aprender a guardar estado que muda ao longo do tempo e reagir a eventos do usuário — a peça que faltava para transformar um cartão estático em um dashboard de verdade.

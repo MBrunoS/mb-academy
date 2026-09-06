@@ -1,0 +1,415 @@
+---
+title: HTML Semântico e Acessível
+description: "Aprenda a estruturar o conteúdo de uma página com as tags certas, incluindo formulários, e entenda por que a semântica importa para acessibilidade."
+---
+
+Agora que você já entende o papel do HTML na arquitetura de uma página web, é hora de efetivamente escrever HTML. E a primeira coisa a deixar clara é: HTML não é sobre deixar a página "bonita" — isso é trabalho do CSS, que vem no próximo capítulo. HTML é sobre **descrever o que cada pedaço de conteúdo é**: isto é um título, isto é uma lista, isto é um formulário, isto é um link. O navegador (e, tão importante quanto, ferramentas como leitores de tela) usam essa descrição para decidir como exibir e como navegar pela página.
+
+Escrever HTML "que funciona visualmente" é relativamente fácil. Escrever HTML **semântico** — que descreve corretamente o significado de cada parte — é a diferença entre uma página amadora e uma página profissional, acessível e bem indexada por buscadores. É esse padrão que você vai aprender aqui.
+
+## Anatomia de um documento HTML
+
+Todo arquivo HTML válido segue uma estrutura mínima obrigatória. Veja o esqueleto mais simples possível de uma página:
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard de Finanças</title>
+  </head>
+  <body>
+    <h1>Bem-vindo ao seu painel financeiro</h1>
+  </body>
+</html>
+```
+
+Vamos entender cada peça:
+
+- **`<!DOCTYPE html>`**: não é uma tag, é uma declaração que diz ao navegador "interprete este arquivo segundo as regras do HTML5". Sem ela, navegadores antigos podem entrar em um modo de compatibilidade estranho (*quirks mode*), então ela é sempre a primeira linha do arquivo.
+- **`<html lang="pt-BR">`**: o elemento raiz, que envolve toda a página. O atributo `lang` declara o idioma principal do conteúdo — isso não é cosmético: leitores de tela usam essa informação para escolher a pronúncia correta, e buscadores usam para segmentar resultados por idioma.
+- **`<head>`**: contém **metadados** — informações sobre a página que não aparecem diretamente no conteúdo visual, como o título da aba do navegador, o charset, a viewport e, mais adiante, o link para o arquivo CSS.
+- **`<body>`**: contém tudo que é **visível** na página — todo o conteúdo real que a pessoa vai ler e interagir.
+
+Dentro do `<head>`, duas tags `<meta>` aparecem quase sempre:
+
+- **`<meta charset="UTF-8" />`**: declara a codificação de caracteres do arquivo. UTF-8 suporta acentos, cedilhas e caracteres especiais — essencial para qualquer página em português. Sem ela, palavras como "não" ou "opções" podem aparecer corrompidas.
+- **`<meta name="viewport" ...>`**: instrui navegadores mobile a renderizar a página na largura real da tela do dispositivo, em vez de simular uma tela de desktop e depois encolher tudo. Você vai entender essa tag com mais profundidade no capítulo de layout, mas já é hora de sempre incluí-la.
+
+<Callout type="warn">
+  Um erro comum de quem está começando é esquecer o `<meta charset="UTF-8" />`
+  e ficar confuso(a) quando acentos aparecem como símbolos estranhos na tela. Se
+  isso acontecer, a primeira coisa a checar é essa linha.
+</Callout>
+
+## Estruturando texto: headings, parágrafos e listas
+
+Com o esqueleto pronto, o próximo passo é preencher o `<body>` com conteúdo textual. HTML oferece tags específicas para os padrões mais comuns de texto.
+
+### Headings (`h1` a `h6`)
+
+As tags `<h1>` até `<h6>` representam títulos e subtítulos, em ordem decrescente de importância. `<h1>` é o título principal da página, `<h2>` são seções principais, `<h3>` subseções dentro delas, e assim por diante.
+
+```html
+<h1>Dashboard de Finanças</h1>
+<h2>Resumo do Mês</h2>
+<h3>Gastos por Categoria</h3>
+```
+
+<Callout>
+  Uma página deve ter **apenas um `<h1>`**, representando o assunto principal
+  daquela página — algo parecido com o título de um capítulo de livro. Os
+  demais níveis devem seguir uma ordem lógica, sem "pular" níveis só porque um
+  título menor parece visualmente adequado (ex.: ir de `<h2>` direto para
+  `<h4>`). Essa hierarquia não é só uma convenção visual: leitores de tela
+  permitem que a pessoa navegue pulando de heading em heading, e uma hierarquia
+  quebrada torna essa navegação confusa.
+</Callout>
+
+### Parágrafos
+
+A tag `<p>` representa um parágrafo de texto — o bloco básico de conteúdo textual corrido.
+
+```html
+<p>
+  Este mês você gastou R$ 1.850,00, distribuídos entre alimentação, transporte
+  e lazer.
+</p>
+```
+
+### Listas
+
+HTML tem duas tags principais de lista:
+
+- **`<ul>`** (*unordered list*): uma lista sem ordem específica, onde cada item é marcado com um `<li>`. É usada quando a ordem dos itens não importa para o sentido do conteúdo.
+- **`<ol>`** (*ordered list*): uma lista numerada, também com itens em `<li>`, usada quando a sequência importa (um passo a passo, um ranking).
+
+```html
+<h3>Categorias de gastos</h3>
+<ul>
+  <li>Alimentação</li>
+  <li>Transporte</li>
+  <li>Moradia</li>
+  <li>Lazer</li>
+  <li>Saúde</li>
+</ul>
+
+<h3>Como registrar um novo gasto</h3>
+<ol>
+  <li>Clique em "Adicionar gasto"</li>
+  <li>Preencha descrição, valor e categoria</li>
+  <li>Confirme o registro</li>
+</ol>
+```
+
+Repare que a categoria de gastos usa `<ul>` (a ordem em que as categorias aparecem não muda o significado), enquanto o passo a passo usa `<ol>` (a ordem importa: você não confirma antes de preencher).
+
+## Links e imagens
+
+### Links com `<a>`
+
+A tag `<a>` (*anchor*) cria um link, usando o atributo `href` para definir o destino:
+
+```html
+<a href="https://forja.academy">Visite a Forja Academy</a>
+<a href="/relatorios">Ver relatórios</a>
+<a href="#resumo">Ir para o resumo</a>
+```
+
+O `href` pode apontar para um site externo (URL completa), para outra página do mesmo site (caminho relativo, como `/relatorios`) ou para uma âncora dentro da própria página (`#resumo`, que aponta para um elemento com `id="resumo"`).
+
+Quando um link abre um site externo em uma nova aba, é boa prática usar `target="_blank"` junto com `rel="noopener noreferrer"`:
+
+```html
+<a href="https://forja.academy" target="_blank" rel="noopener noreferrer">
+  Forja Academy
+</a>
+```
+
+<Callout type="warn">
+  `target="_blank"` sem o `rel="noopener noreferrer"` cria uma brecha de
+  segurança: a página aberta na nova aba ganha acesso parcial à página de
+  origem através do objeto `window.opener`, o que pode ser explorado de forma
+  maliciosa. `noopener` bloqueia esse acesso, e `noreferrer` evita o envio do
+  endereço da página de origem para o site de destino. Trate essa combinação
+  como padrão sempre que usar `target="_blank"`.
+</Callout>
+
+### Imagens com `<img>`
+
+A tag `<img>` é **auto-fechada** — não tem conteúdo interno nem tag de fechamento — e exige dois atributos essenciais: `src` (o caminho do arquivo de imagem) e `alt` (um texto alternativo).
+
+```html
+<img src="/logo.png" alt="Logotipo do Dashboard de Finanças" />
+```
+
+O `alt` não é decoração: é o texto que aparece se a imagem não carregar, e é o texto que um leitor de tela vai ler em voz alta no lugar da imagem. Uma imagem sem `alt` é, para uma pessoa cega usando um leitor de tela, uma lacuna sem explicação nenhuma no meio do conteúdo.
+
+<Callout type="tip">
+  Se uma imagem é puramente decorativa e não carrega nenhuma informação (por
+  exemplo, um floreio visual de fundo), o correto é usar `alt=""` (vazio, mas
+  presente) — isso diz explicitamente ao leitor de tela para pular a imagem,
+  em vez de tentar descrevê-la ou ler o nome do arquivo.
+</Callout>
+
+## HTML semântico: contando a história certa da página
+
+Até aqui, você viu tags de conteúdo (headings, parágrafos, listas, links, imagens). Mas como organizar as **regiões maiores** de uma página — o cabeçalho, o menu de navegação, o conteúdo principal, o rodapé? Por muito tempo, a resposta padrão era usar `<div>` para tudo, diferenciando as regiões só por `class` ou `id`:
+
+```html
+<!-- Como NÃO fazer -->
+<div class="topo">...</div>
+<div class="menu">...</div>
+<div class="conteudo">...</div>
+<div class="rodape">...</div>
+```
+
+Isso funciona visualmente, mas para o navegador (e para qualquer ferramenta ou pessoa lendo o código), todas essas `<div>` são **genéricas e indistinguíveis** — não carregam nenhum significado próprio. O HTML5 introduziu tags **semânticas** específicas para essas regiões, que descrevem o papel de cada uma:
+
+| Tag | Papel |
+|---|---|
+| `<header>` | Cabeçalho da página ou de uma seção — geralmente logo, título, navegação |
+| `<nav>` | Um bloco de links de navegação principal |
+| `<main>` | O conteúdo principal e único da página (deve aparecer só uma vez) |
+| `<section>` | Uma seção temática de conteúdo, geralmente com seu próprio heading |
+| `<article>` | Um conteúdo independente, que faria sentido sozinho (um post, uma notícia, um card de produto) |
+| `<aside>` | Conteúdo relacionado, mas secundário — uma barra lateral, uma nota |
+| `<footer>` | Rodapé da página ou de uma seção — geralmente créditos, links legais, contato |
+
+Reescrevendo o exemplo anterior com tags semânticas:
+
+```html
+<header>
+  <h1>Dashboard de Finanças</h1>
+  <nav>
+    <a href="/">Início</a>
+    <a href="/gastos">Gastos</a>
+    <a href="/relatorios">Relatórios</a>
+  </nav>
+</header>
+
+<main>
+  <section>
+    <h2>Resumo do Mês</h2>
+    <p>Saldo atual: R$ 1.240,00</p>
+  </section>
+
+  <section>
+    <h2>Últimos Gastos</h2>
+    <article>
+      <h3>Supermercado</h3>
+      <p>R$ 320,00 — Alimentação</p>
+    </article>
+    <article>
+      <h3>Uber</h3>
+      <p>R$ 45,00 — Transporte</p>
+    </article>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2026 Dashboard de Finanças</p>
+</footer>
+```
+
+Repare que cada tag agora **diz o que é**, sem precisar de um `class="menu"` para você entender que aquilo é a navegação. Isso traz três benefícios concretos:
+
+1. **Acessibilidade**: leitores de tela reconhecem essas tags como "landmarks" (marcos de navegação), permitindo que a pessoa pule diretamente para `<main>` ou `<nav>` sem precisar ouvir a página inteira.
+2. **SEO**: buscadores como o Google usam a semântica para entender a estrutura e a importância relativa do conteúdo.
+3. **Legibilidade para quem programa**: outro desenvolvedor (ou você mesmo, seis meses depois) entende a estrutura da página só de olhar as tags, sem precisar ler nomes de classes.
+
+<Callout>
+  Isso não significa que a `<div>` deixou de existir ou de ser útil — ela
+  continua sendo a ferramenta certa para **agrupamentos genéricos**, que
+  existem apenas por motivo de estilo ou layout e não representam nenhuma
+  região ou conteúdo com significado próprio. A regra prática é: **primeiro
+  pergunte se existe uma tag semântica que descreve aquele bloco; só use
+  `<div>` quando a resposta for não.**
+</Callout>
+
+## Atributos importantes: `id`, `class`, `href`, `alt`
+
+Você já viu `href` (em links) e `alt` (em imagens). Faltam dois atributos que você vai usar em praticamente toda tag daqui em diante:
+
+- **`id`**: identifica um elemento de forma **única** na página — não pode haver dois elementos com o mesmo `id`. É usado para âncoras internas (`href="#resumo"`), para associar um `<label>` a um campo de formulário (você vai ver isso já já), e, mais adiante no curso, para ser encontrado por CSS ou JavaScript.
+- **`class`**: identifica um elemento como pertencente a um **grupo** — o mesmo `class` pode (e geralmente deve) se repetir em vários elementos. É a principal forma de aplicar o mesmo estilo CSS a vários elementos ao mesmo tempo, como você verá no próximo capítulo.
+
+```html
+<section id="resumo-mensal">
+  <h2>Resumo do Mês</h2>
+  <p class="valor-positivo">Saldo: R$ 1.240,00</p>
+</section>
+
+<a href="#resumo-mensal">Voltar ao resumo</a>
+```
+
+<Callout type="warn">
+  Um erro comum: usar `id` quando na verdade se quer estilizar **vários**
+  elementos parecidos. Como `id` deve ser único, isso força a repetir o mesmo
+  CSS várias vezes com nomes diferentes. Se um estilo vai se repetir, use
+  `class` desde o início.
+</Callout>
+
+## Formulários: coletando informações do usuário
+
+Formulários são como uma página coleta dados de quem a está usando — e são especialmente importantes para o nosso projeto: é assim que o dashboard financeiro vai registrar um novo gasto.
+
+A tag raiz de um formulário é `<form>`. Dentro dela, cada campo de entrada é geralmente um `<input>`, cujo comportamento muda conforme o atributo `type`:
+
+```html
+<form>
+  <label for="descricao">Descrição</label>
+  <input type="text" id="descricao" name="descricao" placeholder="Ex.: Supermercado" required />
+
+  <label for="valor">Valor (R$)</label>
+  <input type="number" id="valor" name="valor" min="0" step="0.01" required />
+
+  <label for="data">Data</label>
+  <input type="date" id="data" name="data" required />
+
+  <label for="categoria">Categoria</label>
+  <select id="categoria" name="categoria">
+    <option value="alimentacao">Alimentação</option>
+    <option value="transporte">Transporte</option>
+    <option value="moradia">Moradia</option>
+    <option value="lazer">Lazer</option>
+    <option value="saude">Saúde</option>
+    <option value="outros">Outros</option>
+  </select>
+
+  <label for="observacoes">Observações</label>
+  <textarea id="observacoes" name="observacoes" placeholder="Opcional"></textarea>
+
+  <button type="submit">Adicionar gasto</button>
+</form>
+```
+
+Vamos destrinchar os elementos novos:
+
+- **`<label>`**: o texto que descreve um campo. O atributo `for` deve ter **exatamente o mesmo valor** do `id` do campo que ele descreve — essa ligação faz o rótulo ser clicável (clicar no texto foca o campo) e, mais importante, faz leitores de tela anunciarem o rótulo correto quando o campo recebe foco.
+- **`type` do `<input>`**: define o tipo de dado esperado e, em muitos casos, a interface que o navegador mostra. Alguns dos mais usados:
+  - `text` — texto livre
+  - `number` — números, com teclado numérico em dispositivos móveis
+  - `email` — valida formato de e-mail automaticamente
+  - `date` — abre um seletor de data nativo
+  - `checkbox` e `radio` — seleção de opções (única ou múltipla)
+  - `password` — oculta o texto digitado
+- **`placeholder`**: um texto de exemplo que aparece **dentro** do campo vazio, e desaparece ao digitar. Serve como dica, nunca como substituto de um `<label>`.
+- **`required`**: impede o envio do formulário se o campo estiver vazio — validação nativa do navegador, sem precisar de JavaScript.
+- **`<select>` e `<option>`**: cria uma lista suspensa. Cada `<option>` representa um valor possível; o atributo `value` é o que será efetivamente enviado (o texto entre as tags é só o que aparece visualmente).
+- **`<textarea>`**: como um `<input type="text">`, mas para texto **longo**, com múltiplas linhas.
+- **`<button type="submit">`**: o botão que envia o formulário. Existe também `type="button"` (não envia nada por padrão, usado quando o clique é tratado por JavaScript) e `type="reset"` (limpa o formulário).
+
+<Callout type="warn">
+  Um dos erros de acessibilidade mais comuns — e mais fáceis de evitar — é usar
+  `placeholder` **no lugar** de `<label>`. Um placeholder desaparece assim que
+  a pessoa começa a digitar, então quem depende de leitor de tela, ou até quem
+  só tem dificuldade de memória de curto prazo, perde a referência do que
+  aquele campo pedia. Todo campo de formulário deve ter um `<label>`
+  associado corretamente pelo par `for`/`id` — mesmo que, visualmente, você
+  decida escondê-lo mais adiante com CSS.
+</Callout>
+
+## Acessibilidade: por que a semântica não é só boa prática
+
+Ao longo deste capítulo, "acessibilidade" apareceu várias vezes, e vale explicar concretamente o que ela significa: é a prática de construir páginas que qualquer pessoa consiga usar, **independentemente de como ela interage com o computador**. Isso inclui pessoas com deficiência visual (usando leitores de tela, que leem a página em voz alta), pessoas com dificuldades motoras (que navegam só pelo teclado, sem mouse), e pessoas com deficiências cognitivas (que se beneficiam de estrutura clara e previsível).
+
+Um leitor de tela não "vê" a página como você vê. Ele percorre a árvore DOM e anuncia cada elemento pelo seu papel semântico: "cabeçalho", "link, Início", "campo de formulário, Descrição, obrigatório", "botão, Adicionar gasto". Tudo o que você aprendeu neste capítulo — usar `<nav>` em vez de `<div class="menu">`, usar `<label>` corretamente, manter uma hierarquia de headings sem pular níveis, usar `alt` em imagens — existe justamente para que essa leitura automática faça sentido.
+
+Pense desta forma: **HTML semântico é, ao mesmo tempo, a forma mais correta e a forma mais acessível de escrever HTML.** Não são dois objetivos concorrentes — são o mesmo objetivo. Quando você escolhe a tag certa para cada conteúdo, você automaticamente torna a página mais acessível, sem esforço extra.
+
+<Callout type="tip">
+  Uma forma rápida de sentir na prática o que um leitor de tela "ouve": no
+  Chrome ou Edge, abra as DevTools (`F12`), vá até a aba **Elements** e procure
+  o painel **Accessibility** — ele mostra exatamente como cada elemento da
+  página é interpretado por tecnologias assistivas. É uma ótima forma de
+  revisar seu próprio HTML.
+</Callout>
+
+## Para praticar
+
+**Cenário:** você vai construir o esqueleto estático da página inicial do Dashboard de Finanças Pessoais — ainda sem nenhum CSS ou JavaScript, só a estrutura HTML semântica e o formulário de cadastro de gastos.
+
+**Requisitos:**
+
+1. Crie um arquivo `index.html` com a estrutura mínima obrigatória (`<!DOCTYPE html>`, `<html lang="pt-BR">`, `<head>` com `charset`, `viewport` e `<title>`, e `<body>`).
+2. No `<body>`, crie um `<header>` contendo um `<h1>` com o título "Dashboard de Finanças" e uma `<nav>` com três links: "Início", "Gastos" e "Relatórios".
+3. Crie um `<main>` com duas `<section>`, cada uma com seu próprio `<h2>`:
+   - A primeira seção, "Resumo do Mês", com um parágrafo mostrando o saldo atual.
+   - A segunda seção, "Adicionar Gasto", contendo um `<form>` com campos para descrição (texto), valor (número), categoria (`<select>` com pelo menos 4 categorias) e data, cada um com seu `<label>` corretamente associado, além de um botão de envio.
+4. Crie um `<footer>` com um parágrafo de direitos autorais.
+5. Garanta que não há nenhum salto de hierarquia entre headings (por exemplo, não pule de `<h1>` para `<h3>`).
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard de Finanças</title>
+  </head>
+  <body>
+    <header>
+      <h1>Dashboard de Finanças</h1>
+      <nav>
+        <a href="/">Início</a>
+        <a href="/gastos">Gastos</a>
+        <a href="/relatorios">Relatórios</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="resumo">
+        <h2>Resumo do Mês</h2>
+        <p>Saldo atual: R$ 1.240,00</p>
+      </section>
+
+      <section id="novo-gasto">
+        <h2>Adicionar Gasto</h2>
+        <form>
+          <label for="descricao">Descrição</label>
+          <input
+            type="text"
+            id="descricao"
+            name="descricao"
+            placeholder="Ex.: Supermercado"
+            required
+          />
+
+          <label for="valor">Valor (R$)</label>
+          <input type="number" id="valor" name="valor" min="0" step="0.01" required />
+
+          <label for="categoria">Categoria</label>
+          <select id="categoria" name="categoria">
+            <option value="alimentacao">Alimentação</option>
+            <option value="transporte">Transporte</option>
+            <option value="moradia">Moradia</option>
+            <option value="lazer">Lazer</option>
+            <option value="saude">Saúde</option>
+            <option value="outros">Outros</option>
+          </select>
+
+          <label for="data">Data</label>
+          <input type="date" id="data" name="data" required />
+
+          <button type="submit">Adicionar gasto</button>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 Dashboard de Finanças</p>
+    </footer>
+  </body>
+</html>
+```
+
+</details>
+
+---
+
+Você acabou de construir sua primeira página HTML de verdade: com estrutura semântica, formulário funcional (mesmo sem lógica ainda) e uma hierarquia de conteúdo que faz sentido tanto visualmente quanto para tecnologias assistivas. Repare que, se você abrir esse arquivo em um navegador agora, tudo funciona — só não tem nenhuma cor, espaçamento ou organização visual. É exatamente essa lacuna que o CSS, o assunto do próximo capítulo, vai preencher.

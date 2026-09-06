@@ -1,0 +1,55 @@
+---
+title: Introdução a Testes
+description: "Entenda por que testar seu código automaticamente é essencial para crescer com confiança em qualquer projeto real."
+---
+
+Chegou até aqui tendo construído páginas com HTML e CSS, dado vida a elas com eventos e manipulação do DOM, componentizado tudo com React e conectado seu front-end a APIs reais, com autenticação incluída. Em algum momento de cada um desses capítulos, você fez a mesma coisa para saber se o que escreveu estava certo: abriu o navegador, olhou a tela, clicou em algo e verificou se aconteceu o que você esperava.
+
+Isso funciona. É, inclusive, uma forma legítima de testar software — só que ela tem um nome específico (**teste manual**) e um limite bem definido de até onde consegue te levar. Este capítulo é sobre o que vem depois desse limite: **testes automatizados**, a prática que separa quem consegue apenas "fazer funcionar" de quem consegue manter um projeto funcionando conforme ele cresce.
+
+## O problema de testar só clicando na tela
+
+Pense em como você validou cada funcionalidade que construiu até agora. Provavelmente foi assim: você escreveu um componente, salvou o arquivo, o navegador recarregou e você foi lá conferir — preencheu um formulário, clicou num botão, olhou se o texto certo apareceu na tela.
+
+Isso funciona bem quando o projeto é pequeno. O problema aparece quando ele cresce. Imagine que seu dashboard de finanças pessoais, depois de alguns capítulos, já tem: uma tela de login, uma lista de gastos, um formulário para adicionar gastos novos, filtros por categoria, e um total calculado automaticamente. Agora você precisa corrigir um bug pequeno no filtro por categoria. Você mexe no código, salva, e recarrega o navegador para conferir se o filtro voltou a funcionar.
+
+Mas aqui está a pergunta incômoda: **como você sabe que essa mudança não quebrou o login, a lista de gastos ou o cálculo do total?** A resposta honesta, se você depende só de teste manual, é que você não sabe — a menos que reabra cada uma dessas telas e reteste tudo manualmente, toda vez que mudar qualquer coisa. Na prática, quase ninguém faz isso de forma consistente. O que costuma acontecer é o oposto: você testa só a parte que mexeu, assume que o resto continua bem, e às vezes descobre semanas depois — ou pior, quando um usuário reclama — que alguma coisa quebrou silenciosamente há tempos.
+
+Esse tipo de problema tem nome: **regressão**. É quando algo que funcionava perfeitamente para de funcionar, não porque alguém mexeu diretamente nele, mas como efeito colateral de uma mudança em outro lugar do código. Quanto maior o projeto, mais partes interligadas existem, e mais fácil é uma mudança pequena derrubar algo distante que parecia não ter relação nenhuma.
+
+Teste manual não escala. Ele depende de disciplina humana (que falha), de memória (você não vai lembrar de testar os quinze cantos do sistema toda vez), e de tempo (reabrir e reclicar em tudo antes de cada mudança é lento e tedioso — e código tedioso de verificar tende a não ser verificado).
+
+## O que testes automatizados resolvem
+
+Um **teste automatizado** é, na essência, um pequeno programa que executa outra parte do seu código e verifica, sozinho, se o resultado é o esperado — sem que uma pessoa precise abrir o navegador e conferir na unha. Você escreve o teste uma vez; a partir daí, ele pode rodar quantas vezes quiser, em segundos, e vai te avisar exatamente quando algo parar de funcionar como deveria.
+
+Isso resolve três problemas concretos:
+
+### 1. Confiança para mudar o código sem medo
+
+Com uma suíte de testes cobrindo o comportamento importante do seu sistema, você pode refatorar, corrigir bugs ou adicionar funcionalidades novas sabendo que, se quebrar algo que já funcionava, algum teste vai denunciar isso imediatamente. Sem essa rede de segurança, toda mudança em um projeto grande vira um ato de fé.
+
+### 2. Documentação viva do comportamento esperado
+
+Um teste bem escrito descreve, em código, exatamente o que uma função ou componente deveria fazer em cada situação. Diferente de um comentário ou de um documento à parte, um teste **nunca fica desatualizado silenciosamente** — se o comportamento real diverge do que o teste descreve, o teste falha e avisa. Ler os testes de uma parte do sistema costuma ser a forma mais confiável de entender o que ela deveria fazer.
+
+### 3. Detectar regressões cedo
+
+Em vez de descobrir que algo quebrou quando um usuário reclama em produção, testes automatizados rodam a cada mudança — muitas vezes antes mesmo do código chegar a ser publicado, dentro de um pipeline de integração contínua. Quanto mais cedo um problema é encontrado, mais barato e simples é corrigi-lo.
+
+<Callout>
+Testes automatizados não eliminam a necessidade de testar manualmente de vez em quando, principalmente para avaliar a experiência real de uso. Mas eles cobrem o trabalho repetitivo de "será que isso ainda funciona?", liberando o teste manual para o que ele faz de melhor: avaliar coisas que uma máquina não consegue julgar, como a sensação de usar a interface.
+</Callout>
+
+## O que você vai aprender neste módulo
+
+Este é um módulo de **introdução** — o objetivo aqui não é te tornar um especialista em testes, e sim te dar o vocabulário, o raciocínio e a prática mínima necessária para escrever e entender testes automatizados com confiança. Você vai voltar a este assunto com muito mais profundidade no curso Pleno, onde vai aprender TDD (desenvolvimento guiado por testes), testes de integração mais elaborados e testes visuais.
+
+Por enquanto, o módulo está dividido em duas partes:
+
+- **Ferramentas de Teste**: você vai conhecer a chamada *pirâmide de testes* — os diferentes níveis em que um sistema pode ser testado — e comparar as ferramentas mais usadas no ecossistema React e TypeScript: Jest, Vitest, Cypress e Playwright. O objetivo aqui é entender o panorama, não decorar configuração.
+- **Escrevendo Testes na Prática**: você vai colocar a mão na massa, entendendo a estrutura de um teste automatizado, os principais comandos de verificação (`expect` e seus matchers) e escrevendo testes reais para uma função e, de forma introdutória, para um componente React.
+
+Ao final, você não vai ser capaz de testar qualquer sistema complexo — mas vai reconhecer o padrão, saber ler um teste escrito por outra pessoa, e escrever os seus próprios testes para a lógica que importa no seu projeto. É exatamente essa base que você vai usar no Capítulo 6, quando o dashboard de finanças pessoais ganhar sua própria suíte de testes antes de ir para produção.
+
+Vamos começar entendendo o mapa das ferramentas.
