@@ -1,0 +1,319 @@
+---
+title: "Testando o Dashboard de Finanças"
+description: "Aplique o que você aprendeu sobre a pirâmide de testes escrevendo testes de lógica pura com Vitest e um teste de componente com Testing Library."
+---
+
+No capítulo anterior você conheceu a pirâmide de testes e as diferenças entre ferramentas como Jest, Vitest, Cypress e Playwright. Agora é hora de aplicar isso de verdade, no projeto que você acabou de construir.
+
+<Callout>
+Este capítulo assume que o Dashboard de Finanças está funcionando conforme a página de Implementação. Se algum arquivo (`types.ts`, `utils.ts`, os componentes ou `App.tsx`) estiver diferente do que foi construído lá, volte antes de continuar — os testes abaixo dependem exatamente dessa estrutura.
+</Callout>
+
+## O que vamos testar (e o que não vamos)
+
+Lembrando a pirâmide de testes: a base é feita de muitos testes pequenos e rápidos sobre lógica pura; o topo, poucos testes mais lentos e abrangentes sobre o comportamento do sistema inteiro. Neste projeto, vamos cobrir dois níveis:
+
+1. **Testes de unidade** sobre as funções puras de `utils.ts` — `calcularTotal`, `filtrarPorCategoria` e `validarGasto`. São rápidos, não dependem de navegador nem de rede, e cobrem exatamente a lógica que mais importa acertar.
+2. **Um teste de componente** sobre o fluxo de adicionar um gasto — do preenchimento do formulário até o item aparecer na lista. Esse é mais lento que os de unidade, mas garante que as peças realmente funcionam juntas, do jeito que uma pessoa usando o dashboard experimentaria.
+
+O que **não** vamos testar aqui:
+
+- **Detalhes de implementação** (por exemplo, "o componente chama `useState` exatamente duas vezes") — isso deixa o teste frágil e amarrado a como o código foi escrito, não ao que ele faz.
+- **A API de câmbio de verdade.** Testes não devem depender de rede — eles precisam rodar do mesmo jeito no seu computador, no de um colega e num servidor de CI, esteja a internet disponível ou não. Por isso, vamos **simular** (fazer um *mock* de) a chamada `fetch` no teste de componente.
+- **Estilos CSS.** Testar que uma cor ou espaçamento está correto é trabalho de teste visual (ferramenta diferente), não de Vitest/Testing Library.
+
+## Instalando as dependências de teste
+
+Na raiz do projeto `dashboard-financas`, instale:
+
+```bash
+npm install -D vitest jsdom @testing-library/react @testing-library/jest-dom @testing-library/user-event
+```
+
+O que cada pacote faz:
+
+| Pacote | Papel |
+|---|---|
+| `vitest` | O test runner — executa os arquivos de teste e fornece `describe`, `it`, `expect` |
+| `jsdom` | Simula um DOM de navegador dentro do Node, para que componentes React possam ser renderizados nos testes |
+| `@testing-library/react` | Renderiza componentes React em testes e oferece `screen`, `render` |
+| `@testing-library/jest-dom` | Adiciona matchers como `toBeInTheDocument()` ao `expect` |
+| `@testing-library/user-event` | Simula interações reais do usuário (digitar, clicar) de forma mais fiel que disparar eventos manualmente |
+
+## Configurando o Vitest
+
+O Vite já está instalado (é o scaffold do projeto), e o Vitest se integra a ele lendo a mesma configuração. Abra `vite.config.ts` e adicione o bloco `test`:
+
+```ts
+// vite.config.ts
+
+/// <reference types="vitest/config" />
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: "jsdom",
+    setupFiles: "./src/setupTests.ts",
+  },
+});
+```
+
+A linha `/// <reference types="vitest/config" />` no topo é o que permite ao TypeScript entender a chave `test` dentro de `defineConfig` — sem ela, o editor acusaria erro de tipo nessa propriedade.
+
+Crie o arquivo de setup, `src/setupTests.ts`:
+
+```ts
+// src/setupTests.ts
+
+import "@testing-library/jest-dom/vitest";
+```
+
+Essa única linha estende o `expect` do Vitest com os matchers do `jest-dom` (`toBeInTheDocument`, `toHaveTextContent`, etc.) em todos os arquivos de teste, sem precisar importar isso em cada um deles.
+
+Por fim, adicione o script de teste ao `package.json`:
+
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  }
+}
+```
+
+<Callout type="tip">
+`vitest run` executa os testes uma vez e encerra — ideal para rodar antes de um commit ou em CI. Durante o desenvolvimento, rodar `npx vitest` (sem `run`) mantém o Vitest observando os arquivos e re-executando os testes a cada alteração salva.
+</Callout>
+
+## Testando a lógica pura: `src/utils.test.ts`
+
+Crie `src/utils.test.ts`, ao lado de `utils.ts`:
+
+```ts
+// src/utils.test.ts
+
+import { describe, expect, it } from "vitest";
+import { calcularTotal, filtrarPorCategoria, validarGasto } from "./utils";
+import type { Gasto } from "./types";
+
+function criarGasto(sobrescritas: Partial<Gasto> = {}): Gasto {
+  return {
+    id: "1",
+    descricao: "Almoço no restaurante",
+    valor: 45.5,
+    categoria: "alimentação",
+    data: "15/06/2026",
+    ...sobrescritas,
+  };
+}
+
+describe("calcularTotal", () => {
+  it("retorna 0 quando não há gastos", () => {
+    expect(calcularTotal([])).toBe(0);
+  });
+
+  it("soma o valor de todos os gastos", () => {
+    const gastos = [
+      criarGasto({ id: "1", valor: 45.5 }),
+      criarGasto({ id: "2", valor: 4.4 }),
+      criarGasto({ id: "3", valor: 32 }),
+    ];
+
+    expect(calcularTotal(gastos)).toBeCloseTo(81.9);
+  });
+});
+
+describe("filtrarPorCategoria", () => {
+  const gastos = [
+    criarGasto({ id: "1", categoria: "alimentação" }),
+    criarGasto({ id: "2", categoria: "transporte" }),
+    criarGasto({ id: "3", categoria: "alimentação" }),
+  ];
+
+  it('retorna todos os gastos quando o filtro é "todas"', () => {
+    expect(filtrarPorCategoria(gastos, "todas")).toHaveLength(3);
+  });
+
+  it("retorna apenas os gastos da categoria informada", () => {
+    const resultado = filtrarPorCategoria(gastos, "alimentação");
+
+    expect(resultado).toHaveLength(2);
+    expect(resultado.every((g) => g.categoria === "alimentação")).toBe(true);
+  });
+
+  it("retorna array vazio quando nenhum gasto pertence à categoria", () => {
+    expect(filtrarPorCategoria(gastos, "saúde")).toHaveLength(0);
+  });
+});
+
+describe("validarGasto", () => {
+  it("rejeita descrição vazia", () => {
+    expect(validarGasto("", 50)).toBe(
+      "Informe uma descrição para o gasto."
+    );
+  });
+
+  it("rejeita descrição só com espaços", () => {
+    expect(validarGasto("   ", 50)).toBe(
+      "Informe uma descrição para o gasto."
+    );
+  });
+
+  it("rejeita valor zero ou negativo", () => {
+    expect(validarGasto("Uber", 0)).toBe(
+      "O valor do gasto deve ser maior que zero."
+    );
+    expect(validarGasto("Uber", -10)).toBe(
+      "O valor do gasto deve ser maior que zero."
+    );
+  });
+
+  it("rejeita valor que não é um número", () => {
+    expect(validarGasto("Uber", Number("abc"))).toBe(
+      "O valor do gasto deve ser maior que zero."
+    );
+  });
+
+  it("aceita descrição e valor válidos", () => {
+    expect(validarGasto("Uber para o trabalho", 23.7)).toBeNull();
+  });
+});
+```
+
+Alguns pontos que vale destacar:
+
+- **`criarGasto` é uma função auxiliar de teste**, não parte do projeto — ela existe só para não repetir as cinco propriedades de `Gasto` em cada teste. `Partial<Gasto>` permite sobrescrever só os campos que importam para aquele caso específico.
+- **Cada `describe` agrupa os testes de uma função**, e cada `it` descreve um comportamento específico em linguagem natural — "rejeita descrição vazia" já diz, sem precisar ler o código, o que está sendo verificado.
+- **`toBeCloseTo` em vez de `toBe`** na soma de decimais: números de ponto flutuante (`45.5 + 4.4 + 32`) podem ter imprecisões mínimas de arredondamento, então comparamos com uma margem de tolerância em vez de igualdade exata.
+- **Casos de borda importam tanto quanto o caso feliz.** Note que `validarGasto` tem testes para string vazia, string só com espaços, zero, negativo e não-número — são exatamente os tipos de entrada inválida que um formulário real vai receber de vez em quando.
+
+## Testando o comportamento da interface: `src/App.test.tsx`
+
+Agora o teste de componente: vamos simular uma pessoa preenchendo o formulário e conferir que o gasto aparece na lista. Como o `App` dispara uma chamada `fetch` ao montar (a busca das taxas de câmbio), precisamos simular essa chamada para o teste não depender de internet.
+
+Crie `src/App.test.tsx`:
+
+```tsx
+// src/App.test.tsx
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import App from "./App";
+
+function mockarRespostaDeTaxas() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            amount: 1,
+            base: "BRL",
+            date: "2026-09-05",
+            rates: { USD: 0.185, EUR: 0.17 },
+          }),
+      } as Response)
+    )
+  );
+}
+
+describe("App", () => {
+  beforeEach(() => {
+    mockarRespostaDeTaxas();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("adiciona um novo gasto e o exibe na lista", async () => {
+    const usuario = userEvent.setup();
+    render(<App />);
+
+    await usuario.type(screen.getByLabelText(/descrição/i), "Cinema com amigos");
+    await usuario.type(screen.getByLabelText(/valor/i), "32");
+    await usuario.selectOptions(screen.getByLabelText(/categoria/i), "lazer");
+    await usuario.click(screen.getByRole("button", { name: /adicionar/i }));
+
+    expect(await screen.findByText("Cinema com amigos")).toBeInTheDocument();
+    expect(screen.getByText("R$ 32.00")).toBeInTheDocument();
+  });
+
+  it("exibe uma mensagem de erro ao tentar adicionar um gasto inválido", async () => {
+    const usuario = userEvent.setup();
+    render(<App />);
+
+    await usuario.click(screen.getByRole("button", { name: /adicionar/i }));
+
+    expect(
+      await screen.findByText("Informe uma descrição para o gasto.")
+    ).toBeInTheDocument();
+  });
+});
+```
+
+Desmontando o teste principal:
+
+### Simulando o `fetch` com `vi.stubGlobal`
+
+```tsx
+vi.stubGlobal(
+  "fetch",
+  vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ ... }) } as Response))
+);
+```
+
+`vi.stubGlobal` substitui `fetch` global por uma função falsa (`vi.fn`) que devolve uma resposta parecida com a de verdade: `ok: true` e um `json()` que resolve para o mesmo formato que a Frankfurter API devolveria. Assim, o `useEffect` do `App` roda normalmente, só que sem tocar na rede. O `afterEach` com `vi.unstubAllGlobals()` desfaz essa substituição depois de cada teste, para um teste não vazar configuração para o próximo.
+
+### Simulando interação real com `user-event`
+
+```tsx
+const usuario = userEvent.setup();
+await usuario.type(screen.getByLabelText(/descrição/i), "Cinema com amigos");
+```
+
+`userEvent` simula o que uma pessoa realmente faz: clicar em um campo, digitar caractere por caractere, disparando os eventos que o React espera (`onChange` a cada tecla). É por isso que ele é preferido a `fireEvent` para esse tipo de teste — o comportamento simulado fica mais próximo do uso real.
+
+Repare que `getByLabelText(/descrição/i)` só funciona porque cada `<input>` do `FormularioDeGasto` está corretamente associado ao seu `<label>` via `htmlFor`/`id` — outra razão prática (além de acessibilidade) para nunca pular essa associação ao construir formulários.
+
+### Por que `findByText` em vez de `getByText`
+
+```tsx
+expect(await screen.findByText("Cinema com amigos")).toBeInTheDocument();
+```
+
+`findByText` é assíncrono — ele espera (com um pequeno timeout interno) até o elemento aparecer. Isso importa aqui porque, entre o clique no botão e o gasto aparecer na tela, o React precisa processar o novo estado e re-renderizar; `getByText` falharia se checasse a tela cedo demais. Já `getByLabelText` e `getByRole`, usados antes do clique, podem ser síncronos, porque o formulário já está na tela desde o primeiro render.
+
+## Rodando os testes
+
+Execute:
+
+```bash
+npm test
+```
+
+A saída esperada é parecida com:
+
+```
+✓ src/utils.test.ts (10)
+✓ src/App.test.tsx (2)
+
+Test Files  2 passed (2)
+     Tests  12 passed (12)
+```
+
+<Callout type="warn">
+Se o teste de componente falhar com um erro relacionado a `fetch is not defined` ou similar, confira se `beforeEach` está realmente rodando antes de `render(<App />)` — o mock precisa existir **antes** do componente montar e disparar o `useEffect`.
+</Callout>
+
+## Por que isso importa no seu portfólio
+
+Um projeto com testes automatizados comunica, sem que você precise dizer uma palavra, que você entende que "funcionar uma vez na sua máquina" e "funcionar de forma confiável, sempre" são coisas diferentes. Isso é exatamente o tipo de sinal que separa um projeto de portfólio comum de um que impressiona quem está entrevistando.
+
+Com a lógica pura e o fluxo principal cobertos por testes, o dashboard está pronto para o último passo: sair do seu computador e ganhar uma URL pública. Vamos publicá-lo na próxima página.

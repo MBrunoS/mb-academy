@@ -17,7 +17,7 @@ Na grande maioria das aplicações web, o login segue um fluxo com quatro passos
 Em código, o formulário de login e a chamada correspondente costumam se parecer com isto:
 
 ```tsx
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 
 interface RespostaLogin {
   token: string;
@@ -47,7 +47,7 @@ function FormularioDeLogin() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState<string | null>(null);
 
-  async function handleSubmit(evento: React.FormEvent) {
+  async function handleSubmit(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
     setErro(null);
 
@@ -219,10 +219,10 @@ Com essa instância configurada uma única vez, toda chamada feita através de `
 A última peça é impedir que um usuário não autenticado sequer veja telas que dependem de dados privados, como o próprio dashboard de gastos. A ideia é sempre a mesma, independente de qual biblioteca de rotas seu projeto usa: um componente "guarda" verifica se existe uma sessão válida antes de renderizar o conteúdo protegido, e redireciona caso contrário.
 
 ```tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 interface RotaProtegidaProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function RotaProtegida({ children }: RotaProtegidaProps) {
@@ -336,8 +336,10 @@ async function buscarComToken(url: string): Promise<unknown> {
 ```
 
 ```tsx
+import type { ReactNode } from "react";
+
 interface RotaProtegidaProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function RotaProtegida({ children }: RotaProtegidaProps) {
