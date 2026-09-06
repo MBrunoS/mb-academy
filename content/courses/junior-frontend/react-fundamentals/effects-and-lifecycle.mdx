@@ -1,0 +1,260 @@
+---
+title: Efeitos Colaterais e Ciclo de Vida
+description: "Entenda o que são efeitos colaterais, use o hook useEffect com segurança e evite as armadilhas mais comuns."
+---
+
+Até aqui, tudo que os seus componentes fizeram foi **renderizar** — transformar estado e props em JSX. Mas nem tudo que um componente precisa fazer se encaixa nessa ideia. Buscar dados de um servidor, salvar algo no `localStorage`, se inscrever em um evento do navegador: nenhuma dessas ações "renderiza" nada diretamente. Elas são **efeitos colaterais**, e o React tem um hook dedicado só para elas.
+
+## O que é um efeito colateral
+
+Um **efeito colateral** (ou apenas "efeito") é qualquer interação do seu componente com algo **fora** do fluxo normal de renderização — algo que o React não controla diretamente. Alguns exemplos comuns:
+
+- Buscar dados de uma API (você vai fazer isso de verdade no Capítulo 4 deste curso, sobre consumo de APIs).
+- Salvar ou ler dados do `localStorage` do navegador.
+- Se inscrever (e depois cancelar a inscrição) em um evento global, como redimensionamento da janela ou uma tecla pressionada.
+- Iniciar um timer com `setTimeout` ou `setInterval`.
+- Manipular diretamente um elemento do DOM que o React não gerencia sozinho (menos comum, mas existe).
+
+O ponto em comum entre todos: eles não fazem parte do "aqui está a UI para este estado" — são consequências que acontecem *por causa* de uma renderização, mas não são a própria renderização. Por isso o React separa esse tipo de código no hook `useEffect`.
+
+## `useEffect`: conectando o componente ao mundo externo
+
+`useEffect` recebe uma função (o efeito em si) e, opcionalmente, um array de dependências. O React executa essa função **depois** que o componente termina de renderizar na tela.
+
+```tsx
+import { useEffect, useState } from "react";
+
+function TituloComContador() {
+  const [contador, setContador] = useState<number>(0);
+
+  useEffect(() => {
+    document.title = `Cliques: ${contador}`;
+  });
+
+  return (
+    <button onClick={() => setContador(contador + 1)}>
+      Cliquei {contador} vezes
+    </button>
+  );
+}
+```
+
+Nesse exemplo, o efeito atualiza o título da aba do navegador (`document.title`) — algo que não faz sentido fazer dentro do `return` do componente, já que não é parte da árvore de elementos que o React renderiza. Toda vez que o componente renderiza, o efeito roda logo em seguida.
+
+## O array de dependências
+
+O segundo argumento de `useEffect` — o array de dependências — controla **quando** o efeito roda de novo. Esse é o detalhe mais importante (e mais confuso, no início) sobre o hook.
+
+### Sem array: roda a cada renderização
+
+```tsx
+useEffect(() => {
+  console.log("Rodou depois de toda renderização.");
+});
+```
+
+Sem o segundo argumento, o efeito executa depois de **toda e qualquer** renderização do componente. Isso raramente é o que você quer — na prática, quase todo `useEffect` que você escrever vai ter um array de dependências.
+
+### Array vazio: roda uma vez
+
+```tsx
+useEffect(() => {
+  console.log("Rodou só uma vez, quando o componente apareceu na tela.");
+}, []);
+```
+
+Um array vazio (`[]`) diz ao React: "esse efeito não depende de nada que muda — rode só uma vez, quando o componente é montado pela primeira vez". É o padrão típico para buscar dados iniciais ou configurar algo que só precisa acontecer uma vez.
+
+### Com dependências: roda quando algo muda
+
+```tsx
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+}
+
+function PainelGastos({ gastos }: { gastos: Gasto[] }) {
+  useEffect(() => {
+    console.log(`A lista agora tem ${gastos.length} gasto(s).`);
+  }, [gastos]);
+
+  // ...
+}
+```
+
+Com `[gastos]` no array, o efeito roda na primeira renderização **e** toda vez que o valor de `gastos` mudar entre uma renderização e outra. O React compara cada item do array de dependências com o valor da renderização anterior; se qualquer um for diferente, o efeito roda de novo.
+
+<Callout type="tip">
+  Pense no array de dependências como a resposta para a pergunta: "de quais
+  valores externos ao efeito esse código depende?". Se o efeito lê `gastos`
+  ou `usuario` de dentro do componente, esses valores devem estar no array.
+  O ESLint do React (plugin `eslint-plugin-react-hooks`) inclusive avisa
+  quando uma dependência usada dentro do efeito foi esquecida no array.
+</Callout>
+
+## Função de limpeza (cleanup)
+
+Alguns efeitos precisam ser **desfeitos** quando o componente sai de tela, ou antes de rodar de novo — senão, você acumula recursos (como escutadores de evento) que nunca são removidos. Para isso, a função passada para `useEffect` pode **retornar outra função**, chamada de função de limpeza:
+
+```tsx
+import { useEffect } from "react";
+
+function FormularioComAtalho({ aoFechar }: { aoFechar: () => void }) {
+  useEffect(() => {
+    function handleKeyDown(evento: KeyboardEvent) {
+      if (evento.key === "Escape") {
+        aoFechar();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Função de limpeza: remove o listener quando o componente sai de tela
+    // ou antes do efeito rodar de novo
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [aoFechar]);
+
+  return <form>{/* campos do formulário */}</form>;
+}
+```
+
+O React chama a função de limpeza automaticamente antes de executar o efeito novamente (quando uma dependência muda) e também quando o componente é removido da tela. Sem essa limpeza, cada vez que esse componente fosse montado, um novo `addEventListener` se acumularia sem nunca ser removido — um vazamento de memória (*memory leak*) clássico.
+
+## Armadilhas comuns
+
+`useEffect` é um dos hooks mais poderosos do React, mas também o que mais gera bugs confusos para quem está começando. Duas armadilhas merecem atenção especial.
+
+### Loop infinito por dependência mal configurada
+
+Se um efeito atualiza um estado que também está no seu próprio array de dependências, sem nenhuma condição de parada, você cria um loop infinito:
+
+```tsx
+// ARMADILHA: loop infinito
+function ContadorQuebrado() {
+  const [contador, setContador] = useState<number>(0);
+
+  useEffect(() => {
+    setContador(contador + 1); // atualiza o estado...
+  }, [contador]); // ...que está na lista de dependências, que dispara o efeito de novo
+
+  return <p>{contador}</p>;
+}
+```
+
+O ciclo é: o efeito roda → atualiza `contador` → o componente renderiza de novo → como `contador` mudou, o efeito roda de novo → atualiza `contador` de novo → e assim indefinidamente, travando a aplicação. A correção depende do que você realmente precisa fazer: se o objetivo era rodar só uma vez, o array de dependências deveria ser `[]`; se o objetivo era reagir a uma mudança de `contador` vinda de **outro lugar**, o efeito não deveria alterar o próprio `contador` de volta.
+
+### Closures desatualizadas (stale closures)
+
+Um efeito "captura" os valores de estado e props do momento em que ele foi criado — se ele não roda de novo (por exemplo, por ter array de dependências vazio), ele continua enxergando os valores **daquela primeira renderização**, mesmo que o estado tenha mudado depois. Isso é chamado de **closure desatualizada**:
+
+```tsx
+function ContadorComTimer() {
+  const [contador, setContador] = useState<number>(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      // "contador" aqui está sempre travado no valor 0,
+      // porque o efeito nunca roda de novo (array vazio)
+      console.log("Contador atual:", contador);
+    }, 1000);
+
+    return () => clearInterval(id);
+  }, []); // array vazio: o efeito só roda uma vez, com contador = 0
+
+  return (
+    <button onClick={() => setContador(contador + 1)}>
+      Cliquei {contador} vezes
+    </button>
+  );
+}
+```
+
+Esse é um conceito mais sutil, ligado a como closures funcionam em TypeScript/JavaScript de forma geral — algo que você vai revisitar com bem mais profundidade no curso Pleno, quando estudarmos closures em detalhe. Por enquanto, o importante é saber que esse comportamento existe e que a causa raiz quase sempre é a mesma: um valor usado dentro do efeito que não está (mas deveria estar) no array de dependências.
+
+<Callout type="warn">
+  Regra prática para não cair nessas armadilhas: toda variável de estado ou
+  prop **lida** dentro do efeito deveria estar no array de dependências —
+  a menos que você tenha um motivo bem específico para não incluí-la (e,
+  nesse caso, geralmente existe uma forma melhor de escrever o efeito).
+</Callout>
+
+## Para praticar
+
+Vamos usar `useEffect` para resolver um problema real do nosso dashboard: fazer a lista de gastos sobreviver a um recarregamento da página, salvando-a no `localStorage` do navegador.
+
+**Cenário:** Você quer que os gastos cadastrados não desapareçam quando a página é recarregada.
+
+**Requisitos:**
+
+1. Crie um componente `PainelFinanceiro` com estado `gastos: Gasto[]`, inicializado lendo o valor salvo no `localStorage` sob a chave `"forja:gastos"` — use a forma de função no `useState` (`useState(() => ...)`) para ler e fazer `JSON.parse` do valor salvo, ou retornar um array vazio se não houver nada salvo ainda.
+2. Crie um `useEffect` com `gastos` no array de dependências que, toda vez que a lista mudar, salve o array atualizado no `localStorage` com `JSON.stringify`.
+3. Adicione uma função `adicionarGasto` que recebe um `Gasto` e atualiza o estado de forma imutável (sem mutar o array anterior).
+4. Renderize a quantidade de gastos salvos (`gastos.length`) na tela.
+5. Adicione um botão que, ao ser clicado, chama `adicionarGasto` com um gasto de teste fixo.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```tsx
+import { useEffect, useState } from "react";
+
+type Categoria =
+  | "alimentação"
+  | "transporte"
+  | "moradia"
+  | "lazer"
+  | "saúde"
+  | "outros";
+
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+  categoria: Categoria;
+}
+
+const CHAVE_LOCAL_STORAGE = "forja:gastos";
+
+function PainelFinanceiro() {
+  const [gastos, setGastos] = useState<Gasto[]>(() => {
+    const salvos = localStorage.getItem(CHAVE_LOCAL_STORAGE);
+    return salvos ? (JSON.parse(salvos) as Gasto[]) : [];
+  });
+
+  // Sempre que "gastos" mudar, salva a nova versão no localStorage
+  useEffect(() => {
+    localStorage.setItem(CHAVE_LOCAL_STORAGE, JSON.stringify(gastos));
+  }, [gastos]);
+
+  function adicionarGasto(novoGasto: Gasto): void {
+    setGastos((atuais) => [...atuais, novoGasto]);
+  }
+
+  function adicionarGastoDeTeste(): void {
+    adicionarGasto({
+      id: Date.now(),
+      descricao: "Café da tarde",
+      valor: 12.5,
+      categoria: "alimentação",
+    });
+  }
+
+  return (
+    <div>
+      <p>Gastos salvos: {gastos.length}</p>
+      <button onClick={adicionarGastoDeTeste}>Adicionar gasto de teste</button>
+    </div>
+  );
+}
+```
+
+A função passada ao `useState` (`useState(() => ...)`) é chamada de **inicializador preguiçoso**: ela só executa uma vez, na primeira renderização, em vez de toda vez que o componente renderiza — ideal para uma leitura de `localStorage`, que não precisa (e não deveria) ser repetida a cada renderização.
+
+</details>
+
+---
+
+Você agora sabe conectar componentes ao mundo fora do React: persistir dados, reagir a eventos globais, e limpar tudo direito com a função de cleanup — sem cair nas armadilhas mais comuns de dependências. No próximo capítulo, vamos revisitar essa mesma lógica de persistência com um olhar de performance e reutilização: os hooks `useMemo`, `useCallback`, `useRef`, e como transformar padrões como esse `useEffect` de `localStorage` em um hook customizado seu, pronto para ser reutilizado em qualquer componente.
