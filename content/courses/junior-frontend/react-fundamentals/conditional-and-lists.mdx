@@ -37,10 +37,10 @@ Se `pago` for `true`, o JSX à direita do `&&` é renderizado. Se for `false`, a
   Cuidado com uma armadilha clássica do `&&`: se o valor da esquerda for `0`
   (e não um booleano), o React **renderiza o próprio `0`** na tela, em vez de
   esconder o elemento. Isso acontece porque `0` é "falsy" em uma condição,
-  mas ainda é um valor válido para renderização. Por exemplo,{" "}
-  `{quantidadeGastos && <ListaDeGastos />}` mostra um `0` solto na tela quando
+  mas ainda é um valor válido para renderização. Por exemplo, a expressão
+  `quantidadeGastos && <ListaDeGastos />` mostra um `0` solto na tela quando
   a lista está vazia. Prefira transformar a condição em um booleano explícito:
-  `{quantidadeGastos > 0 && <ListaDeGastos />}`.
+  `quantidadeGastos > 0 && <ListaDeGastos />`.
 </Callout>
 
 ### Ternário para "se, senão"

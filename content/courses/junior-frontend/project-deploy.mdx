@@ -1,0 +1,124 @@
+---
+title: "Publicando o Dashboard de Finanças"
+description: "Compare GitHub Pages e Vercel, publique o dashboard com deploy automático e entenda como apontar um domínio próprio."
+---
+
+Um projeto que só roda na sua máquina não é um projeto de portfólio — é um rascunho. Nesta última página, vamos publicar o Dashboard de Finanças com uma URL pública real, que qualquer pessoa no mundo pode abrir.
+
+## GitHub Pages ou Vercel?
+
+Existem várias formas gratuitas de publicar um projeto front-end. As duas mais comuns são o **GitHub Pages** e a **Vercel** — mas elas não são equivalentes para um projeto como o seu.
+
+| | GitHub Pages | Vercel |
+|---|---|---|
+| O que serve bem | Sites estáticos simples (HTML/CSS puro, sem build step) | Projetos com **build step** — Vite, React, Next.js, e praticamente qualquer framework moderno |
+| Configuração para Vite | Exige ajustar a `base` no `vite.config.ts` e configurar uma Action ou branch `gh-pages` manualmente | Detecta o framework automaticamente e já sabe rodar `npm run build` |
+| Deploy a cada push | Precisa configurar você mesmo (GitHub Actions) | Automático, sem configuração |
+| Preview de Pull Requests | Não tem, nativamente | Cria uma URL de preview para cada PR automaticamente |
+| Domínio próprio | Suporta, com configuração manual de DNS | Suporta, com um passo a passo guiado na própria plataforma |
+| Melhor para | Páginas estáticas simples, documentação, projetos sem framework | Aplicações React/Vite/Next.js — exatamente o seu caso |
+
+**Recomendação: use a Vercel.** Seu projeto tem uma etapa de build (o TypeScript e o JSX precisam ser compilados para JavaScript puro antes de virar arquivos que o navegador entende), e a Vercel foi desenhada exatamente para esse tipo de fluxo — sem exigir que você configure isso manualmente.
+
+<Callout type="tip">
+Isso não significa que o GitHub Pages seja uma ferramenta ruim — é ótima para sites estáticos sem build step. Mas para um projeto Vite/React como este, a Vercel elimina uma etapa inteira de configuração que não ensina nada de especialmente valioso neste momento do seu aprendizado.
+</Callout>
+
+## Preparando o repositório no GitHub
+
+Antes de conectar à Vercel, o projeto precisa estar em um repositório Git, hospedado no GitHub.
+
+Se você ainda não versionou o projeto:
+
+```bash
+cd dashboard-financas
+git init
+git add .
+git commit -m "feat: dashboard de finanças em React e TypeScript"
+```
+
+<Callout type="warn">
+O scaffold do Vite já cria um `.gitignore` com `node_modules/` e `dist/` — confira que ele existe antes do `git add .`, para não versionar arquivos que não deveriam ir ao repositório.
+</Callout>
+
+Em seguida:
+
+1. Crie um repositório vazio no GitHub (sem README, sem `.gitignore` — seu projeto já tem os dois)
+2. Conecte seu repositório local a ele e envie o código:
+   ```bash
+   git remote add origin https://github.com/SEU-USUARIO/dashboard-financas.git
+   git branch -M main
+   git push -u origin main
+   ```
+
+## Deploy na Vercel
+
+Com o código no GitHub, o deploy leva poucos minutos:
+
+1. Acesse [vercel.com](https://vercel.com) e crie uma conta usando **"Continue with GitHub"** — isso já concede à Vercel permissão para ler seus repositórios
+2. No painel, clique em **"Add New... → Project"**
+3. Selecione o repositório `dashboard-financas` na lista (autorize o acesso ao repositório específico, se solicitado)
+4. Na tela de configuração, a Vercel detecta automaticamente que é um projeto **Vite** e preenche:
+   - **Build Command:** `npm run build` (ou `vite build`)
+   - **Output Directory:** `dist`
+   - **Install Command:** `npm install`
+
+   Você normalmente não precisa alterar nada aqui — é exatamente por isso que a Vercel é a recomendação para este tipo de projeto.
+5. Clique em **"Deploy"**
+
+Em cerca de um minuto, a Vercel mostra uma tela de sucesso com um link parecido com `https://dashboard-financas-SEUUSUARIO.vercel.app`. Abra esse link — seu dashboard está no ar, funcionando exatamente como no seu `localhost`, só que acessível para qualquer pessoa.
+
+### Variáveis de ambiente (quando você precisar)
+
+O Dashboard de Finanças, como está, **não precisa de nenhuma variável de ambiente** — a Frankfurter API é pública e não exige chave. Ainda assim, vale saber como isso funcionaria, porque é praticamente garantido que um projeto futuro seu vai precisar:
+
+1. No painel do projeto na Vercel, vá em **Settings → Environment Variables**
+2. Toda variável que o código do navegador precisa enxergar tem que começar com o prefixo `VITE_` (é uma regra do próprio Vite, por segurança — variáveis sem esse prefixo nunca chegam ao código do cliente)
+3. No código, você acessaria com `import.meta.env.VITE_NOME_DA_VARIAVEL`
+4. Depois de adicionar ou alterar uma variável, é preciso disparar um novo deploy para o valor entrar em vigor
+
+### Deploy automático a cada push
+
+A partir de agora, todo `git push` para a branch `main` do seu repositório dispara automaticamente um novo deploy de produção na Vercel — você não precisa repetir nenhum passo manual. Se você abrir um Pull Request, a Vercel também gera uma **URL de preview** exclusiva para aquele PR, com as mudanças daquela branch, sem afetar a versão em produção. É assim que times reais trabalham: cada mudança é validada isoladamente antes de ir ao ar.
+
+## Domínio próprio e DNS (opcional)
+
+A URL `dashboard-financas-seuusuario.vercel.app` já é pública e funcional — perfeita para colocar no portfólio agora mesmo. Mas se você quiser um endereço mais pessoal (por exemplo, `financas.seunome.dev`), este é o caminho:
+
+### O que é um domínio
+
+Um **domínio** é o endereço legível que as pessoas digitam no navegador (`google.com`, `vercel.com`). Por trás dele, o **DNS** (Domain Name System) funciona como uma agenda de contatos gigante e distribuída: ele traduz esse nome legível para o endereço técnico (IP, ou outro domínio) de onde o conteúdo realmente está hospedado.
+
+Domínios são comprados em um **registrador** (Registro.br para domínios `.br`, ou serviços como Namecheap, GoDaddy, Google Domains para domínios internacionais) por uma taxa anual.
+
+### Apontando o domínio para a Vercel
+
+Depois de comprar um domínio em qualquer registrador:
+
+1. No painel do seu projeto na Vercel, vá em **Settings → Domains** e digite o domínio que você comprou
+2. A Vercel mostra quais **registros DNS** você precisa criar no painel do seu registrador. Normalmente são dois tipos:
+   - **Registro CNAME** — usado para subdomínios (como `www.seudominio.com` ou `financas.seunome.dev`). Ele aponta para `cname.vercel-dns.com`.
+   - **Registro A** — usado quando o domínio é "raiz" (sem subdomínio, como `seudominio.com`). Ele aponta para um endereço IP que a Vercel fornece.
+3. Você cria esse registro na área de "Gerenciar DNS" do painel do seu registrador (a localização exata varia de provedor para provedor, mas o conceito — adicionar um registro do tipo indicado, apontando para o valor indicado — é sempre o mesmo)
+4. A propagação do DNS pode levar de minutos a algumas horas. A Vercel mostra o status da verificação automaticamente na mesma tela de **Domains**
+
+<Callout>
+Você não precisa comprar um domínio para este projeto ser válido no portfólio. A URL gratuita `.vercel.app` já é HTTPS, estável e perfeitamente apresentável — um domínio próprio é um refinamento, não um requisito.
+</Callout>
+
+## Parabéns — você tem uma URL pública de verdade
+
+Pare um segundo para dimensionar o que você acabou de fazer: partiu de um CLI que só rodava no seu terminal, e chegou a uma aplicação web completa — com formulário, estado, integração com uma API real, testes automatizados e uma URL pública que qualquer recrutador, colega ou curioso pode abrir agora mesmo.
+
+Coloque o link no seu LinkedIn, no seu currículo, e no README do repositório no GitHub — com uma descrição curta do que o projeto faz e quais tecnologias usa. É exatamente esse tipo de projeto, pequeno, completo e publicado, que faz a diferença numa primeira triagem de candidaturas.
+
+### Para ir além
+
+Se quiser continuar evoluindo o dashboard depois deste capítulo, alguns caminhos naturais:
+
+- **Persistência.** Salvar os gastos em `localStorage` para que sobrevivam a um recarregamento de página — um primeiro passo antes de um backend de verdade.
+- **Editar e remover gastos.** Adicionar essas duas operações à `ListaDeGastos`, completando o CRUD que faltou nesta versão.
+- **Mais moedas.** A Frankfurter API suporta dezenas de moedas — vale a pena deixar o usuário escolher quais exibir.
+- **Domínio próprio.** Se ainda não fez, esse é o momento de comprar um domínio e seguir o passo a passo acima.
+
+Essas extensões não são obrigatórias para considerar o projeto concluído — mas são exatamente o tipo de iniciativa que mostra que você não só terminou um curso, como continua construindo por conta própria.
