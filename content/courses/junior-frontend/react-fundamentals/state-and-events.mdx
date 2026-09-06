@@ -1,0 +1,316 @@
+---
+title: Estado e Eventos
+description: "Aprenda a guardar dados que mudam com useState, tipar eventos do React e construir formulários controlados."
+---
+
+Você já sabe criar componentes e passar dados para eles via props. Mas até agora, tudo que construímos é **estático** — os dados não mudam depois que a página carrega. Um dashboard de finanças de verdade precisa reagir ao usuário: adicionar um gasto, marcar algo como pago, digitar em um formulário. Chegou a hora de dar vida aos componentes.
+
+## O problema: variáveis comuns não fazem a tela reagir
+
+A primeira tentação, vindo do que você já sabe de TypeScript, seria guardar esse tipo de dado em uma variável comum dentro do componente. Vamos ver por que isso não funciona:
+
+```tsx
+function ContadorClique() {
+  let contador = 0;
+
+  function incrementar() {
+    contador = contador + 1;
+    console.log(contador); // O valor realmente muda...
+  }
+
+  return (
+    <div>
+      <p>Cliques: {contador}</p>
+      <button onClick={incrementar}>Clicar</button>
+    </div>
+  );
+}
+```
+
+Se você rodar esse componente, vai notar algo estranho: o `console.log` mostra o valor certo aumentando a cada clique, mas o número exibido na tela (`Cliques: {contador}`) nunca muda — fica travado em `0`.
+
+Isso acontece porque o React só re-executa a função do componente (recalculando o JSX) quando é **avisado explicitamente** de que algo mudou. Reatribuir uma variável comum (`contador = contador + 1`) não dispara esse aviso — o React não tem como saber que aquele valor é "estado" que a UI depende. É exatamente esse aviso que o hook `useState` fornece.
+
+## `useState`: o hook que guarda estado
+
+Um **hook** é uma função especial do React (sempre com nome começando em `use`) que "conecta" seu componente a funcionalidades do React, como estado e efeitos colaterais. `useState` é o mais fundamental de todos: ele guarda um valor que sobrevive entre renderizações e, quando atualizado, avisa o React para renderizar a tela novamente.
+
+```tsx
+import { useState } from "react";
+
+function ContadorClique() {
+  const [contador, setContador] = useState<number>(0);
+
+  function incrementar() {
+    setContador(contador + 1);
+  }
+
+  return (
+    <div>
+      <p>Cliques: {contador}</p>
+      <button onClick={incrementar}>Clicar</button>
+    </div>
+  );
+}
+```
+
+`useState<number>(0)` retorna sempre um **array com dois elementos**, e por convenção usamos desestruturação para nomeá-los:
+
+- **`contador`**: o valor atual do estado (aqui, tipado como `number`).
+- **`setContador`**: a função que você chama para atualizar esse estado — e é essa chamada que avisa o React para recalcular a UI.
+
+O tipo entre os `<>` (`useState<number>`) informa ao TypeScript qual é o tipo do estado. Quando o valor inicial já deixa isso claro (como `useState(0)`), o TypeScript costuma inferir o tipo sozinho — mas ser explícito nunca é errado, e é obrigatório quando o estado pode começar como `null` ou `undefined`, como veremos em capítulos futuros.
+
+<Callout type="warn">
+  Nunca modifique o estado diretamente (`contador++` ou `contador = 5`). Isso
+  não é apenas "não recomendado" — simplesmente não funciona, pelo mesmo
+  motivo do exemplo anterior. Toda atualização de estado **precisa** passar
+  pela função retornada pelo `useState` (`setContador`, no exemplo acima).
+</Callout>
+
+## Atualizando estado sem mutar diretamente
+
+Esse cuidado fica ainda mais importante quando o estado é um objeto ou um array — exatamente o caso da nossa lista de gastos. Vamos imaginar que já temos um array de gastos guardado em estado:
+
+```tsx
+import { useState } from "react";
+
+type Categoria = "alimentação" | "transporte" | "moradia" | "lazer" | "saúde" | "outros";
+
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+  categoria: Categoria;
+}
+
+function PainelGastos() {
+  const [gastos, setGastos] = useState<Gasto[]>([]);
+
+  // ERRADO: mutar o array existente não avisa o React de nada
+  function adicionarGastoErrado(novoGasto: Gasto) {
+    gastos.push(novoGasto); // muta o array atual
+    setGastos(gastos); // mesma referência — React acha que nada mudou
+  }
+
+  // CORRETO: cria um novo array a partir do anterior
+  function adicionarGasto(novoGasto: Gasto) {
+    setGastos([...gastos, novoGasto]);
+  }
+
+  // ...
+}
+```
+
+O React decide se precisa re-renderizar comparando a **referência** do novo valor com a do valor anterior. Quando você usa `.push()`, o array continua sendo o mesmo objeto na memória — só o conteúdo interno mudou — e o React pode simplesmente não perceber a diferença. Por isso, sempre que o estado for um array ou objeto, a atualização deve criar uma **cópia nova** com a mudança aplicada, geralmente usando o operador spread (`...`), assim como você já fazia ao evitar mutação em estruturas de dados no Starter.
+
+Há ainda um segundo detalhe importante: quando o novo valor depende do valor anterior, prefira passar uma **função de atualização** para o setter, em vez do valor calculado diretamente:
+
+```tsx
+// Arriscado se houver múltiplas atualizações em sequência
+setContador(contador + 1);
+
+// Mais seguro: o React garante que "atual" é sempre o valor mais recente
+setContador((atual) => atual + 1);
+```
+
+Essa forma evita bugs sutis quando várias atualizações do mesmo estado acontecem antes do React ter a chance de re-renderizar — algo comum, por exemplo, dentro de efeitos ou de várias chamadas seguidas.
+
+## Eventos em React e como tipá-los
+
+Eventos em React (`onClick`, `onChange`, `onSubmit`) funcionam de forma parecida com `addEventListener`, mas são passados como props diretamente para os elementos JSX. A diferença é que o React usa um sistema próprio de eventos (chamados de **eventos sintéticos**), que padroniza o comportamento entre navegadores — mas na prática, você usa quase como o evento nativo do DOM que já conhece.
+
+Em TypeScript, cada tipo de evento e de elemento tem uma tipagem específica. Os mais comuns:
+
+```tsx
+import React from "react";
+
+function BotaoRemover() {
+  function handleClick(evento: React.MouseEvent<HTMLButtonElement>) {
+    console.log("Botão clicado:", evento.currentTarget);
+  }
+
+  return <button onClick={handleClick}>Remover</button>;
+}
+
+function CampoBusca() {
+  function handleChange(evento: React.ChangeEvent<HTMLInputElement>) {
+    console.log("Novo valor digitado:", evento.target.value);
+  }
+
+  return <input type="text" onChange={handleChange} />;
+}
+```
+
+`React.MouseEvent<HTMLButtonElement>` e `React.ChangeEvent<HTMLInputElement>` dizem ao TypeScript exatamente que tipo de evento esperar e em qual elemento HTML ele ocorreu — o que permite autocompletar propriedades como `evento.target.value` com segurança de tipos, sem precisar de `as HTMLInputElement` em todo lugar como você faria manipulando o DOM puro.
+
+<Callout>
+  Você não precisa decorar todos os tipos de evento de cor. Na prática, ao
+  digitar `onClick={(e) => ...}` no seu editor, o TypeScript já infere e
+  sugere o tipo correto automaticamente. Tipar explicitamente (como nos
+  exemplos acima) fica mais importante quando o handler é extraído para uma
+  função nomeada separada, como fizemos aqui.
+</Callout>
+
+## Formulários controlados
+
+Um dos usos mais comuns de estado é conectar um campo de formulário ao React, de forma que o **valor exibido no input** venha sempre do estado, e qualquer digitação do usuário atualize esse estado. Isso é chamado de **componente controlado** — o React, e não o DOM, é a fonte da verdade sobre o valor do campo.
+
+```tsx
+import React, { useState } from "react";
+
+function FormularioDescricao() {
+  const [descricao, setDescricao] = useState<string>("");
+
+  function handleChange(evento: React.ChangeEvent<HTMLInputElement>) {
+    setDescricao(evento.target.value);
+  }
+
+  return (
+    <div>
+      <input type="text" value={descricao} onChange={handleChange} />
+      <p>Você digitou: {descricao}</p>
+    </div>
+  );
+}
+```
+
+Repare no par `value={descricao}` + `onChange={handleChange}`: o `value` sempre reflete o estado atual, e o `onChange` atualiza esse estado a cada tecla digitada, criando um ciclo previsível: **digitar → dispara evento → atualiza estado → React re-renderiza → input mostra o novo valor**.
+
+Formulários com múltiplos campos seguem o mesmo padrão, um `useState` por campo:
+
+```tsx
+import React, { useState } from "react";
+
+function FormularioNovoGasto() {
+  const [descricao, setDescricao] = useState<string>("");
+  const [valor, setValor] = useState<number>(0);
+
+  function handleSubmit(evento: React.FormEvent<HTMLFormElement>) {
+    evento.preventDefault(); // evita o recarregamento padrão da página
+    console.log({ descricao, valor });
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={descricao}
+        onChange={(e) => setDescricao(e.target.value)}
+        placeholder="Descrição do gasto"
+      />
+      <input
+        type="number"
+        value={valor}
+        onChange={(e) => setValor(Number(e.target.value))}
+        placeholder="Valor"
+      />
+      <button type="submit">Adicionar</button>
+    </form>
+  );
+}
+```
+
+Repare que o input de valor exige um cuidado extra: todo `input`, mesmo do tipo `"number"`, entrega seu valor como **string** em `evento.target.value`. Por isso convertemos explicitamente com `Number(...)` antes de guardar no estado tipado como `number`.
+
+<Callout type="warn">
+  Se você definir `value={descricao}` em um input sem também definir
+  `onChange`, o React exibe um aviso no console dizendo que você criou um
+  campo controlado sem um manipulador de mudança. Sem o `onChange`, o campo
+  fica travado no valor do estado e o usuário não consegue digitar nada — o
+  par `value` + `onChange` é indissociável em um componente controlado.
+</Callout>
+
+## Para praticar
+
+Vamos construir o formulário de novo gasto completo, unindo tudo que vimos: múltiplos estados, eventos tipados e um `<select>` controlado.
+
+**Cenário:** O dashboard precisa de um formulário para cadastrar um novo gasto, com descrição, valor e categoria.
+
+**Requisitos:**
+
+1. Crie um componente `NovoGastoForm`.
+2. Use `useState` para guardar três campos: `descricao` (`string`, iniciando vazio), `valor` (`number`, iniciando em `0`) e `categoria` (do tipo `Categoria` do capítulo anterior, iniciando em `"outros"`).
+3. Crie um input controlado para `descricao`, um input controlado do tipo `"number"` para `valor`, e um `<select>` controlado para `categoria` com pelo menos três `<option>`.
+4. Tipe os handlers de mudança usando `React.ChangeEvent<HTMLInputElement>` (para os inputs) e `React.ChangeEvent<HTMLSelectElement>` (para o select).
+5. No `onSubmit` do formulário (tipado como `React.FormEvent<HTMLFormElement>`), previna o comportamento padrão, monte um objeto com os três campos e exiba no console. Em seguida, limpe os campos, voltando aos valores iniciais.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```tsx
+import React, { useState } from "react";
+
+type Categoria =
+  | "alimentação"
+  | "transporte"
+  | "moradia"
+  | "lazer"
+  | "saúde"
+  | "outros";
+
+function NovoGastoForm() {
+  const [descricao, setDescricao] = useState<string>("");
+  const [valor, setValor] = useState<number>(0);
+  const [categoria, setCategoria] = useState<Categoria>("outros");
+
+  function handleDescricaoChange(evento: React.ChangeEvent<HTMLInputElement>) {
+    setDescricao(evento.target.value);
+  }
+
+  function handleValorChange(evento: React.ChangeEvent<HTMLInputElement>) {
+    setValor(Number(evento.target.value));
+  }
+
+  function handleCategoriaChange(
+    evento: React.ChangeEvent<HTMLSelectElement>
+  ) {
+    setCategoria(evento.target.value as Categoria);
+  }
+
+  function handleSubmit(evento: React.FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+
+    console.log({ descricao, valor, categoria });
+
+    // Limpa o formulário para o próximo cadastro
+    setDescricao("");
+    setValor(0);
+    setCategoria("outros");
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={descricao}
+        onChange={handleDescricaoChange}
+        placeholder="Descrição"
+      />
+      <input
+        type="number"
+        value={valor}
+        onChange={handleValorChange}
+        placeholder="Valor"
+      />
+      <select value={categoria} onChange={handleCategoriaChange}>
+        <option value="alimentação">Alimentação</option>
+        <option value="transporte">Transporte</option>
+        <option value="moradia">Moradia</option>
+        <option value="lazer">Lazer</option>
+        <option value="saúde">Saúde</option>
+        <option value="outros">Outros</option>
+      </select>
+      <button type="submit">Adicionar gasto</button>
+    </form>
+  );
+}
+```
+
+Um detalhe que vale destacar: o valor de um `<select>` também chega como `string` no `evento.target.value`, por isso usamos `as Categoria` para informar ao TypeScript que aquela string corresponde a uma das opções válidas do union type — já que as `<option>` foram escritas com os mesmos valores exatos do tipo `Categoria`.
+
+</details>
+
+---
+
+Agora seus componentes reagem: guardam estado com `useState`, respondem a cliques e digitação com eventos tipados, e formulários controlados mantêm o React como fonte da verdade. Falta uma peça essencial: como decidir *o que* renderizar com base nesse estado — mostrar uma mensagem quando a lista está vazia, ou transformar um array de gastos em uma lista de cartões na tela. É exatamente isso que vamos ver no próximo capítulo.

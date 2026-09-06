@@ -1,0 +1,386 @@
+---
+title: Fundamentos de CSS
+description: "Aprenda a vincular CSS ao HTML, entenda seletores, a cascata, o box model e as unidades de medida mais usadas."
+---
+
+No capítulo anterior, você construiu o esqueleto do Dashboard de Finanças. Se abriu o arquivo em um navegador, viu algo funcional, mas visualmente cru: texto preto, fundo branco, tudo empilhado sem espaçamento. Isso não é um erro — é exatamente como o navegador exibe HTML puro, sem nenhuma instrução de estilo. É aqui que entra o **CSS** (*Cascading Style Sheets*), a linguagem responsável por dizer ao navegador **como** cada elemento deve aparecer.
+
+CSS é, na essência, um conjunto de **regras**: cada regra escolhe um ou mais elementos da página (o **seletor**) e define quais propriedades visuais eles devem ter (a **declaração**). Neste capítulo você vai aprender a escrever essas regras, entender como o navegador resolve conflitos entre elas, e como cada elemento é efetivamente medido e desenhado na tela.
+
+## Três formas de vincular CSS ao HTML
+
+Antes de escrever qualquer regra, você precisa decidir **onde** ela vai morar. Existem três formas de aplicar CSS a um HTML, e é importante entender as diferenças entre elas.
+
+### Inline
+
+O estilo é escrito diretamente no atributo `style` de um elemento específico:
+
+```html
+<p style="color: green; font-weight: bold;">Saldo: R$ 1.240,00</p>
+```
+
+Funciona, mas afeta **apenas aquele elemento** — não há reaproveitamento nenhum. Se você tiver 20 parágrafos parecidos, precisa repetir o mesmo `style` em cada um. Use isso só para testes rápidos ou casos muito pontuais.
+
+### Interno
+
+O estilo fica dentro de uma tag `<style>`, no `<head>` do próprio documento HTML:
+
+```html
+<head>
+  <style>
+    p {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+```
+
+Já afeta todos os elementos daquele tipo na página inteira, mas o estilo fica preso a esse arquivo HTML específico — se você tiver várias páginas, precisa copiar o bloco `<style>` em cada uma delas.
+
+### Externo
+
+O estilo fica em um arquivo `.css` separado, vinculado ao HTML por meio de um `<link>` no `<head>`:
+
+```html
+<head>
+  <link rel="stylesheet" href="estilos.css" />
+</head>
+```
+
+```css
+/* estilos.css */
+p {
+  color: green;
+  font-weight: bold;
+}
+```
+
+Essa é a abordagem recomendada para qualquer projeto real: o mesmo arquivo `.css` pode ser reaproveitado em várias páginas do site, o navegador consegue guardá-lo em cache (carregando mais rápido em visitas seguintes), e o código fica organizado — HTML em um lugar, CSS em outro.
+
+<Callout type="tip">
+  A partir de agora, sempre que possível, use CSS externo. É o padrão que você
+  vai encontrar em qualquer projeto profissional, inclusive quando o curso
+  chegar em React — lá, o CSS muda de forma (módulos, styled-components,
+  Tailwind), mas o princípio de "separar estilo do conteúdo" continua o mesmo.
+</Callout>
+
+## Seletores: dizendo ao CSS o que estilizar
+
+Um **seletor** é a parte de uma regra CSS que escolhe quais elementos vão receber aquele estilo. Os mais comuns:
+
+| Seletor | Sintaxe | O que seleciona |
+|---|---|---|
+| Elemento | `p { }` | Todas as tags `<p>` da página |
+| Classe | `.destaque { }` | Todo elemento com `class="destaque"` |
+| ID | `#resumo { }` | O único elemento com `id="resumo"` |
+| Descendente | `nav a { }` | Todo `<a>` que esteja dentro de um `<nav>` |
+| Pseudo-classe | `a:hover { }` | Um `<a>` apenas quando o mouse está sobre ele |
+
+```css
+/* Seletor de elemento: afeta TODOS os parágrafos */
+p {
+  font-family: sans-serif;
+}
+
+/* Seletor de classe: afeta só elementos com class="valor-negativo" */
+.valor-negativo {
+  color: red;
+}
+
+/* Seletor de ID: afeta só o único elemento com esse id */
+#resumo-mensal {
+  border: 1px solid gray;
+}
+
+/* Seletor descendente: só links DENTRO de um nav */
+nav a {
+  text-decoration: none;
+}
+
+/* Pseudo-classe: estado de interação do mouse */
+button:hover {
+  background-color: #1d4ed8;
+}
+```
+
+Repare que `class` é o seletor mais usado no dia a dia: diferente do `id` (que deve ser único na página), a mesma classe pode ser aplicada a quantos elementos você quiser, o que é exatamente o comportamento que você quer para estilizar, por exemplo, todos os cards de gasto do dashboard da mesma forma.
+
+```html
+<p class="valor-negativo">-R$ 45,00</p>
+<p class="valor-negativo">-R$ 320,00</p>
+```
+
+```css
+.valor-negativo {
+  color: red;
+  font-weight: bold;
+}
+```
+
+Ambos os parágrafos recebem o mesmo estilo, sem repetir a regra.
+
+## A cascata e a especificidade: quando duas regras competem
+
+O "C" de CSS vem de *Cascading* — cascata — e essa palavra descreve exatamente como o navegador decide **qual regra vence** quando duas regras diferentes tentam estilizar o mesmo elemento com propriedades conflitantes.
+
+O navegador segue, em ordem de prioridade:
+
+1. **Especificidade**: seletores mais específicos vencem os mais genéricos. Um `id` é mais específico que uma `class`, que é mais específica que um seletor de elemento.
+2. **Ordem no código**: entre duas regras com a **mesma** especificidade, a que aparece **por último** no CSS vence.
+3. **`!important`**: uma declaração marcada com `!important` sobrescreve qualquer outra, independente de especificidade — e por isso deve ser evitada na prática, como você vai ver a seguir.
+
+Veja um exemplo de conflito:
+
+```css
+p {
+  color: blue;
+}
+
+.aviso {
+  color: red;
+}
+
+#alerta-critico {
+  color: orange;
+}
+```
+
+```html
+<p id="alerta-critico" class="aviso">Este texto fica laranja</p>
+```
+
+O parágrafo acima recebe as três regras ao mesmo tempo, mas só uma cor pode "vencer". Como `#alerta-critico` (seletor de ID) é mais específico que `.aviso` (classe), que por sua vez é mais específico que `p` (elemento), o texto fica **laranja**.
+
+<Callout type="warn">
+  Evite usar `!important` para "resolver" um conflito de especificidade. Ele
+  funciona, mas gera um problema maior no futuro: quando outra regra também
+  precisar sobrescrever aquele estilo, ela também vai precisar de
+  `!important`, criando uma corrida armamentista de prioridades difícil de
+  depurar. Prefira ajustar a especificidade dos seletores ou reorganizar o
+  CSS. Guarde `!important` para casos excepcionais — como sobrescrever estilos
+  de uma biblioteca externa que você não controla.
+</Callout>
+
+## O box model: como o navegador mede cada elemento
+
+Todo elemento HTML é tratado pelo navegador como uma **caixa retangular**, mesmo que visualmente não pareça uma. Essa caixa é composta por quatro camadas, de dentro para fora:
+
+```text
+┌─────────────────────────────────────┐
+│               margin                 │
+│   ┌───────────────────────────────┐   │
+│   │            border             │   │
+│   │   ┌───────────────────────┐   │   │
+│   │   │        padding         │   │   │
+│   │   │   ┌───────────────┐   │   │   │
+│   │   │   │    content     │   │   │   │
+│   │   │   └───────────────┘   │   │   │
+│   │   └───────────────────────┘   │   │
+│   └───────────────────────────────┘   │
+└─────────────────────────────────────┘
+```
+
+- **content**: o conteúdo real (texto, imagem) — seu tamanho é definido por `width` e `height`.
+- **padding**: espaço interno, entre o conteúdo e a borda — "respiro" dentro da caixa.
+- **border**: uma linha ao redor do padding — pode ter espessura, estilo e cor.
+- **margin**: espaço externo, entre esta caixa e as caixas vizinhas.
+
+```css
+.card-gasto {
+  width: 240px;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  margin: 8px;
+  background-color: white;
+}
+```
+
+Aqui está a armadilha mais comum do box model: **por padrão, `width` define apenas o `content`** — padding e border são **somados** ao tamanho final da caixa. No exemplo acima, a caixa renderizada na tela não tem 240px de largura; ela tem `240px + 16px de padding em cada lado + 1px de border em cada lado`, totalizando 274px.
+
+```css
+/* Comportamento padrão: box-sizing: content-box */
+.card-gasto {
+  box-sizing: content-box; /* padrão, não precisa escrever */
+  width: 240px;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  /* largura final renderizada: 274px */
+}
+```
+
+Para evitar essa surpresa, a propriedade `box-sizing: border-box` muda a regra: `width` passa a incluir padding e border **dentro** do valor definido, e a largura final é exatamente `240px`, não importa quanto padding ou border você adicione.
+
+```css
+.card-gasto {
+  box-sizing: border-box;
+  width: 240px;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  /* largura final renderizada: 240px */
+}
+```
+
+<Callout type="tip">
+  É prática comum e recomendada aplicar `box-sizing: border-box` a **todos** os
+  elementos da página logo no início do seu CSS, usando o seletor universal
+  `*`:
+
+  ```css
+  * {
+    box-sizing: border-box;
+  }
+  ```
+
+  Isso torna o comportamento de `width` e `height` muito mais previsível em
+  toda a página, e evita boa parte dos "por que essa caixa está maior do que
+  eu defini?" que todo iniciante enfrenta.
+</Callout>
+
+## Unidades de medida: px, %, rem e em
+
+CSS aceita várias unidades para definir tamanhos, e escolher a certa faz diferença real no resultado:
+
+- **`px`** (pixels): uma unidade absoluta e fixa. Um elemento com `font-size: 16px` sempre terá 16 pixels, independente de qualquer outra configuração. É previsível, mas não se adapta a preferências de acessibilidade do usuário (como aumentar a fonte padrão do navegador).
+- **`%`** (porcentagem): relativa ao elemento **pai**. Um `<div>` com `width: 50%` ocupa metade da largura do elemento que o contém.
+- **`em`**: relativa ao `font-size` do elemento **pai**. O problema do `em` é que ele **compõe** — se um elemento pai tem `font-size: 1.2em` e um filho também tem `font-size: 1.2em`, o filho acaba com 1.2 × 1.2 do tamanho base, o que pode gerar tamanhos inesperados em estruturas aninhadas.
+- **`rem`** (*root em*): relativa ao `font-size` do elemento **raiz** (`<html>`), sempre — não importa o quão aninhado o elemento esteja. Isso torna o `rem` **previsível**, e por isso é a unidade recomendada por padrão para fontes e espaçamentos na maioria dos projetos modernos.
+
+```css
+html {
+  font-size: 16px; /* 1rem = 16px, em qualquer lugar da página */
+}
+
+.titulo {
+  font-size: 2rem; /* sempre 32px, não importa onde esteja */
+}
+
+.card {
+  padding: 1rem; /* sempre 16px */
+  width: 80%; /* 80% do elemento pai */
+}
+```
+
+Uma regra prática para começar: use `rem` para fontes e espaçamentos (`padding`, `margin`, `gap`), use `%` quando o tamanho precisa ser relativo ao container pai (muito comum em layouts responsivos, que você verá no próximo capítulo), e reserve `px` para detalhes que realmente não devem mudar de tamanho nunca, como a espessura de uma borda (`border: 1px solid`).
+
+## Cor e texto: propriedades essenciais
+
+Para fechar os fundamentos, as propriedades mais usadas no dia a dia para estilizar texto e cor:
+
+```css
+.saldo-positivo {
+  color: #16a34a; /* cor do texto: verde */
+  font-weight: bold; /* espessura da fonte */
+}
+
+.saldo-negativo {
+  color: #dc2626; /* cor do texto: vermelho */
+  font-weight: bold;
+}
+
+.card {
+  background-color: #f9fafb; /* cor de fundo */
+  font-family: "Segoe UI", Arial, sans-serif; /* pilha de fontes, com fallback */
+  font-size: 1rem;
+  text-align: center; /* alinhamento do texto: left, center, right, justify */
+}
+```
+
+Cores em CSS podem ser escritas de várias formas: por nome (`red`, `green`), em hexadecimal (`#dc2626`), ou em `rgb(220, 38, 38)`. O formato hexadecimal é o mais comum em projetos profissionais, por ser compacto e fácil de copiar de ferramentas de design.
+
+Repare também em `font-family`: é sempre uma **lista** de fontes, não uma só. O navegador tenta a primeira; se não estiver disponível no computador da pessoa, tenta a próxima, até chegar em uma categoria genérica de fallback (`sans-serif`, `serif`, `monospace`). Sempre termine sua lista de fontes com uma dessas categorias genéricas.
+
+## Para praticar
+
+**Cenário:** retome o HTML do capítulo anterior (a página inicial do Dashboard de Finanças) e adicione um arquivo CSS externo que aplique um visual básico, mas coerente, usando os conceitos deste capítulo.
+
+**Requisitos:**
+
+1. Crie um arquivo `estilos.css` e vincule-o ao `index.html` usando `<link rel="stylesheet">`.
+2. No início do arquivo CSS, aplique `box-sizing: border-box` a todos os elementos usando o seletor universal `*`.
+3. Estilize o `<header>` com uma cor de fundo diferente do restante da página e algum `padding`, usando `rem`.
+4. Crie uma classe `.card` (para ser reaproveitada em vários elementos) com `padding`, `border` e `border-radius`, e aplique-a à seção "Resumo do Mês".
+5. Dentro dessa seção, use uma classe (por exemplo, `.valor-positivo`) para colorir de verde o parágrafo do saldo, caso ele seja positivo.
+6. Estilize o formulário: adicione espaçamento entre os campos e destaque o botão de envio com uma cor de fundo e `:hover` diferente ao passar o mouse.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```html
+<!-- No <head> do index.html -->
+<link rel="stylesheet" href="estilos.css" />
+```
+
+```css
+/* estilos.css */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  margin: 0;
+  color: #1f2937;
+}
+
+header {
+  background-color: #1e3a8a;
+  color: white;
+  padding: 1rem 1.5rem;
+}
+
+header nav a {
+  color: white;
+  margin-right: 1rem;
+  text-decoration: none;
+}
+
+.card {
+  padding: 1.5rem;
+  margin: 1.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #f9fafb;
+}
+
+.valor-positivo {
+  color: #16a34a;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+form label {
+  display: block;
+  margin-top: 0.75rem;
+  font-weight: bold;
+}
+
+form input,
+form select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+
+button[type="submit"] {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #1d4ed8;
+}
+```
+
+</details>
+
+---
+
+Você agora entende como o CSS se conecta ao HTML, como escolher o que estilizar com seletores, como o navegador resolve conflitos entre regras e como cada elemento é efetivamente medido na tela. Isso é o suficiente para estilizar elementos **individuais** com confiança. O que ainda falta é organizar **múltiplos** elementos juntos em um layout coerente — colocar cards lado a lado, alinhar uma barra de navegação, fazer a página se adaptar ao celular. É exatamente esse o assunto do próximo capítulo: layout com Flexbox e Grid.

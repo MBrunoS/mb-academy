@@ -1,0 +1,370 @@
+---
+title: Layout com CSS
+description: "Domine Flexbox para organizar elementos em linha ou coluna, entenda quando usar Grid, e torne suas páginas responsivas."
+---
+
+Até agora, você estilizou elementos **individualmente**: uma cor aqui, um espaçamento ali. Mas nenhuma interface real é feita de elementos isolados — é feita de elementos **organizados em conjunto**: uma barra de navegação com links lado a lado, uma lista de cards de gastos organizados em grade, um rodapé colado na base da página. Esse é o trabalho de **layout**, e é aqui que o CSS realmente ganha poder.
+
+Durante muitos anos, posicionar elementos lado a lado em CSS era surpreendentemente difícil — as ferramentas disponíveis (`float`, `inline-block`) não foram desenhadas para isso e exigiam gambiarras. Isso mudou com a chegada de duas ferramentas modernas, feitas especificamente para layout: **Flexbox** e **Grid**. Você vai aprender as duas neste capítulo, além do que torna uma página **responsiva** — capaz de se adaptar do celular ao monitor widescreen.
+
+## Flexbox: alinhando e distribuindo elementos em uma direção
+
+Flexbox (*Flexible Box Layout*) resolve um problema específico e muito comum: organizar um grupo de elementos **em uma linha ou em uma coluna**, distribuindo o espaço disponível entre eles de forma inteligente.
+
+Para usar Flexbox, você aplica `display: flex` em um elemento **pai** — ele se torna o *flex container*, e todos os seus filhos diretos se tornam automaticamente *flex items*, organizados lado a lado por padrão:
+
+```html
+<div class="barra-acoes">
+  <button>Adicionar Gasto</button>
+  <button>Ver Relatório</button>
+  <button>Exportar</button>
+</div>
+```
+
+```css
+.barra-acoes {
+  display: flex;
+}
+```
+
+Só essa linha (`display: flex`) já coloca os três botões em uma linha horizontal, um do lado do outro — sem precisar de `float`, sem gambiarra. A partir daí, um pequeno conjunto de propriedades controla toda a organização:
+
+### `flex-direction`: a direção principal
+
+```css
+.barra-acoes {
+  display: flex;
+  flex-direction: row; /* padrão: em linha, da esquerda para a direita */
+}
+
+.menu-lateral {
+  display: flex;
+  flex-direction: column; /* em coluna, de cima para baixo */
+}
+```
+
+### `justify-content`: alinhamento no eixo principal
+
+Controla como o espaço é distribuído **ao longo da direção definida** por `flex-direction` (horizontal, se `row`):
+
+```css
+.cabecalho {
+  display: flex;
+  justify-content: space-between; /* empurra os itens para as extremidades */
+}
+```
+
+Os valores mais usados: `flex-start` (junta no início, padrão), `center` (centraliza), `flex-end` (junta no fim), `space-between` (espaço igual **entre** os itens, sem espaço nas pontas) e `space-around` (espaço igual **ao redor** de cada item, incluindo as pontas).
+
+### `align-items`: alinhamento no eixo transversal
+
+Controla o alinhamento na direção **perpendicular** à principal — se `flex-direction` é `row`, `align-items` controla o alinhamento **vertical**:
+
+```css
+.cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* centraliza verticalmente, mesmo com alturas diferentes */
+}
+```
+
+### `flex-wrap`: permitir quebra de linha
+
+Por padrão, o Flexbox tenta espremer todos os itens em uma única linha, mesmo que isso deixe cada item minúsculo. Com `flex-wrap: wrap`, os itens que não couberem "quebram" para a linha seguinte, como texto em um parágrafo:
+
+```css
+.lista-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem; /* espaço entre os itens, inclusive entre linhas quebradas */
+}
+```
+
+### `flex-grow`: dividindo o espaço sobrando
+
+Enquanto as propriedades anteriores ficam no **container**, `flex-grow` é aplicada aos **itens** e controla o quanto cada um deve crescer para preencher o espaço disponível:
+
+```css
+.item {
+  flex-grow: 1; /* todos os itens crescem igualmente para ocupar o espaço livre */
+}
+```
+
+Se um item específico tiver `flex-grow: 2` enquanto os outros têm `1`, ele vai crescer o dobro em relação aos demais.
+
+## Padrões práticos com Flexbox
+
+Com essas poucas propriedades, você já resolve a maioria dos layouts do dia a dia. Dois exemplos muito comuns:
+
+### Uma barra de navegação (logo à esquerda, links à direita)
+
+```html
+<header class="navbar">
+  <span class="logo">Dashboard de Finanças</span>
+  <nav class="links">
+    <a href="/">Início</a>
+    <a href="/gastos">Gastos</a>
+    <a href="/relatorios">Relatórios</a>
+  </nav>
+</header>
+```
+
+```css
+.navbar {
+  display: flex;
+  justify-content: space-between; /* logo de um lado, links do outro */
+  align-items: center; /* tudo alinhado verticalmente ao centro */
+  padding: 1rem 1.5rem;
+  background-color: #1e3a8a;
+}
+
+.navbar .links {
+  display: flex;
+  gap: 1.5rem; /* espaço entre os links, sem precisar de margin individual */
+}
+```
+
+### Cards em linha, que quebram em telas menores
+
+```html
+<div class="cards-gastos">
+  <div class="card">Alimentação<br />R$ 620,00</div>
+  <div class="card">Transporte<br />R$ 310,00</div>
+  <div class="card">Lazer<br />R$ 180,00</div>
+  <div class="card">Moradia<br />R$ 1.200,00</div>
+</div>
+```
+
+```css
+.cards-gastos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card {
+  flex: 1 1 200px; /* atalho para grow, shrink e basis: cresce, encolhe, mas nunca menos que 200px */
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #f3f4f6;
+  text-align: center;
+}
+```
+
+A propriedade `flex` usada aqui (`flex: 1 1 200px`) é um atalho para três propriedades de uma vez: `flex-grow: 1`, `flex-shrink: 1` e `flex-basis: 200px` (o tamanho "ideal" de partida, antes de crescer ou encolher). Esse padrão — cards que crescem para preencher espaço, mas nunca ficam menores que um tamanho mínimo confortável — é extremamente comum em dashboards e listagens.
+
+<Callout>
+  Flexbox resolve organização em **uma dimensão por vez**: uma linha, ou uma
+  coluna. Ele não foi pensado para alinhar simultaneamente linhas E colunas de
+  forma precisa (por exemplo, um grid de galeria onde cada item deve alinhar
+  tanto horizontal quanto verticalmente com os vizinhos das outras linhas).
+  Para isso, existe uma ferramenta mais adequada: o CSS Grid.
+</Callout>
+
+## Grid: pensando em linhas e colunas ao mesmo tempo
+
+Enquanto o Flexbox é **unidimensional** (você decide uma direção, linha ou coluna), o **CSS Grid** é **bidimensional**: você define uma grade de linhas e colunas de uma vez, e posiciona os elementos dentro dela.
+
+Grid é a ferramenta certa quando o layout tem uma estrutura clara de "regiões" — o exemplo clássico é o layout de uma página inteira, com cabeçalho, menu lateral, conteúdo principal e rodapé:
+
+```html
+<div class="layout-dashboard">
+  <header class="area-header">Dashboard de Finanças</header>
+  <aside class="area-menu">Menu</aside>
+  <main class="area-conteudo">Conteúdo principal</main>
+  <footer class="area-footer">Rodapé</footer>
+</div>
+```
+
+```css
+.layout-dashboard {
+  display: grid;
+  grid-template-columns: 200px 1fr; /* coluna fixa de 200px + coluna que ocupa o resto */
+  grid-template-rows: auto 1fr auto; /* linha do tamanho do conteúdo, uma que ocupa o resto, outra do tamanho do conteúdo */
+  grid-template-areas:
+    "header  header"
+    "menu    conteudo"
+    "footer  footer";
+  min-height: 100vh;
+}
+
+.area-header {
+  grid-area: header;
+}
+.area-menu {
+  grid-area: menu;
+}
+.area-conteudo {
+  grid-area: conteudo;
+}
+.area-footer {
+  grid-area: footer;
+}
+```
+
+A propriedade `grid-template-areas` é particularmente elegante: ela permite "desenhar" o layout usando texto, nomeando cada região, e depois cada elemento diz a qual região pertence com `grid-area`. Note como `header` e `footer` aparecem duas vezes lado a lado no desenho — isso significa que eles ocupam as **duas** colunas, enquanto `menu` e `conteudo` ficam cada um em uma coluna.
+
+A unidade `fr` (*fraction*), usada em `grid-template-columns` e `grid-template-rows`, representa uma fração do espaço disponível — `1fr` significa "o que sobrar", de forma parecida com o `flex-grow` do Flexbox.
+
+<Callout type="tip">
+  Uma forma prática de decidir entre os dois: se você está organizando **itens
+  de conteúdo parecidos em sequência** (uma lista de cards, os botões de uma
+  barra de ações, os links de um menu), comece com **Flexbox**. Se você está
+  organizando **a estrutura geral da página** (regiões distintas como
+  cabeçalho, menu lateral, conteúdo, rodapé), considere **Grid**. Muitos
+  layouts reais, aliás, usam os dois ao mesmo tempo: Grid para a estrutura
+  geral, Flexbox dentro de cada região.
+</Callout>
+
+## Responsividade: adaptando a página a qualquer tela
+
+Um layout que parece ótimo em um monitor grande pode ficar completamente quebrado em um celular. **Responsividade** é a prática de fazer uma página se adaptar ao tamanho da tela em que está sendo exibida — e ela depende de duas ferramentas.
+
+### A viewport meta tag
+
+Você já usou essa tag desde o primeiro capítulo, mas agora cabe entender por quê ela é necessária:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+```
+
+Sem ela, navegadores mobile assumem, por padrão, que a página foi feita para uma tela larga (geralmente 980px) e renderizam nessa largura "virtual", depois encolhendo tudo para caber na tela pequena — resultado: texto minúsculo e ilegível, mesmo que seu CSS esteja correto. Essa tag diz ao navegador: "renderize na largura real do dispositivo (`width=device-width`), sem zoom inicial (`initial-scale=1.0`)". Ela é obrigatória em qualquer página que precise funcionar em celulares — ou seja, praticamente qualquer página hoje em dia.
+
+### Media queries
+
+Uma **media query** é uma regra CSS condicional: um bloco de estilos que só é aplicado quando a tela satisfaz uma condição, geralmente uma largura mínima ou máxima.
+
+```css
+.cards-gastos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Quando a tela tiver 600px de largura ou menos */
+@media (max-width: 600px) {
+  .cards-gastos {
+    flex-direction: column; /* empilha os cards em vez de lado a lado */
+  }
+}
+```
+
+### Mobile-first vs. desktop-first
+
+Existem duas filosofias para organizar media queries, e a diferença está em **qual tela você estiliza primeiro**:
+
+- **Desktop-first**: você escreve o CSS "padrão" pensando na tela grande, e usa `@media (max-width: ...)` para **sobrescrever** e simplificar o layout conforme a tela diminui.
+- **Mobile-first**: você escreve o CSS "padrão" pensando na tela pequena (a mais restritiva), e usa `@media (min-width: ...)` para **adicionar** complexidade conforme a tela cresce.
+
+```css
+/* Mobile-first: o padrão já é a versão simples (empilhada) */
+.cards-gastos {
+  display: flex;
+  flex-direction: column;
+}
+
+/* A partir de telas médias, os cards passam a ficar lado a lado */
+@media (min-width: 600px) {
+  .cards-gastos {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+```
+
+A abordagem **mobile-first** é a recomendada e a mais usada atualmente, por dois motivos práticos: a maior parte do tráfego da web hoje vem de celulares, então faz sentido que o caso mais comum seja o padrão; e é mais fácil **adicionar** complexidade a um layout simples do que **remover** complexidade de um layout complexo já pronto.
+
+<Callout type="warn">
+  Um erro muito comum de quem está começando: testar o layout **só** no
+  monitor do computador e nunca redimensionar a janela (ou usar o modo de
+  simulação de dispositivos das DevTools) para ver como ele se comporta em
+  telas menores. Faça disso um hábito desde já — é muito mais barato corrigir
+  um problema de responsividade enquanto você ainda está escrevendo o CSS do
+  que depois que "esqueceu" que ele existia.
+</Callout>
+
+## Para praticar
+
+**Cenário:** retome a página do Dashboard de Finanças dos capítulos anteriores e transforme a barra de navegação e a lista de cards de gastos em um layout responsivo, seguindo a filosofia mobile-first.
+
+**Requisitos:**
+
+1. Transforme o `<header>` em um flex container, com o título de um lado e a `<nav>` do outro (`justify-content: space-between`), alinhados verticalmente ao centro.
+2. Crie uma seção com pelo menos quatro "cards" de categoria de gasto (pode reaproveitar as categorias do formulário: Alimentação, Transporte, Moradia, Lazer), organizados como flex items com `flex-wrap: wrap` e `gap`.
+3. Cada card deve usar `flex: 1 1 200px`, para crescer de forma flexível sem nunca ficar menor que 200px.
+4. Por padrão (estilo mobile, sem media query), a `<nav>` deve ficar em coluna (`flex-direction: column`), com os links empilhados.
+5. Usando uma media query `min-width`, faça a `<nav>` mudar para `flex-direction: row` a partir de 600px de largura de tela.
+6. Redimensione a janela do navegador (ou use o modo responsivo das DevTools) para confirmar que o layout muda corretamente no ponto de quebra definido.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```html
+<header class="navbar">
+  <h1>Dashboard de Finanças</h1>
+  <nav class="links">
+    <a href="/">Início</a>
+    <a href="/gastos">Gastos</a>
+    <a href="/relatorios">Relatórios</a>
+  </nav>
+</header>
+
+<section class="cards-gastos">
+  <div class="card">Alimentação<br />R$ 620,00</div>
+  <div class="card">Transporte<br />R$ 310,00</div>
+  <div class="card">Moradia<br />R$ 1.200,00</div>
+  <div class="card">Lazer<br />R$ 180,00</div>
+</section>
+```
+
+```css
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #1e3a8a;
+  color: white;
+}
+
+/* Mobile-first: links empilhados por padrão */
+.navbar .links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.navbar .links a {
+  color: white;
+  text-decoration: none;
+}
+
+/* A partir de 600px, os links ficam lado a lado */
+@media (min-width: 600px) {
+  .navbar .links {
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+}
+
+.cards-gastos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.card {
+  flex: 1 1 200px;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #f3f4f6;
+  text-align: center;
+}
+```
+
+</details>
+
+---
+
+Com Flexbox, Grid e media queries, você agora consegue organizar qualquer combinação de elementos em qualquer tela — de uma simples barra de navegação a um dashboard completo que se adapta do celular ao desktop. Esse é, na prática, o mesmo raciocínio de layout que frameworks JavaScript como React usam por trás dos componentes visuais que você vai construir mais adiante no curso. Mas antes disso, vale conhecer uma categoria de ferramenta que boa parte da indústria usa para acelerar exatamente esse trabalho de estilização: as bibliotecas e frameworks CSS, assunto do último capítulo deste módulo.

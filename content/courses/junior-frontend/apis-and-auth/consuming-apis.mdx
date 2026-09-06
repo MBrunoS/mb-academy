@@ -1,0 +1,409 @@
+---
+title: Consumindo APIs na Prática
+description: "Junte fetch, useState e useEffect em um padrão sólido, entenda métodos HTTP, status codes e quando trocar o fetch nativo pelo axios."
+---
+
+No módulo de JavaScript no Navegador, você usou `fetch` para buscar dados de um servidor. No módulo de React, você aprendeu `useState` para guardar informação que muda e `useEffect` para reagir ao ciclo de vida de um componente. Até aqui, você provavelmente praticou essas duas coisas separadamente. Chegou a hora de juntá-las: **buscar dados de uma API de dentro de um componente React**, de um jeito que sobrevive a erros de rede, demora do servidor e tudo mais que pode dar errado quando seu código depende de algo fora do seu controle.
+
+## De fetch isolado a um componente completo
+
+Um componente que depende de dados externos passa, tipicamente, por três estados possíveis: está **carregando** os dados, **carregou com sucesso**, ou **falhou** ao carregar. Modelar esses três estados com clareza é a diferença entre uma tela que "trava" silenciosamente e uma tela que se comunica bem com quem está usando.
+
+Vamos recuperar o exemplo da cotação do dólar que você já viu no Starter, mas agora dentro de um componente React:
+
+```tsx
+import { useEffect, useState } from "react";
+
+interface Cotacao {
+  bid: string;
+}
+
+function CotacaoDolar() {
+  const [cotacao, setCotacao] = useState<Cotacao | null>(null);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function buscarCotacao() {
+      try {
+        const resposta = await fetch(
+          "https://economia.awesomeapi.com.br/json/last/USD-BRL"
+        );
+
+        if (!resposta.ok) {
+          throw new Error(`Erro HTTP: ${resposta.status}`);
+        }
+
+        const dados = await resposta.json();
+        setCotacao(dados.USDBRL);
+      } catch (erro) {
+        if (erro instanceof Error) {
+          setErro(erro.message);
+        }
+      } finally {
+        setCarregando(false);
+      }
+    }
+
+    buscarCotacao();
+  }, []);
+
+  if (carregando) return <p>Carregando cotação...</p>;
+  if (erro) return <p>Não foi possível carregar a cotação: {erro}</p>;
+
+  return <p>Dólar agora: R$ {cotacao?.bid}</p>;
+}
+```
+
+Repare na estrutura: o array de dependências vazio (`[]`) faz a busca acontecer **uma vez**, quando o componente monta — o mesmo comportamento de `useEffect` que você já conhece. O `try/catch/finally` garante que, aconteça o que acontecer (sucesso ou erro), `carregando` sempre volta para `false` no `finally`, então a tela nunca fica presa em "Carregando..." para sempre.
+
+Esse é o esqueleto que você vai repetir, com variações, toda vez que um componente React precisar de dados de uma API.
+
+## Os métodos HTTP e quando usar cada um
+
+Cada requisição HTTP declara uma **intenção** através do seu método. Imagine que existe uma API de gastos pessoais, com um endpoint `/gastos` — os métodos mais comuns seriam usados assim:
+
+| Método | Intenção | Exemplo |
+|---|---|---|
+| `GET` | Buscar dados, sem alterar nada no servidor | `GET /gastos` → lista todos os gastos |
+| `POST` | Criar um novo recurso | `POST /gastos` → cria um novo gasto |
+| `PUT` | Substituir um recurso inteiro por um novo | `PUT /gastos/12` → sobrescreve o gasto 12 por completo |
+| `PATCH` | Atualizar parcialmente um recurso | `PATCH /gastos/12` → altera só o campo `valor`, por exemplo |
+| `DELETE` | Remover um recurso | `DELETE /gastos/12` → apaga o gasto 12 |
+
+Na prática, `PUT` e `PATCH` são frequentemente confundidos. A diferença importa: `PUT` espera o objeto **completo** (se você omitir um campo, ele pode ser apagado ou zerado, dependendo da implementação do servidor), enquanto `PATCH` espera **só os campos que mudaram**. Quando tiver dúvida sobre qual usar, `PATCH` costuma ser a escolha mais segura para atualizações parciais, como editar só a descrição de um gasto.
+
+Fazer uma requisição `POST` com `fetch` exige um pouco mais de configuração que um `GET`, porque você precisa informar o método, os cabeçalhos e o corpo da requisição:
+
+```ts
+interface NovoGasto {
+  descricao: string;
+  valor: number;
+  categoria: string;
+}
+
+async function criarGasto(gasto: NovoGasto) {
+  const resposta = await fetch("https://api.forja.dev/gastos", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(gasto),
+  });
+
+  if (!resposta.ok) {
+    throw new Error(`Não foi possível criar o gasto: ${resposta.status}`);
+  }
+
+  return resposta.json();
+}
+```
+
+Repare no cabeçalho `Content-Type: application/json` — ele avisa o servidor que o corpo da requisição (`body`) está em formato JSON. Sem esse cabeçalho, muitos servidores simplesmente não conseguem interpretar os dados que você enviou, mesmo que o `JSON.stringify` esteja correto.
+
+## Interpretando códigos de status HTTP
+
+Toda resposta HTTP vem com um **código de status** — um número de três dígitos que resume o que aconteceu. Você já usou `resposta.status` e `resposta.ok` nos exemplos acima; agora vamos entender o que esses números realmente significam. Eles são agrupados em faixas:
+
+| Faixa | Significado | Como reagir |
+|---|---|---|
+| `2xx` | Sucesso | `200 OK` (deu certo), `201 Created` (recurso criado), `204 No Content` (deu certo, sem corpo de resposta) — siga o fluxo normal |
+| `3xx` | Redirecionamento | O recurso mudou de lugar; o `fetch` geralmente já segue redirecionamentos sozinho |
+| `4xx` | Erro do cliente | `400 Bad Request` (dados inválidos), `401 Unauthorized` (não autenticado), `403 Forbidden` (autenticado, mas sem permissão), `404 Not Found` (recurso não existe) — o problema está na requisição que **você** enviou |
+| `5xx` | Erro do servidor | `500 Internal Server Error`, `503 Service Unavailable` — o problema é do lado do servidor, não há nada de errado com o que você enviou |
+
+<Callout type="warn">
+  `fetch` **não lança um erro automaticamente** para respostas `4xx` ou `5xx`. Ele só rejeita a Promise quando a requisição falha de verdade (sem internet, DNS não resolveu, servidor inacessível). Por isso, todo exemplo deste capítulo verifica `resposta.ok` manualmente antes de continuar — esquecer essa verificação é um dos erros mais comuns de quem está aprendendo a consumir APIs, porque o código "parece" funcionar até o dia em que o servidor retorna um 404 e sua tela quebra silenciosamente.
+</Callout>
+
+Como as faixas têm significados diferentes, muitas vezes vale a pena reagir de forma diferente para cada uma, em vez de tratar todo erro da mesma maneira:
+
+```ts
+async function buscarGasto(id: number) {
+  const resposta = await fetch(`https://api.forja.dev/gastos/${id}`);
+
+  if (resposta.status === 404) {
+    throw new Error("Gasto não encontrado.");
+  }
+
+  if (resposta.status === 401) {
+    throw new Error("Você precisa entrar na sua conta para ver isso.");
+  }
+
+  if (!resposta.ok) {
+    throw new Error(`Algo deu errado no servidor (${resposta.status}).`);
+  }
+
+  return resposta.json();
+}
+```
+
+Essa mensagem diferenciada é o que permite que sua interface mostre "Esse gasto não existe mais" em vez de um genérico "Ocorreu um erro" — uma diferença pequena no código, mas grande na experiência de quem usa o produto.
+
+## axios: uma alternativa ao fetch nativo
+
+`fetch` é nativo do navegador e resolve bem a maioria dos casos, mas o mercado usa muito uma biblioteca chamada **axios**, que resolve alguns incômodos comuns:
+
+- **JSON automático**: você acessa `resposta.data` diretamente, sem chamar `.json()` manualmente.
+- **Erros em `4xx`/`5xx` já lançam exceção**: diferente do `fetch`, o axios rejeita a Promise sozinho quando o status indica erro, então você não precisa checar `resposta.ok` na mão.
+- **Interceptors**: funções que rodam automaticamente antes de toda requisição (por exemplo, para anexar um token de autenticação) ou depois de toda resposta (por exemplo, para tratar erros de forma centralizada).
+- **Cancelamento de requisições** com a mesma API `AbortController` do `fetch` nativo.
+
+Primeiro, instale a biblioteca:
+
+```bash
+npm install axios
+```
+
+Compare os dois, buscando a lista de gastos:
+
+**Com `fetch`:**
+
+```ts
+async function buscarGastos() {
+  const resposta = await fetch("https://api.forja.dev/gastos");
+
+  if (!resposta.ok) {
+    throw new Error(`Erro HTTP: ${resposta.status}`);
+  }
+
+  return resposta.json();
+}
+```
+
+**Com `axios`:**
+
+```ts
+import axios from "axios";
+
+async function buscarGastos() {
+  const resposta = await axios.get("https://api.forja.dev/gastos");
+  return resposta.data;
+  // Se o servidor responder 4xx ou 5xx, o axios já lança
+  // uma exceção sozinho — não é preciso checar o status manualmente.
+}
+```
+
+Um dos usos mais práticos do axios é criar uma **instância configurada uma única vez**, com uma URL base e interceptors, para reaproveitar em todo o projeto:
+
+```ts
+// src/api/client.ts
+import axios from "axios";
+
+export const api = axios.create({
+  baseURL: "https://api.forja.dev",
+});
+
+// Roda antes de toda requisição feita com "api"
+api.interceptors.request.use((config) => {
+  console.log(`Chamando: ${config.method?.toUpperCase()} ${config.url}`);
+  return config;
+});
+
+// Roda depois de toda resposta (ou erro) recebida com "api"
+api.interceptors.response.use(
+  (resposta) => resposta,
+  (erro) => {
+    console.error("Requisição falhou:", erro.message);
+    return Promise.reject(erro);
+  }
+);
+```
+
+Com isso, qualquer chamada feita com `api.get(...)`, `api.post(...)` etc. já passa automaticamente pelos dois interceptors, sem repetir essa lógica em cada componente. No próximo capítulo deste módulo, vamos usar exatamente esse padrão de interceptor para anexar um token de autenticação em toda requisição.
+
+<Callout type="tip">
+  Não existe "certo" ou "errado" entre `fetch` e `axios` — `fetch` é suficiente para a maioria dos projetos pequenos e não exige instalar nada, enquanto `axios` compensa em projetos maiores, com muitas chamadas de API e necessidade de lógica compartilhada (como autenticação). Muitas vagas júnior vão pedir familiaridade com os dois, então vale a pena entender ambos, mesmo que você tenha uma preferência pessoal.
+</Callout>
+
+## Um padrão reutilizável para o estado da requisição
+
+Repare que, no primeiro exemplo deste capítulo, usamos **três variáveis de estado separadas** (`cotacao`, `carregando`, `erro`). Isso funciona, mas permite combinações que não deveriam existir — por exemplo, nada impede `carregando` e `erro` de estarem `true` ao mesmo tempo, o que não faz sentido de verdade.
+
+Uma forma mais robusta de modelar isso é com um **único estado**, representado por um tipo que só permite combinações válidas:
+
+```ts
+type EstadoRequisicao<T> =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; dados: T }
+  | { status: "error"; mensagem: string };
+```
+
+Esse tipo diz: em qualquer momento, a requisição está em **exatamente um** desses quatro estados — nunca dois ao mesmo tempo, e nunca nenhum. Podemos encapsular esse padrão em um hook personalizado, reaproveitável em qualquer componente que precise buscar dados:
+
+```tsx
+import { useEffect, useState } from "react";
+
+type EstadoRequisicao<T> =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; dados: T }
+  | { status: "error"; mensagem: string };
+
+function useApi<T>(url: string): EstadoRequisicao<T> {
+  const [estado, setEstado] = useState<EstadoRequisicao<T>>({ status: "idle" });
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function buscar() {
+      setEstado({ status: "loading" });
+
+      try {
+        const resposta = await fetch(url, { signal: controller.signal });
+
+        if (!resposta.ok) {
+          throw new Error(`Erro HTTP: ${resposta.status}`);
+        }
+
+        const dados: T = await resposta.json();
+        setEstado({ status: "success", dados });
+      } catch (erro) {
+        if (erro instanceof Error && erro.name !== "AbortError") {
+          setEstado({ status: "error", mensagem: erro.message });
+        }
+      }
+    }
+
+    buscar();
+
+    // Cancela a requisição se o componente desmontar ou a URL mudar
+    // antes da resposta chegar, evitando atualizar estado de um
+    // componente que já não existe mais na tela.
+    return () => controller.abort();
+  }, [url]);
+
+  return estado;
+}
+```
+
+E usá-lo em um componente fica bem mais declarativo, com um `switch` que cobre todos os casos possíveis:
+
+```tsx
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+}
+
+function ListaDeGastos() {
+  const estado = useApi<Gasto[]>("https://api.forja.dev/gastos");
+
+  switch (estado.status) {
+    case "idle":
+    case "loading":
+      return <p>Carregando gastos...</p>;
+    case "error":
+      return <p>Erro ao carregar: {estado.mensagem}</p>;
+    case "success":
+      return (
+        <ul>
+          {estado.dados.map((gasto) => (
+            <li key={gasto.id}>
+              {gasto.descricao} — R$ {gasto.valor.toFixed(2)}
+            </li>
+          ))}
+        </ul>
+      );
+  }
+}
+```
+
+Note que, dentro de `case "success"`, o TypeScript já sabe que `estado.dados` existe e tem o tipo `Gasto[]` — e dentro de `case "error"`, ele sabe que `estado.mensagem` existe. Essa é a vantagem de modelar estado como uma união de casos: o próprio compilador te impede de acessar um campo que não existe naquele estado específico.
+
+<Callout type="warn">
+  Ao adotar esse padrão, resista à tentação de "economizar" e usar só um booleano `carregando` junto de um campo `dados` que pode ser `null`. Combinações impossíveis (como `carregando: false`, `dados: null`, `erro: null`, todos "vazios" sem explicação) são exatamente o tipo de bug sutil que aparece em produção e é difícil de reproduzir. Modelar o estado como uma união de casos elimina essa classe inteira de erro.
+</Callout>
+
+## Para praticar
+
+**Cenário:** Você está construindo a tela de resumo do dashboard de finanças pessoais. Ela precisa buscar a lista de gastos de uma API e exibir um retrato fiel do que está acontecendo: carregando, sucesso ou erro.
+
+**Requisitos:**
+
+1. Crie uma interface `Gasto` com os campos `id: number`, `descricao: string`, `valor: number` e `categoria: string`.
+2. Implemente (ou reaproveite) um hook `useApi<T>(url: string)` que retorne um valor do tipo `EstadoRequisicao<T>`, com os quatro casos `idle`, `loading`, `success` e `error`, como visto neste capítulo.
+3. Crie um componente `ResumoDeGastos` que use `useApi<Gasto[]>` para buscar os dados de `"https://api.forja.dev/gastos"`.
+4. No estado `"loading"`, exiba a mensagem `"Carregando gastos..."`.
+5. No estado `"error"`, exiba a mensagem de erro recebida, precedida de `"Erro: "`.
+6. No estado `"success"`, exiba o **total gasto** (soma de todos os valores, usando `reduce`) e a **quantidade de gastos** encontrados.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```tsx
+import { useEffect, useState } from "react";
+
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+  categoria: string;
+}
+
+type EstadoRequisicao<T> =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; dados: T }
+  | { status: "error"; mensagem: string };
+
+function useApi<T>(url: string): EstadoRequisicao<T> {
+  const [estado, setEstado] = useState<EstadoRequisicao<T>>({ status: "idle" });
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function buscar() {
+      setEstado({ status: "loading" });
+
+      try {
+        const resposta = await fetch(url, { signal: controller.signal });
+
+        if (!resposta.ok) {
+          throw new Error(`Erro HTTP: ${resposta.status}`);
+        }
+
+        const dados: T = await resposta.json();
+        setEstado({ status: "success", dados });
+      } catch (erro) {
+        if (erro instanceof Error && erro.name !== "AbortError") {
+          setEstado({ status: "error", mensagem: erro.message });
+        }
+      }
+    }
+
+    buscar();
+    return () => controller.abort();
+  }, [url]);
+
+  return estado;
+}
+
+function ResumoDeGastos() {
+  const estado = useApi<Gasto[]>("https://api.forja.dev/gastos");
+
+  switch (estado.status) {
+    case "idle":
+    case "loading":
+      return <p>Carregando gastos...</p>;
+    case "error":
+      return <p>Erro: {estado.mensagem}</p>;
+    case "success": {
+      const total = estado.dados.reduce((acc, gasto) => acc + gasto.valor, 0);
+      return (
+        <div>
+          <p>Total gasto: R$ {total.toFixed(2)}</p>
+          <p>Quantidade de gastos: {estado.dados.length}</p>
+        </div>
+      );
+    }
+  }
+}
+```
+
+</details>
+
+---
+
+Com isso, você já sabe buscar dados, tratar erros por faixa de status, escolher entre `fetch` e `axios`, e modelar o estado de uma requisição de forma robusta. Mas em algum momento — geralmente sem aviso prévio — você vai tentar consumir uma API de outro domínio e ver o console do navegador cheio de mensagens vermelhas sobre CORS. É exatamente esse mistério que vamos desvendar a seguir.

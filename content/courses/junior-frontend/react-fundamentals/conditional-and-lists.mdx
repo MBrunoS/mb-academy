@@ -1,0 +1,251 @@
+---
+title: Renderização Condicional e Listas
+description: "Aprenda a mostrar ou esconder partes da interface e a transformar arrays de dados em elementos na tela com segurança."
+---
+
+Você já sabe guardar uma lista de gastos em estado com `useState`. Mas guardar os dados é só metade do trabalho — agora precisamos exibi-los. E aqui aparecem duas perguntas centrais em praticamente toda tela que você vai construir: *isso deveria aparecer agora?* e *como transformo um array de dados em elementos na tela?*. Vamos responder as duas.
+
+## Renderização condicional: mostrando (ou escondendo) partes da UI
+
+Como vimos no capítulo anterior sobre JSX, você não pode usar um `if` solto dentro do `return (...)` de um componente — JSX só aceita **expressões**. Felizmente, TypeScript já tem expressões que resolvem exatamente esse problema.
+
+### O operador `&&` para "se, então"
+
+Quando você quer renderizar algo **apenas se** uma condição for verdadeira (e nada, caso contrário), o operador `&&` é a ferramenta mais direta:
+
+```tsx
+interface CartaoGastoProps {
+  descricao: string;
+  valor: number;
+  pago: boolean;
+}
+
+function CartaoGasto({ descricao, valor, pago }: CartaoGastoProps) {
+  return (
+    <div className="cartao-gasto">
+      <p>{descricao}</p>
+      <strong>R$ {valor.toFixed(2)}</strong>
+      {pago && <span className="selo-pago">Pago</span>}
+    </div>
+  );
+}
+```
+
+Se `pago` for `true`, o JSX à direita do `&&` é renderizado. Se for `false`, a expressão inteira é avaliada como `false`, e o React sabe que "renderizar `false`" significa não renderizar nada.
+
+<Callout type="warn">
+  Cuidado com uma armadilha clássica do `&&`: se o valor da esquerda for `0`
+  (e não um booleano), o React **renderiza o próprio `0`** na tela, em vez de
+  esconder o elemento. Isso acontece porque `0` é "falsy" em uma condição,
+  mas ainda é um valor válido para renderização. Por exemplo, a expressão
+  `quantidadeGastos && <ListaDeGastos />` mostra um `0` solto na tela quando
+  a lista está vazia. Prefira transformar a condição em um booleano explícito:
+  `quantidadeGastos > 0 && <ListaDeGastos />`.
+</Callout>
+
+### Ternário para "se, senão"
+
+Quando existem **duas** possibilidades — uma coisa ou outra — o operador ternário (`condição ? seVerdadeiro : seFalso`) resolve bem, especialmente para casos simples:
+
+```tsx
+function StatusGasto({ pago }: { pago: boolean }) {
+  return <span>{pago ? "Pago" : "Pendente"}</span>;
+}
+```
+
+Ternários aninhados (um ternário dentro de outro) tendem a ficar difíceis de ler rapidamente. Se você perceber que está encadeando mais de um, geralmente é sinal de que vale a pena usar uma variável auxiliar ou um `if`/`early return` antes do `return` do componente.
+
+### Early return e variável auxiliar
+
+Nem toda decisão precisa acontecer dentro do JSX. Como o corpo de um componente é só uma função TypeScript comum, você pode usar `if` normalmente **antes** do `return`, incluindo um retorno antecipado:
+
+```tsx
+interface PainelGastosProps {
+  carregando: boolean;
+  gastos: { id: number; descricao: string }[];
+}
+
+function PainelGastos({ carregando, gastos }: PainelGastosProps) {
+  if (carregando) {
+    return <p>Carregando gastos...</p>;
+  }
+
+  return (
+    <div>
+      <h2>Meus gastos</h2>
+      <p>Total de itens: {gastos.length}</p>
+    </div>
+  );
+}
+```
+
+Outra alternativa é calcular uma variável auxiliar de JSX antes do `return`, útil quando a lógica de decisão é um pouco mais elaborada:
+
+```tsx
+function ResumoSaldo({ saldo }: { saldo: number }) {
+  const corDoSaldo = saldo >= 0 ? "verde" : "vermelho";
+  const mensagem = saldo >= 0 ? "Saldo positivo" : "Atenção: saldo negativo";
+
+  return (
+    <p className={`saldo-${corDoSaldo}`}>
+      {mensagem}: R$ {saldo.toFixed(2)}
+    </p>
+  );
+}
+```
+
+Não existe uma técnica "certa" entre `&&`, ternário, early return e variável auxiliar — a escolha certa é a que deixa o componente mais fácil de ler. Como regra prática: `&&` para "mostrar ou não mostrar", ternário para "isso ou aquilo" simples, e early return/variável auxiliar quando a lógica cresce.
+
+## Renderizando listas com `.map()`
+
+Chegamos à peça que faltava para exibir a nossa lista de gastos: transformar um array de dados em um array de elementos JSX. A ferramenta é a mesma que você já usa em TypeScript puro desde o Starter — o método `.map()` dos arrays.
+
+```tsx
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+}
+
+interface ListaDeGastosProps {
+  gastos: Gasto[];
+}
+
+function ListaDeGastos({ gastos }: ListaDeGastosProps) {
+  return (
+    <ul>
+      {gastos.map((gasto) => (
+        <li key={gasto.id}>
+          {gasto.descricao} — R$ {gasto.valor.toFixed(2)}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+O `.map()` recebe uma função que transforma cada `gasto` em um elemento JSX (`<li>`), e retorna um novo array — dessa vez, um array de elementos. O JSX sabe renderizar arrays de elementos naturalmente: basta colocar a expressão entre chaves, exatamente como fizemos com qualquer outra expressão.
+
+## A prop `key`: por que o React precisa dela
+
+Você deve ter notado o atributo `key={gasto.id}` no exemplo acima. Ele não é opcional — se você omitir, o React exibe um aviso no console dizendo que cada item de uma lista precisa de uma prop `key` única, e por um bom motivo.
+
+Quando uma lista muda (um item é adicionado, removido ou reordenado), o React precisa decidir: quais elementos da tela continuam sendo os mesmos, e quais são novos? Esse processo se chama **reconciliação**, e a prop `key` é a informação que o React usa para parear "o item de antes" com "o item de agora" — sem ela, o React só tem a posição do item na lista como pista, e isso pode enganar.
+
+```tsx
+// Arriscado: usar o índice como key
+{gastos.map((gasto, index) => (
+  <li key={index}>{gasto.descricao}</li>
+))}
+```
+
+Imagine uma lista com três gastos, nas posições `0`, `1` e `2`. Se o usuário remover o primeiro gasto (posição `0`), o que era o segundo gasto passa a ocupar a posição `0`, e o terceiro passa a ocupar a posição `1`. Usando o índice como `key`, o React entende que "o item na posição `0` é o mesmo de antes, só que com conteúdo diferente" — e não que um item foi removido. Isso não causa problema visível em uma lista puramente de texto como essa, mas se cada `<li>` tivesse estado próprio (um input controlado, um checkbox marcado, uma animação em andamento), esse estado **ficaria grudado na posição errada**, migrando para o item vizinho em vez de acompanhar o item correto — um bug sutil e difícil de perceber até tarde.
+
+A solução é usar um identificador **estável e único** por item — no nosso caso, `gasto.id`, que não muda mesmo que a posição do gasto na lista mude:
+
+```tsx
+{gastos.map((gasto) => (
+  <li key={gasto.id}>{gasto.descricao}</li>
+))}
+```
+
+<Callout type="warn">
+  Use o índice como `key` apenas quando a lista é **verdadeiramente estática**
+  — nunca reordenada, filtrada ou tem itens removidos/adicionados no meio.
+  Fora desse caso raro, prefira sempre um identificador único e estável dos
+  próprios dados (`id`, `slug`, etc.), nunca a posição no array.
+</Callout>
+
+## Estados vazios: quando a lista não tem nada para mostrar
+
+Toda lista, mais cedo ou mais tarde, vai estar vazia — um usuário novo que ainda não cadastrou nenhum gasto, ou um filtro que não encontrou resultados. Deixar essa situação sem tratamento resulta em uma tela em branco, sem explicação para quem está usando o app. Combinando o que aprendemos nas duas seções deste capítulo:
+
+```tsx
+function ListaDeGastos({ gastos }: ListaDeGastosProps) {
+  if (gastos.length === 0) {
+    return <p>Nenhum gasto registrado ainda.</p>;
+  }
+
+  return (
+    <ul>
+      {gastos.map((gasto) => (
+        <li key={gasto.id}>
+          {gasto.descricao} — R$ {gasto.valor.toFixed(2)}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+Repare que essa mensagem — "Nenhum gasto registrado ainda." — é a mesma que você já escreveu no método `listarGastos` do Rastreador de Gastos em TypeScript puro, no Starter. A lógica de "o que exibir quando não há dados" não muda entre um projeto de terminal e um projeto React; muda apenas *como* você expressa essa decisão em código.
+
+## Para praticar
+
+Vamos aplicar exatamente essa combinação — `.map()`, `key` e estado vazio — em um cenário que já apareceu no seu Rastreador de Gastos do Starter: o resumo por categoria.
+
+**Cenário:** O dashboard precisa de um componente que agrupe os gastos por categoria e mostre o total de cada uma.
+
+**Requisitos:**
+
+1. Crie um componente `ResumoPorCategoria` que recebe uma prop `gastos: Gasto[]` (reaproveite a interface `Gasto` com `id`, `descricao`, `valor` e `categoria`).
+2. Use `.reduce()` para agrupar o total gasto por categoria em um objeto do tipo `Record<string, number>`.
+3. Use `Object.entries(...)` para transformar esse objeto agrupado em uma lista de pares `[categoria, total]`.
+4. Renderize essa lista com `.map()`, exibindo cada linha como um `<li>` com o texto `"categoria: R$ total"` — usando a própria `categoria` como `key` (categorias não se repetem no objeto agrupado, então são únicas).
+5. Se `gastos` estiver vazio, renderize a mensagem `"Nenhum gasto para resumir."` em vez da lista.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```tsx
+type Categoria =
+  | "alimentação"
+  | "transporte"
+  | "moradia"
+  | "lazer"
+  | "saúde"
+  | "outros";
+
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+  categoria: Categoria;
+}
+
+interface ResumoPorCategoriaProps {
+  gastos: Gasto[];
+}
+
+function ResumoPorCategoria({ gastos }: ResumoPorCategoriaProps) {
+  if (gastos.length === 0) {
+    return <p>Nenhum gasto para resumir.</p>;
+  }
+
+  const totaisPorCategoria = gastos.reduce<Record<string, number>>(
+    (acumulador, gasto) => {
+      acumulador[gasto.categoria] = (acumulador[gasto.categoria] ?? 0) + gasto.valor;
+      return acumulador;
+    },
+    {}
+  );
+
+  return (
+    <ul>
+      {Object.entries(totaisPorCategoria).map(([categoria, total]) => (
+        <li key={categoria}>
+          {categoria}: R$ {total.toFixed(2)}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+Essa é a mesma lógica de agrupamento do método `resumoPorCategoria` que você escreveu no Rastreador de Gastos do Starter — só que, em vez de imprimir com `console.table`, agora transformamos o resultado agrupado diretamente em elementos JSX com `.map()`.
+
+</details>
+
+---
+
+Agora você sabe controlar o que aparece na tela e transformar qualquer array de dados em uma lista de elementos, com a segurança da prop `key`. Com isso, os blocos visuais do dashboard já estão praticamente completos. Falta uma peça: como buscar e sincronizar dados que vêm de **fora** do fluxo normal de renderização — como salvar a lista de gastos para que ela sobreviva a um recarregamento de página. É isso que veremos no próximo capítulo, sobre efeitos colaterais.

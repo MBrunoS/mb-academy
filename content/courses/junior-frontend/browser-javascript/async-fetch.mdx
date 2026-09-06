@@ -1,0 +1,259 @@
+---
+title: Comunicação com Servidores
+description: "Use fetch para buscar dados reais de uma API, atualizando a tela e tratando falhas de rede como parte natural do fluxo."
+---
+
+Até agora, todos os gastos que você exibiu na tela vieram de arrays escritos diretamente no código TypeScript. Isso é útil para aprender, mas nenhuma aplicação real funciona assim: os dados de verdade — os gastos de um usuário, o saldo de uma conta, o histórico de transações — vivem em um **servidor**, não no seu arquivo `.ts`. Sua página precisa **pedir** esses dados pela rede, esperar a resposta, e só então desenhar a tela com eles.
+
+Essa última peça fecha o quadro do capítulo: você já sabe manipular o DOM e reagir a eventos; agora vai aprender a alimentar essa interface com dados reais, vindos de fora.
+
+## Relembrando: Promises e `async/await`
+
+No Starter, você já aprendeu que uma operação demorada — como uma requisição de rede — não trava seu programa esperando. Em vez disso, ela devolve uma **Promise**, um objeto que representa um valor que ainda vai chegar, e você usa `async`/`await` para escrever esse código de forma que pareça síncrona:
+
+```ts
+async function exemplo(): Promise<void> {
+  const resultado = await algumaOperacaoDemorada();
+  console.log(resultado);
+}
+```
+
+Isso não muda no navegador — é exatamente o mesmo `async/await` que você já domina. A única novidade real aqui é **qual operação assíncrona** você vai aguardar: em vez de simular um atraso com `setTimeout`, agora você vai aguardar uma resposta de rede de verdade, usando `fetch`.
+
+## `fetch`: pedindo dados a um servidor
+
+`fetch` é a função nativa do navegador (também disponível em `Node.js` moderno) para fazer requisições HTTP. Ela recebe uma URL, dispara a requisição, e devolve uma `Promise` que resolve quando a resposta **começa** a chegar — não quando ela termina de ser processada, um detalhe importante que você vai ver na próxima seção.
+
+```ts
+async function buscarGastos(): Promise<void> {
+  const resposta = await fetch("https://api.forja.dev/gastos");
+  const dados = await resposta.json();
+  console.log(dados);
+}
+```
+
+<Callout>
+  A URL `https://api.forja.dev/gastos` é fictícia — usada aqui só para fins didáticos. Mas o código acima é **exatamente** o que você escreveria contra uma API real: o padrão de `fetch` + `.json()` não muda dependendo do servidor do outro lado.
+</Callout>
+
+Repare que precisamos de **dois** `await`: um para esperar a resposta chegar (`fetch`), outro para converter o corpo dessa resposta de texto bruto para um objeto TypeScript utilizável (`.json()`). Isso acontece porque o corpo de uma resposta HTTP não chega instantaneamente pronto — ele também é lido de forma assíncrona, principalmente para respostas grandes.
+
+### Tipando o retorno esperado
+
+Por padrão, `resposta.json()` devolve `any` — o TypeScript não tem como saber, sozinho, qual é o formato dos dados que um servidor externo vai devolver. Cabe a você declarar essa forma, geralmente com uma `interface`, e informar o tipo esperado ao usar o resultado:
+
+```ts
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+  categoria: string;
+}
+
+async function buscarGastos(): Promise<Gasto[]> {
+  const resposta = await fetch("https://api.forja.dev/gastos");
+  const dados = (await resposta.json()) as Gasto[];
+  return dados;
+}
+```
+
+<Callout type="warn">
+  Um `as Gasto[]` é uma **afirmação de tipo** — você está dizendo ao TypeScript "confie em mim, isso é um array de `Gasto`". Mas o TypeScript não verifica isso em tempo de execução: se o servidor devolver algo com um formato diferente (um campo faltando, um tipo trocado), seu código vai compilar normalmente e só quebrar quando rodar. Para APIs críticas, vale a pena validar a resposta em tempo de execução com uma biblioteca como Zod — você vai ver isso com mais profundidade no capítulo de consumo de APIs.
+</Callout>
+
+## `response.ok`: a pegadinha do `fetch`
+
+Aqui está um dos detalhes mais importantes — e mais surpreendentes para quem está começando — sobre `fetch`: **a Promise que ele devolve só é rejeitada em caso de falha de rede** (sem conexão, DNS não resolvido, servidor inatingível). Se o servidor responder normalmente, mas com um status de erro — como `404 Not Found` ou `500 Internal Server Error` — o `fetch` considera isso uma resposta **bem-sucedida** do ponto de vista da Promise, porque, tecnicamente, uma resposta chegou.
+
+```ts
+const resposta = await fetch("https://api.forja.dev/gastos/999999");
+console.log(resposta.status); // 404
+console.log(resposta.ok);     // false
+// mas nenhum erro foi lançado aqui — o await passou normalmente!
+```
+
+Por isso, checar `resposta.ok` (um booleano que é `true` para status entre 200 e 299) é obrigatório antes de assumir que os dados vieram certos:
+
+```ts
+async function buscarGastos(): Promise<Gasto[]> {
+  const resposta = await fetch("https://api.forja.dev/gastos");
+
+  if (!resposta.ok) {
+    throw new Error(`Erro ao buscar gastos: ${resposta.status}`);
+  }
+
+  const dados = (await resposta.json()) as Gasto[];
+  return dados;
+}
+```
+
+Lançar um `Error` manualmente aqui é o que permite que o problema seja capturado por um `try/catch`, unificando o tratamento de "servidor respondeu com erro" e "a rede falhou completamente" no mesmo bloco.
+
+## Tratando falhas de rede e atualizando a interface
+
+Em uma aplicação real, uma requisição pode falhar de várias formas: o usuário está sem internet, o servidor está fora do ar, a resposta demora além do razoável. Sua interface precisa **mostrar isso ao usuário** — não só logar no console, que ninguém vê.
+
+Vamos montar um exemplo completo, juntando tudo o que você aprendeu neste capítulo: um botão que busca os gastos, um estado de carregamento, uma lista que é preenchida com o resultado, e uma mensagem de erro visível quando algo dá errado.
+
+```html
+<button id="btn-carregar">Carregar gastos</button>
+<p id="mensagem-status"></p>
+<ul id="lista-gastos"></ul>
+```
+
+```ts
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+  categoria: string;
+}
+
+async function buscarGastos(): Promise<Gasto[]> {
+  const resposta = await fetch("https://api.forja.dev/gastos");
+
+  if (!resposta.ok) {
+    throw new Error(`Erro ao buscar gastos: ${resposta.status}`);
+  }
+
+  return (await resposta.json()) as Gasto[];
+}
+
+function renderizarGastos(gastos: Gasto[], lista: HTMLUListElement): void {
+  lista.innerHTML = ""; // limpa a lista antes de renderizar de novo
+
+  for (const gasto of gastos) {
+    const item = document.createElement("li");
+    item.textContent = `${gasto.descricao} — R$ ${gasto.valor.toFixed(2)}`;
+    lista.appendChild(item);
+  }
+}
+
+const botao = document.querySelector<HTMLButtonElement>("#btn-carregar");
+const lista = document.querySelector<HTMLUListElement>("#lista-gastos");
+const mensagem = document.querySelector<HTMLParagraphElement>("#mensagem-status");
+
+botao?.addEventListener("click", async () => {
+  if (!lista || !mensagem) return;
+
+  botao.disabled = true;
+  mensagem.textContent = "Carregando...";
+
+  try {
+    const gastos = await buscarGastos();
+    renderizarGastos(gastos, lista);
+    mensagem.textContent = `${gastos.length} gastos carregados.`;
+  } catch (erro) {
+    if (erro instanceof Error) {
+      mensagem.textContent = `Não foi possível carregar os gastos: ${erro.message}`;
+    }
+  } finally {
+    botao.disabled = false;
+  }
+});
+```
+
+Note o padrão: `botao.disabled = true` antes da requisição evita que o usuário clique várias vezes enquanto os dados ainda estão chegando; o `finally` garante que o botão volta a ficar habilitado **independentemente** do resultado (sucesso ou erro); e a mensagem de status é sempre atualizada via `textContent`, então o usuário nunca fica olhando para uma tela que parece travada.
+
+<Callout type="tip">
+  Quando um servidor demora demais para responder, `fetch` sozinho não tem um "tempo limite" embutido — ele espera indefinidamente. Para lidar com isso, você pode combinar `fetch` com um `AbortController`, que cancela a requisição depois de um tempo definido:
+
+```ts
+async function buscarComTimeout(url: string, tempoLimiteMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), tempoLimiteMs);
+
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+```
+
+  Não se preocupe em memorizar isso agora — é uma ferramenta boa de saber que existe, para quando você precisar dela em um projeto real.
+</Callout>
+
+## Para praticar
+
+Você tem a seguinte página HTML:
+
+```html
+<button id="btn-buscar">Buscar gasto por ID</button>
+<input id="input-id" type="number" placeholder="ID do gasto" />
+<p id="resultado"></p>
+```
+
+E uma API fictícia que responde em `https://api.forja.dev/gastos/:id`, devolvendo um JSON no formato:
+
+```json
+{ "id": 1, "descricao": "Mercado", "valor": 189.9, "categoria": "Alimentação" }
+```
+
+ou um status `404` caso o ID não exista.
+
+**Requisitos:**
+
+1. Crie uma `interface Gasto` com os campos `id`, `descricao`, `valor` e `categoria`.
+2. Ao clicar no botão, leia o valor digitado em `#input-id` e faça uma requisição `fetch` para `https://api.forja.dev/gastos/{id}`.
+3. Enquanto a requisição está em andamento, exiba `"Buscando..."` no elemento `#resultado`.
+4. Se a resposta não for `ok`, exiba uma mensagem de erro amigável no `#resultado` (não deixe a exceção "estourar" sem tratamento).
+5. Se a busca der certo, exiba `"Descrição — R$ Valor"` no `#resultado`.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+  categoria: string;
+}
+
+async function buscarGastoPorId(id: number): Promise<Gasto> {
+  const resposta = await fetch(`https://api.forja.dev/gastos/${id}`);
+
+  if (!resposta.ok) {
+    throw new Error(
+      resposta.status === 404 ? "Gasto não encontrado." : `Erro do servidor: ${resposta.status}`
+    );
+  }
+
+  return (await resposta.json()) as Gasto;
+}
+
+const botao = document.querySelector<HTMLButtonElement>("#btn-buscar");
+const inputId = document.querySelector<HTMLInputElement>("#input-id");
+const resultado = document.querySelector<HTMLParagraphElement>("#resultado");
+
+botao?.addEventListener("click", async () => {
+  if (!inputId || !resultado) return;
+
+  const id = Number(inputId.value);
+
+  if (Number.isNaN(id)) {
+    resultado.textContent = "Digite um ID válido.";
+    return;
+  }
+
+  resultado.textContent = "Buscando...";
+
+  try {
+    const gasto = await buscarGastoPorId(id);
+    resultado.textContent = `${gasto.descricao} — R$ ${gasto.valor.toFixed(2)}`;
+  } catch (erro) {
+    if (erro instanceof Error) {
+      resultado.textContent = erro.message;
+    }
+  }
+});
+```
+
+</details>
+
+---
+
+Com `fetch`, `async/await` e tratamento de erros, seu front-end deixou de depender de dados inventados no código: ele agora conversa com o mundo real, com todas as incertezas que isso traz — respostas que demoram, servidores que falham, dados que não vêm no formato esperado. Você fechou o círculo deste capítulo: seleciona e manipula o DOM, reage a eventos do usuário, e busca dados reais de um servidor.
+
+Tudo isso, porém, foi feito manualmente — selecionando elementos um a um, criando e limpando listas na mão, torcendo para não esquecer de atualizar algum pedaço da tela. No próximo capítulo, você vai conhecer o **React**, que resolve exatamente esse problema: em vez de descrever passo a passo como atualizar o DOM, você vai aprender a descrever **como a interface deve parecer** para cada estado dos dados, deixando o framework cuidar do resto.

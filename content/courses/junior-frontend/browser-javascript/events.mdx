@@ -1,0 +1,225 @@
+---
+title: Eventos
+description: "Faça sua página reagir a cliques, digitação e envios de formulário, entendendo o objeto de evento e a propagação pela árvore do DOM."
+---
+
+No capítulo anterior, você aprendeu a selecionar, criar e remover elementos do DOM. Mas repare em uma limitação: tudo o que você escreveu roda **uma única vez**, exatamente quando o script carrega. Se você quiser que um botão adicione um gasto quando clicado, ou que um formulário reaja quando o usuário digita, precisa de um jeito de dizer ao navegador: "quando isso acontecer, execute este código".
+
+É exatamente isso que os **eventos** fazem. Eles são o mecanismo que transforma sua página de uma foto estática em algo que responde ao que o usuário faz, em tempo real.
+
+## O modelo de eventos do navegador
+
+O navegador está o tempo todo observando o que acontece na página: cliques do mouse, teclas pressionadas, formulários enviados, a página terminando de carregar, o mouse passando por cima de um elemento. Cada uma dessas ocorrências gera um **evento** — um objeto que descreve o que aconteceu e onde.
+
+Seu código não fica checando ativamente "o usuário já clicou?" a cada milissegundo. Em vez disso, você **registra um ouvinte** (*listener*) em um elemento, dizendo qual tipo de evento te interessa e qual função deve rodar quando ele acontecer. O navegador cuida do resto — e chama sua função automaticamente, no momento certo.
+
+Esse modelo é chamado de **programação orientada a eventos**, e é a espinha dorsal de praticamente toda interface gráfica, seja ela web, desktop ou mobile.
+
+## `addEventListener`
+
+O método usado para registrar um ouvinte é `addEventListener`, chamado em qualquer elemento do DOM. Ele recebe o nome do evento (uma string) e uma função de callback que roda quando o evento ocorre.
+
+```ts
+const botao = document.querySelector<HTMLButtonElement>("#btn-adicionar");
+
+botao?.addEventListener("click", (event: MouseEvent) => {
+  console.log("Botão clicado!", event);
+});
+```
+
+Repare em algo importante na tipagem: o TypeScript sabe, só de você escrever `"click"`, que o evento recebido pelo callback é um `MouseEvent` — um tipo que tem propriedades específicas de cliques, como `clientX` e `clientY` (a posição do cursor). Se você escrever `"keydown"` no lugar, o TypeScript espera (e a lib `dom` fornece) um `KeyboardEvent`, com propriedades como `key`. Essa correspondência entre o nome do evento e o tipo do objeto vem da própria definição de `addEventListener` na biblioteca de tipos do DOM — não é algo que você precisa configurar, só aproveitar.
+
+```ts
+document.addEventListener("keydown", (event: KeyboardEvent) => {
+  console.log("Tecla pressionada:", event.key);
+});
+```
+
+<Callout type="tip">
+  Você pode até omitir a anotação de tipo do parâmetro (`event`) e deixar o TypeScript inferir sozinho, com base no nome do evento passado como primeiro argumento. Anotar explicitamente, como nos exemplos acima, deixa o código mais claro para quem está lendo — mas ambas as formas são igualmente seguras.
+</Callout>
+
+## O objeto de evento
+
+Todo callback de evento recebe um objeto (`event`) com informações sobre o que aconteceu. As duas propriedades mais usadas no dia a dia são `target` e `preventDefault()`.
+
+**`event.target`** é o elemento exato que originou o evento — por exemplo, o botão específico que foi clicado, mesmo que o ouvinte esteja registrado em um elemento pai (você vai ver por que isso importa daqui a pouco, na seção sobre delegação). O tipo de `target` é `EventTarget`, um tipo bem genérico que não conhece propriedades específicas de HTML. Por isso, é comum precisar convertê-lo (fazer um *cast*) para o tipo real que você espera encontrar:
+
+```ts
+document.addEventListener("click", (event: MouseEvent) => {
+  const elementoClicado = event.target as HTMLElement;
+  console.log("Você clicou em uma tag:", elementoClicado.tagName);
+});
+```
+
+**`preventDefault()`** cancela o comportamento padrão que o navegador executaria automaticamente para aquele evento. O caso mais comum é em formulários: por padrão, ao enviar um `<form>`, o navegador recarrega a página inteira (ou navega para a URL definida no atributo `action`). Isso quase nunca é o que você quer em uma aplicação moderna, onde você prefere capturar os dados e tratá-los com TypeScript sem perder o estado da página.
+
+```ts
+const formulario = document.querySelector<HTMLFormElement>("#form-gasto");
+
+formulario?.addEventListener("submit", (event: SubmitEvent) => {
+  event.preventDefault(); // impede o recarregamento da página
+  console.log("Formulário capturado, sem recarregar a página.");
+});
+```
+
+<Callout type="warn">
+  Esquecer o `preventDefault()` em um listener de `submit` é um dos erros mais comuns de quem está começando: o código parece certo, mas a página recarrega antes de você conseguir ver o resultado no console. Se seu formulário parece "não fazer nada", primeiro cheque se você chamou `preventDefault()`.
+</Callout>
+
+## Eventos de formulário: capturando o que o usuário digita
+
+Além de `submit`, dois eventos são essenciais para trabalhar com formulários: `input` (dispara a cada tecla digitada, a cada mudança no valor) e `change` (dispara quando o campo perde o foco após uma mudança — mais comum em `<select>` e checkboxes).
+
+Vamos montar um formulário completo para adicionar um gasto:
+
+```html
+<form id="form-gasto">
+  <input id="input-descricao" type="text" placeholder="Descrição" required />
+  <input id="input-valor" type="number" placeholder="Valor" required />
+  <button type="submit">Adicionar</button>
+</form>
+```
+
+```ts
+const formulario = document.querySelector<HTMLFormElement>("#form-gasto");
+
+formulario?.addEventListener("submit", (event: SubmitEvent) => {
+  event.preventDefault();
+
+  const inputDescricao = document.querySelector<HTMLInputElement>("#input-descricao");
+  const inputValor = document.querySelector<HTMLInputElement>("#input-valor");
+
+  if (!inputDescricao || !inputValor) return;
+
+  const descricao = inputDescricao.value;      // sempre string
+  const valor = Number(inputValor.value);      // precisa converter para number
+
+  console.log(`Novo gasto: ${descricao} — R$ ${valor.toFixed(2)}`);
+
+  formulario.reset(); // limpa os campos do formulário
+});
+```
+
+Repare que `.value` em qualquer `HTMLInputElement` sempre devolve uma `string`, mesmo quando o campo é `type="number"`. É responsabilidade sua converter esse valor para `number` (com `Number(...)` ou `parseFloat(...)`) antes de fazer contas com ele — o TypeScript não converte isso automaticamente, porque, do ponto de vista da API do DOM, todo valor digitado é texto.
+
+Se você quiser reagir a cada tecla digitada — para validar em tempo real, por exemplo — use `input`:
+
+```ts
+const inputValor = document.querySelector<HTMLInputElement>("#input-valor");
+
+inputValor?.addEventListener("input", (event: Event) => {
+  const valorAtual = (event.target as HTMLInputElement).value;
+  console.log("Valor digitado até agora:", valorAtual);
+});
+```
+
+## Propagação: bubbling e delegação de eventos
+
+Quando um evento acontece em um elemento, ele não fica restrito àquele elemento — ele **sobe pela árvore do DOM**, passando por cada elemento pai, até chegar ao `document`. Esse processo se chama **bubbling** (borbulhamento). Um clique em um `<button>` dentro de um `<li>`, dentro de um `<ul>`, dispara o evento de clique no botão primeiro, depois no `<li>`, depois no `<ul>`, e assim por diante.
+
+Isso pode parecer só um detalhe técnico, mas ele abilita uma técnica extremamente útil: a **delegação de eventos**. Em vez de registrar um `addEventListener` em cada item de uma lista (o que seria inviável para uma lista que cresce dinamicamente, como a de gastos), você registra **um único listener no elemento pai**, e usa `event.target` para descobrir em qual filho o clique realmente aconteceu.
+
+```html
+<ul id="lista-gastos">
+  <li>Mercado — R$ 189,90 <button class="remover">Remover</button></li>
+  <li>Academia — R$ 99,90 <button class="remover">Remover</button></li>
+</ul>
+```
+
+```ts
+const lista = document.querySelector<HTMLUListElement>("#lista-gastos");
+
+lista?.addEventListener("click", (event: MouseEvent) => {
+  const alvo = event.target as HTMLElement;
+
+  // .matches() verifica se o elemento clicado casa com o seletor CSS
+  if (alvo.matches("button.remover")) {
+    const item = alvo.closest("li"); // sobe até o <li> mais próximo
+    item?.remove();
+  }
+});
+```
+
+Essa abordagem tem duas vantagens enormes: você registra **um único listener**, não importa quantos itens existam na lista, e ela funciona automaticamente para itens **criados depois** — como um `<li>` que você adiciona dinamicamente com `appendChild`, sem precisar lembrar de registrar um novo listener para ele.
+
+<Callout>
+  Se você registrasse o listener diretamente em cada botão `.remover` no momento em que a página carrega, qualquer botão criado depois (dinamicamente, via `createElement`) **não teria** esse listener — porque ele não existia quando o registro aconteceu. A delegação resolve isso elegantemente, escutando no elemento pai que já existia desde o início.
+</Callout>
+
+## Para praticar
+
+Você tem a seguinte estrutura HTML:
+
+```html
+<form id="form-gasto">
+  <input id="input-descricao" type="text" placeholder="Descrição" required />
+  <input id="input-valor" type="number" placeholder="Valor" required />
+  <button type="submit">Adicionar</button>
+</form>
+
+<ul id="lista-gastos"></ul>
+```
+
+**Requisitos:**
+
+1. Ao enviar o formulário, capture a descrição e o valor digitados, impedindo o recarregamento da página com `preventDefault()`.
+2. Crie um novo `<li>` contendo o texto `"Descrição — R$ Valor"` e um `<button class="remover">Remover</button>` dentro dele, e adicione-o à `<ul id="lista-gastos">`.
+3. Limpe os campos do formulário depois de adicionar o item (`formulario.reset()`).
+4. Use **delegação de eventos**: registre um único `addEventListener` de `click` na `<ul>`, que remove o `<li>` correspondente sempre que um botão `.remover` for clicado — inclusive para itens adicionados depois que a página carregou.
+5. Não permita adicionar um gasto se a descrição estiver vazia ou o valor não for um número válido.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+const formulario = document.querySelector<HTMLFormElement>("#form-gasto");
+const lista = document.querySelector<HTMLUListElement>("#lista-gastos");
+
+function criarItemGasto(descricao: string, valor: number): HTMLLIElement {
+  const item = document.createElement("li");
+  item.textContent = `${descricao} — R$ ${valor.toFixed(2)} `;
+
+  const botaoRemover = document.createElement("button");
+  botaoRemover.textContent = "Remover";
+  botaoRemover.classList.add("remover");
+
+  item.appendChild(botaoRemover);
+  return item;
+}
+
+formulario?.addEventListener("submit", (event: SubmitEvent) => {
+  event.preventDefault();
+
+  const inputDescricao = document.querySelector<HTMLInputElement>("#input-descricao");
+  const inputValor = document.querySelector<HTMLInputElement>("#input-valor");
+
+  if (!inputDescricao || !inputValor || !lista) return;
+
+  const descricao = inputDescricao.value.trim();
+  const valor = Number(inputValor.value);
+
+  if (descricao === "" || Number.isNaN(valor)) {
+    console.log("Descrição ou valor inválidos.");
+    return;
+  }
+
+  lista.appendChild(criarItemGasto(descricao, valor));
+  formulario.reset();
+});
+
+lista?.addEventListener("click", (event: MouseEvent) => {
+  const alvo = event.target as HTMLElement;
+
+  if (alvo.matches("button.remover")) {
+    const item = alvo.closest("li");
+    item?.remove();
+  }
+});
+```
+
+</details>
+
+---
+
+Com eventos, sua página deixou de ser passiva: ela responde a cliques, captura o que o usuário digita e reage a mudanças em tempo real. Falta uma última peça para completar o quadro: até agora, todos os dados que você exibiu vieram de arrays escritos diretamente no código. No próximo capítulo, você vai aprender a buscar dados **de verdade**, vindos de um servidor, usando `fetch` — e a tratar tudo o que pode dar errado nesse caminho.

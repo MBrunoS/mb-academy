@@ -1,0 +1,205 @@
+---
+title: "Planejamento do Projeto: Dashboard de Finanças"
+description: "Planeje a versão web do seu Rastreador de Gastos: um dashboard em React e TypeScript que consome uma API pública e vai parar no seu portfólio."
+---
+
+Você chegou ao projeto que fecha este curso. Nos últimos cinco capítulos você aprendeu HTML semântico e CSS, JavaScript no navegador, React com TypeScript, consumo de APIs e os fundamentos de testes automatizados. Chegou a hora de juntar tudo isso em um projeto único, real, publicado — exatamente como acontece no trabalho de um(a) desenvolvedor(a) júnior de verdade.
+
+## De onde viemos
+
+Lá no Starter, você construiu o **Rastreador de Gastos Pessoais**: um CLI em TypeScript com três arquivos (`tipos.ts`, `rastreador.ts`, `index.ts`) que registrava gastos, categorizava e calculava totais direto no terminal. Funcionava bem, mas tinha uma limitação inevitável: só rodava na sua máquina, no seu terminal, para você mesmo ver.
+
+Agora esse mesmo domínio — gastos pessoais, categorias, totais — vira uma **aplicação web de verdade**: interface visual, formulário interativo, dados que atualizam a tela em tempo real, e uma chamada para uma API pública que ninguém no Starter tinha feito ainda. No fim deste capítulo, esse projeto vai ter uma URL pública que você pode colocar no LinkedIn, no currículo e mandar para qualquer recrutador testar no navegador dele.
+
+<Callout>
+Este é o projeto **capstone** do curso: ele existe para você aplicar, em um único lugar, tudo o que os Capítulos 1 a 5 ensinaram — HTML/CSS, JavaScript no navegador, componentes React, consumo de API e testes automatizados. Se algum desses tópicos ainda está incerto para você, vale a pena revisar o capítulo correspondente antes de seguir.
+</Callout>
+
+## O projeto: Dashboard de Finanças
+
+**Dashboard de Finanças** — uma aplicação web em React e TypeScript que permite registrar gastos pessoais, visualizar totais e ver esses totais convertidos para outras moedas, usando dados reais de câmbio.
+
+Por que esse projeto é bom para portfólio:
+
+- Resolve o mesmo problema real do CLI do Starter, mas agora numa interface que qualquer pessoa consegue abrir e usar sem saber o que é um terminal
+- Demonstra domínio de React com TypeScript: componentes, estado, efeitos, formulários controlados
+- Consome uma API pública de verdade — a mesma habilidade que você vai usar em praticamente todo projeto profissional
+- Tem testes automatizados cobrindo a lógica e o comportamento da interface
+- Termina publicado, com uma URL real — não é "só código no GitHub", é um produto que funciona
+
+## Requisitos funcionais (o que o projeto vai ter)
+
+Esta primeira versão do dashboard entrega:
+
+1. **Adicionar gasto** — formulário controlado com descrição, valor e categoria
+2. **Listar gastos** — todos os gastos registrados aparecem na tela, atualizados automaticamente
+3. **Resumo com totais** — o total gasto em Reais, calculado a partir da lista
+4. **Filtrar por categoria** — ver apenas os gastos de uma categoria específica
+5. **Conversão de moeda** — o total também é exibido em Dólar e Euro, usando taxas de câmbio reais buscadas de uma API pública
+
+## Fora do escopo por enquanto
+
+Um projeto de portfólio bem-sucedido tem escopo definido — não é sobre fazer tudo, é sobre entregar bem o que se propõe a fazer. Esta versão **não** inclui:
+
+- **Persistência de dados.** Os gastos vivem apenas no estado da página. Se você recarregar o navegador, a lista reinicia do zero. Guardar isso em `localStorage` ou em um backend é um ótimo desafio de extensão, mas não é o foco aqui — o foco é praticar React, consumo de API e testes.
+- **Autenticação de usuários.** Não há login. É um dashboard de sessão única, sem conceito de "minha conta" — o módulo de Autenticação do Capítulo 4 cobre esse tópico separadamente.
+- **Edição ou remoção de gastos.** Só é possível adicionar. Editar e remover ficam como desafios de extensão no final do capítulo.
+- **Gráficos e visualizações avançadas.** Cartões de resumo com números já cobrem bem o requisito de "ver os totais". Gráficos com bibliotecas dedicadas aparecem em níveis futuros do curso.
+
+<Callout type="tip">
+Definir o que **não** vai ter é tão importante quanto definir o que vai ter. Um projeto pequeno e completo vale mais no portfólio do que um projeto ambicioso e pela metade.
+</Callout>
+
+## Wireframe textual
+
+Antes de programar, vale desenhar — nem que seja em texto — como a tela vai se organizar. Um wireframe não precisa ser bonito, precisa ser claro sobre onde cada informação vive:
+
+```text
+┌────────────────────────────────────────────────────┐
+│  Dashboard de Finanças                              │  ← cabeçalho da página
+│  Registre seus gastos e acompanhe o total           │
+├────────────────────────────────────────────────────┤
+│  Novo gasto                                         │
+│  Descrição: [_______________]                       │  ← formulário
+│  Valor (R$): [_______]  Categoria: [alimentação ▾]  │
+│  [ Adicionar ]                                      │
+├────────────────────────────────────────────────────┤
+│  Resumo                                             │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐│
+│  │ Total em R$  │ │ Total em US$ │ │ Total em €   ││  ← cartões de resumo
+│  │ R$ 542,90    │ │ US$ 100,54   │ │ € 92,29      ││
+│  └──────────────┘ └──────────────┘ └──────────────┘│
+├────────────────────────────────────────────────────┤
+│  Gastos registrados      Filtrar: [Todas ▾]         │
+│  Almoço no restaurante   alimentação   R$ 45,50     │  ← lista filtrável
+│  Passagem de metrô       transporte    R$ 4,40      │
+│  Consulta médica         saúde         R$ 250,00    │
+└────────────────────────────────────────────────────┘
+```
+
+Cada bloco desse wireframe já antecipa um componente React:
+
+| Seção da tela | Componente | Responsabilidade |
+|---|---|---|
+| Cabeçalho | `App` | Título e contexto da página |
+| Novo gasto | `FormularioDeGasto` | Captura descrição, valor e categoria; dispara a adição |
+| Resumo | `Resumo` | Mostra o total em R$, US$ e € |
+| Gastos registrados | `ListaDeGastos` | Lista os gastos e permite filtrar por categoria |
+
+O `App` é quem guarda a lista de gastos e a repassa para quem precisa dela — os outros três componentes recebem dados via *props* e devolvem eventos via funções de callback. Essa árvore de componentes é exatamente o que vamos construir no próximo capítulo.
+
+## Decisões técnicas
+
+### Scaffold: Vite + React + TypeScript
+
+Vamos criar o projeto com **Vite**, a ferramenta padrão atual para projetos React standalone. Comparado com alternativas mais antigas (como o Create React App, hoje descontinuado), o Vite oferece:
+
+- Servidor de desenvolvimento quase instantâneo, com *hot reload* real
+- Configuração mínima — o template `react-ts` já vem com TypeScript, ESLint básico e build de produção prontos
+- Build de produção rápido e otimizado, gerando arquivos estáticos simples de publicar
+
+### Estrutura de pastas
+
+```text
+dashboard-financas/
+  src/
+    types.ts               ← Gasto, Categoria, TaxasDeCambio (equivalente ao tipos.ts do Starter)
+    utils.ts                ← funções puras: calcularTotal, filtrarPorCategoria, validarGasto, converterValor
+    components/
+      FormularioDeGasto.tsx
+      ListaDeGastos.tsx
+      Resumo.tsx
+    App.tsx                  ← componente raiz: guarda o estado e monta a tela
+    App.css
+    main.tsx                 ← ponto de entrada do React
+  index.html
+  package.json
+  tsconfig.json
+  vite.config.ts
+```
+
+Repare no paralelo com o Starter: lá você tinha `tipos.ts` guardando as definições e `rastreador.ts` guardando a lógica de negócio dentro de uma classe. Aqui, o **React já cuida da parte de "orquestrar comportamento"** através de componentes e hooks — então a lógica pura (cálculos, validações, filtros) fica isolada em `utils.ts` como funções simples, fáceis de testar isoladamente. É a mesma ideia de "separar responsabilidades", adaptada ao paradigma de componentes.
+
+### A API escolhida: Frankfurter
+
+Para a conversão de moeda, vamos usar a **Frankfurter API** (`https://api.frankfurter.app`) — uma API pública, gratuita, sem necessidade de cadastro ou chave de autenticação, que fornece taxas de câmbio reais (com base em dados do Banco Central Europeu).
+
+Por que ela encaixa perfeitamente neste projeto:
+
+- **Sem chave de API.** Você faz uma requisição `fetch` simples e já recebe uma resposta — nenhuma etapa de cadastro, nenhum segredo para guardar em variável de ambiente.
+- **Tema alinhado.** É uma API de câmbio, e o projeto é um dashboard de finanças — a conversão de moeda é uma funcionalidade que faz sentido de verdade, não um recurso emendado só para "usar uma API".
+- **Resposta simples.** Um único endpoint JSON, fácil de tipar em TypeScript.
+
+Uma chamada de exemplo:
+
+```
+GET https://api.frankfurter.app/latest?from=BRL&to=USD,EUR
+```
+
+Resposta:
+
+```json
+{
+  "amount": 1,
+  "base": "BRL",
+  "date": "2026-09-05",
+  "rates": {
+    "USD": 0.185,
+    "EUR": 0.17
+  }
+}
+```
+
+O campo `rates` traz quanto vale 1 Real convertido para cada moeda pedida. Multiplicando o total em Reais por essas taxas, chegamos ao total em Dólar e em Euro.
+
+### Gerenciamento de estado
+
+Nesta versão do projeto, `useState` e `useEffect` são suficientes:
+
+- `useState` guarda a lista de gastos no componente `App` — o mesmo padrão de "estado elevado" (*lifted state*) que você viu no Capítulo 3, já que tanto o formulário quanto a lista e o resumo precisam desse dado.
+- `useEffect` dispara a busca das taxas de câmbio **uma única vez**, quando a página carrega.
+
+Bibliotecas de gerenciamento de estado global (Redux, Zustand) só fazem sentido quando o estado fica complexo demais para os hooks nativos darem conta — isso é assunto do Pleno, quando o dashboard ganhar autenticação, mais telas e estado compartilhado entre rotas.
+
+## Plano de implementação em etapas
+
+Para não se perder no meio do caminho, vamos construir o dashboard nesta ordem, ao longo das próximas páginas:
+
+1. **Criar o projeto com Vite** e organizar a estrutura de pastas
+2. **Modelar os tipos** — `Gasto`, `Categoria`, `TaxasDeCambio` — em `types.ts`
+3. **Escrever a lógica pura** — `calcularTotal`, `filtrarPorCategoria`, `validarGasto`, `converterValor` — em `utils.ts`, antes de qualquer componente visual
+4. **Construir o `FormularioDeGasto`** com campos controlados e validação
+5. **Construir o `ListaDeGastos`**, incluindo o filtro por categoria
+6. **Construir o `Resumo`**, mostrando o total em R$
+7. **Conectar tudo no `App`** usando `useState` para a lista de gastos
+8. **Buscar as taxas de câmbio com `useEffect`** e exibir a conversão no `Resumo`
+9. **Escrever os testes** — lógica pura com Vitest, comportamento da interface com Testing Library
+10. **Publicar no Vercel** e obter a URL pública
+
+As etapas 1 a 8 acontecem na próxima página (Implementação). As etapas 9 e 10 têm páginas próprias, porque merecem atenção dedicada — testar e publicar são disciplinas com seu próprio raciocínio, não só "mais uma etapa do código".
+
+## Configurando o ambiente
+
+Antes da próxima página, prepare o ambiente do projeto:
+
+1. Escolha (ou crie) uma pasta onde deseja guardar seus projetos e, dentro dela, rode:
+   ```bash
+   npm create vite@latest dashboard-financas -- --template react-ts
+   ```
+2. Entre na pasta criada e instale as dependências:
+   ```bash
+   cd dashboard-financas
+   npm install
+   ```
+3. Confirme que tudo está funcionando iniciando o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+   O terminal vai mostrar um endereço local, algo como `http://localhost:5173`. Abra no navegador — você deve ver a tela padrão do Vite com o logo do React.
+4. Pare o servidor por enquanto (`Ctrl+C` no terminal) e crie a pasta `src/components`, que vai receber os componentes que ainda não existem.
+
+<Callout type="warn">
+Se o comando `npm create vite@latest` pedir para instalar um pacote adicional (`create-vite`), confirme com "y" — é esperado, é apenas o instalador do scaffold, não uma dependência do seu projeto.
+</Callout>
+
+Com o ambiente pronto e o plano traçado, vamos escrever o código na próxima página.

@@ -1,0 +1,283 @@
+---
+title: Princípios de Código Eficiente
+description: "Três princípios simples — DRY, KISS e YAGNI — que tornam seu código React e TypeScript mais fácil de manter e de evoluir."
+---
+
+Fazer o código funcionar é só a primeira parte do trabalho. A segunda parte — que separa quem está começando de quem já tem experiência — é fazer com que esse código continue fácil de entender e de mudar daqui a um mês, quando você (ou outra pessoa do time) precisar mexer nele de novo.
+
+Existem três princípios simples, quase clichês de tão repetidos no mundo do desenvolvimento, que ajudam exatamente nisso: **DRY**, **KISS** e **YAGNI**. Eles não são regras rígidas nem fórmulas matemáticas — são heurísticas, atalhos mentais que você aplica no momento de escrever ou revisar código. E os três aparecem o tempo todo em componentes React e código TypeScript, porque interfaces crescem rápido e é fácil acumular bagunça sem perceber.
+
+## DRY: não se repita
+
+**DRY** significa *Don't Repeat Yourself* — não se repita. A ideia central: se uma regra de negócio ou um pedaço de lógica existe em mais de um lugar do código, qualquer mudança futura precisa ser replicada em todos eles. Esquecer um só lugar cria um bug — e geralmente um bug difícil de rastrear, porque o código "parece certo" em todo canto que você olha primeiro.
+
+Imagine um dashboard financeiro com dois componentes que precisam exibir valores em reais:
+
+```tsx
+function CardSaldo({ saldo }: { saldo: number }) {
+  const saldoFormatado = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(saldo);
+
+  return <p className="saldo">{saldoFormatado}</p>;
+}
+
+function CardTransacao({ valor }: { valor: number }) {
+  const valorFormatado = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(valor);
+
+  return <p className="transacao">{valorFormatado}</p>;
+}
+```
+
+A lógica de formatação está duplicada. Se amanhã o time decidir mostrar valores negativos entre parênteses, ou trocar a moeda para dólar em telas específicas, você precisa lembrar de mudar nos dois lugares — e em um projeto real, provavelmente não seriam só dois.
+
+A solução é extrair a regra repetida para um único lugar:
+
+```ts
+// utils/formatarMoeda.ts
+export function formatarMoeda(valor: number): string {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(valor);
+}
+```
+
+```tsx
+import { formatarMoeda } from "../utils/formatarMoeda";
+
+function CardSaldo({ saldo }: { saldo: number }) {
+  return <p className="saldo">{formatarMoeda(saldo)}</p>;
+}
+
+function CardTransacao({ valor }: { valor: number }) {
+  return <p className="transacao">{formatarMoeda(valor)}</p>;
+}
+```
+
+Agora existe uma única fonte de verdade. Uma mudança na regra de formatação acontece em um lugar só, e os dois componentes recebem a atualização automaticamente.
+
+<Callout type="warn">
+DRY é sobre não repetir **conhecimento** ou **regra de negócio**, não sobre nunca repetir uma linha de código parecida. Dois trechos que se parecem hoje, mas mudam por motivos diferentes (um representa uma regra fiscal, o outro só uma preferência visual), não deveriam virar uma função compartilhada só porque "são parecidos". Unificar coisas que evoluem de forma independente costuma criar uma abstração confusa, cheia de `if` para lidar com casos que não deveriam nem estar juntos. Isso vai ficar mais claro na próxima seção.
+</Callout>
+
+## KISS: prefira o caminho simples
+
+**KISS** significa *Keep It Simple, Stupid* — mantenha simples. O princípio é direto: entre duas soluções que resolvem o mesmo problema, prefira a mais simples, mesmo que a mais complexa pareça "mais profissional" ou "mais preparada para o futuro".
+
+É muito comum um desenvolvedor júnior — geralmente animado depois de aprender um padrão novo — aplicar esse padrão em um problema que não precisa dele. Veja um exemplo comum: controlar se um campo de senha está visível ou escondido.
+
+Versão que ignora KISS, usando um reducer completo para um problema que é só um liga/desliga:
+
+```tsx
+type EstadoCampo = { visivel: boolean };
+type AcaoCampo = { type: "ABRIR" } | { type: "FECHAR" } | { type: "ALTERNAR" };
+
+function campoReducer(estado: EstadoCampo, acao: AcaoCampo): EstadoCampo {
+  switch (acao.type) {
+    case "ABRIR":
+      return { visivel: true };
+    case "FECHAR":
+      return { visivel: false };
+    case "ALTERNAR":
+      return { visivel: !estado.visivel };
+    default:
+      return estado;
+  }
+}
+
+function CampoSenha() {
+  const [estado, dispatch] = useReducer(campoReducer, { visivel: false });
+
+  return (
+    <div>
+      <input type={estado.visivel ? "text" : "password"} />
+      <button onClick={() => dispatch({ type: "ALTERNAR" })}>
+        {estado.visivel ? "Esconder" : "Mostrar"}
+      </button>
+    </div>
+  );
+}
+```
+
+Versão que aplica KISS, para o mesmo problema:
+
+```tsx
+function CampoSenha() {
+  const [visivel, setVisivel] = useState(false);
+
+  return (
+    <div>
+      <input type={visivel ? "text" : "password"} />
+      <button onClick={() => setVisivel(!visivel)}>
+        {visivel ? "Esconder" : "Mostrar"}
+      </button>
+    </div>
+  );
+}
+```
+
+O resultado é idêntico para quem usa a tela. Mas a segunda versão tem menos conceitos para entender, menos arquivos ou blocos para navegar, e é óbvia à primeira leitura. Um `useReducer` é uma ferramenta ótima — quando o estado realmente tem múltiplas transições relacionadas e regras de negócio entre elas. Para um valor booleano que só alterna, ele é complexidade sem benefício.
+
+<Callout type="tip">
+Uma pergunta simples ajuda bastante aqui: "se eu explicasse essa solução para alguém do time em uma frase, ela faria sentido rápido?" Se a resposta exige um parágrafo cheio de "mas também" e "só que nesse caso", provavelmente dá para simplificar.
+</Callout>
+
+## YAGNI: você não vai precisar disso (ainda)
+
+**YAGNI** significa *You Aren't Gonna Need It* — você não vai precisar disso. É o princípio que evita que você construa hoje uma abstração flexível para atender necessidades que só existem na sua imaginação sobre o futuro do projeto.
+
+Um exemplo muito comum em times front-end: criar um componente de botão genérico demais, cedo demais, porque "algum dia o projeto vai precisar de várias variações".
+
+```tsx
+type BotaoProps = {
+  texto: string;
+  variante?: "primario" | "secundario" | "perigo" | "fantasma" | "link";
+  tamanho?: "pequeno" | "medio" | "grande";
+  icone?: React.ReactNode;
+  posicaoIcone?: "esquerda" | "direita";
+  carregando?: boolean;
+  tooltip?: string;
+  badge?: number;
+  onClick?: () => void;
+  analyticsId?: string;
+  arredondado?: boolean;
+};
+
+function Botao({
+  texto,
+  variante = "primario",
+  tamanho = "medio",
+  icone,
+  posicaoIcone = "esquerda",
+  carregando = false,
+  tooltip,
+  badge,
+  onClick,
+  analyticsId,
+  arredondado = false,
+}: BotaoProps) {
+  // ... dezenas de linhas para combinar cada uma dessas opções
+  return <button>{/* ... */}</button>;
+}
+```
+
+O problema não é o botão ter opções — é que, no dia em que esse componente foi criado, o projeto só precisava de um botão "Enviar" no formulário de cadastro. Nenhuma das outras variantes tinha um caso de uso real ainda. O resultado é um componente difícil de ler, difícil de testar (quantas combinações existem?) e que carrega complexidade que talvez nunca seja usada.
+
+A alternativa é construir apenas o que o problema de hoje pede:
+
+```tsx
+type BotaoProps = {
+  texto: string;
+  onClick?: () => void;
+};
+
+function Botao({ texto, onClick }: BotaoProps) {
+  return (
+    <button className="botao-primario" onClick={onClick}>
+      {texto}
+    </button>
+  );
+}
+```
+
+Quando surgir uma necessidade real de um botão secundário, você adiciona uma prop `variante` naquele momento — com um caso de uso concreto guiando a decisão, em vez de uma suposição. Crescer uma API aos poucos, conforme a necessidade aparece de verdade, quase sempre resulta em um design melhor do que tentar prever tudo de uma vez.
+
+<Callout type="warn">
+YAGNI não significa "nunca pense no futuro" ou "escreva o código mais preguiçoso possível". Existem decisões estruturais (como escolher bem os tipos de dados, ou separar responsabilidades entre componentes) que valem a pena logo de início. A diferença é entre **flexibilidade estrutural razoável** e **flexibilidade especulativa** — construída para casos de uso que ninguém pediu ainda.
+</Callout>
+
+## Os três princípios trabalhando juntos
+
+DRY, KISS e YAGNI não são regras isoladas — elas se equilibram entre si:
+
+- **DRY sem KISS/YAGNI** vira abstração prematura: você une dois trechos parecidos numa função "flexível" cheia de parâmetros e condicionais, só para descobrir depois que eles nunca deveriam ter sido unificados.
+- **KISS sem DRY** vira duplicação descontrolada: manter tudo simples localmente, mas espalhar a mesma regra em dez arquivos diferentes.
+- **YAGNI sem DRY** ignora repetição real que já existe hoje, esperando "o momento certo" que nunca chega.
+
+Uma heurística prática usada por muitos times: **espere aparecer a mesma necessidade três vezes antes de extrair uma abstração compartilhada.** Na primeira vez, escreva direto. Na segunda, talvez já dê para perceber um padrão, mas ainda é cedo para ter certeza. Na terceira, o padrão geralmente já está claro o bastante para ser extraído com confiança — e você extrai exatamente a abstração que os três casos realmente pedem, não uma imaginada antecipadamente.
+
+No dia a dia de um time, esses três princípios aparecem disfarçados em comentários de code review: "dá pra extrair isso numa função?" (DRY), "acho que isso pode ficar mais simples" (KISS), "a gente precisa disso tudo agora?" (YAGNI). Reconhecer os princípios por trás do comentário ajuda você a entender o *porquê* do feedback, não só a aplicá-lo mecanicamente.
+
+## Para praticar
+
+Os dois componentes abaixo pertencem a um dashboard de finanças pessoais. Cada um implementa sua própria função para formatar uma data no padrão `dd/mm/aaaa`:
+
+```tsx
+function ListaGastos({ gastos }: { gastos: { descricao: string; data: Date }[] }) {
+  function formatarData(data: Date): string {
+    const dia = String(data.getDate()).padStart(2, "0");
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
+    const ano = data.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  return (
+    <ul>
+      {gastos.map((gasto) => (
+        <li key={gasto.descricao}>
+          {gasto.descricao} — {formatarData(gasto.data)}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ResumoMensal({ ultimaAtualizacao }: { ultimaAtualizacao: Date }) {
+  function formatarData(data: Date): string {
+    const dia = String(data.getDate()).padStart(2, "0");
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
+    const ano = data.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  return <p>Última atualização: {formatarData(ultimaAtualizacao)}</p>;
+}
+```
+
+Aplique o princípio DRY: extraia a lógica repetida para uma função compartilhada em um arquivo `utils/data.ts`, e atualize os dois componentes para usá-la.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+// utils/data.ts
+export function formatarData(data: Date): string {
+  const dia = String(data.getDate()).padStart(2, "0");
+  const mes = String(data.getMonth() + 1).padStart(2, "0");
+  const ano = data.getFullYear();
+  return `${dia}/${mes}/${ano}`;
+}
+```
+
+```tsx
+import { formatarData } from "../utils/data";
+
+function ListaGastos({ gastos }: { gastos: { descricao: string; data: Date }[] }) {
+  return (
+    <ul>
+      {gastos.map((gasto) => (
+        <li key={gasto.descricao}>
+          {gasto.descricao} — {formatarData(gasto.data)}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ResumoMensal({ ultimaAtualizacao }: { ultimaAtualizacao: Date }) {
+  return <p>Última atualização: {formatarData(ultimaAtualizacao)}</p>;
+}
+```
+
+Repare que a solução não criou uma função genérica de formatação de datas com opções para dezenas de formatos possíveis (`dd/mm/aaaa`, `mm/dd/aaaa`, com ou sem hora, por extenso...). Isso seria YAGNI ignorado: nenhum dos dois componentes precisa de outro formato hoje. A extração resolveu exatamente a duplicação que existia, nada além disso.
+
+</details>
+
+---
+
+Nenhum desses três princípios é uma regra que você aplica uma vez e esquece. Eles fazem parte do julgamento que você desenvolve com prática — cada vez que revisar um código (seu ou de outra pessoa) e sentir que "tem algo estranho aqui", é bem provável que um desses três esteja apontando o caminho.

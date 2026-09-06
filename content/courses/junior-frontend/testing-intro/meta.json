@@ -1,0 +1,5 @@
+{
+  "title": "Introdução a Testes",
+  "description": "Entenda por que testamos software, conheça as principais ferramentas e escreva seus primeiros testes automatizados.",
+  "pages": ["index", "testing-tools", "writing-tests"]
+}

@@ -1,0 +1,239 @@
+---
+title: Princípios Visuais, Usabilidade e Figma
+description: "Domine contraste, alinhamento, repetição e espaçamento, entenda o que torna uma interface usável e aprenda a navegar em arquivos do Figma como front-end."
+---
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+Designers experientes raramente decidem "isso fica bonito assim" no improviso. Por trás de praticamente todo layout que funciona visualmente existem alguns princípios recorrentes, aplicados de forma consistente. A boa notícia é que esses princípios não são segredo nem exigem talento artístico — são regras que você consegue aprender, reconhecer e aplicar no seu próprio código a partir de hoje.
+
+Vamos ver os quatro mais importantes, cada um com um exemplo de "antes e depois" para deixar claro o que muda na prática.
+
+## Contraste
+
+**Contraste** é a diferença perceptível entre dois elementos — de cor, tamanho, peso de fonte ou espaço. Ele existe para uma função clara: guiar o olho do usuário para o que é mais importante na tela.
+
+Imagine uma tela de login onde o botão "Entrar" tem a mesma cor cinza-claro do fundo, com um texto cinza um pouco mais escuro. Tecnicamente o botão está lá, mas o usuário precisa procurar por ele. Agora imagine o mesmo botão em uma cor sólida e vibrante, com texto branco bem legível por cima. A diferença de esforço para "encontrar o botão" é enorme — e isso é contraste bem aplicado.
+
+O mesmo vale para texto. Um parágrafo em cinza-claro sobre fundo branco pode parecer "elegante", mas se o contraste for baixo demais, ele se torna difícil de ler — especialmente para quem tem baixa visão ou está em um ambiente com muita luz. A [WCAG (Web Content Accessibility Guidelines)](https://www.w3.org/WAI/WCAG21/quickref/) recomenda uma razão de contraste mínima de 4.5:1 entre texto e fundo para a maioria dos casos.
+
+<Callout>
+Contraste não significa "colorido". Uma tela inteira em preto e branco pode ter excelente contraste — o que importa é a **diferença perceptível** entre o que precisa se destacar e o que é secundário, não a quantidade de cores usadas.
+</Callout>
+
+## Alinhamento
+
+**Alinhamento** é a organização dos elementos ao longo de linhas invisíveis — um "grid mental" que o olho humano detecta mesmo quando ninguém desenhou as linhas de verdade.
+
+Pense em um formulário onde cada campo começa em uma posição horizontal ligeiramente diferente da anterior — um label alinhado à esquerda, o próximo com um recuo maior, o botão de envio flutuando em algum lugar no meio. Mesmo que cada elemento individualmente esteja correto, o conjunto passa uma sensação de desleixo, quase como um texto digitado com margens tortas.
+
+Agora imagine o mesmo formulário com todos os labels alinhados na mesma margem esquerda, todos os campos com a mesma largura, e o botão alinhado à borda direita dos campos. Nada mudou em termos de conteúdo — só a organização espacial — mas a tela imediatamente parece mais profissional e mais fácil de escanear visualmente.
+
+Na prática, isso normalmente significa usar `display: flex` ou `display: grid` com propriedades consistentes (`align-items`, `justify-content`, larguras fixas ou em `%`) em vez de posicionar elementos "no olho" com margens variadas.
+
+## Repetição
+
+**Repetição** é reutilizar os mesmos padrões visuais — cores, espaçamentos, formatos de botão, tamanhos de fonte — em toda a interface. Ela é o que faz uma aplicação parecer *um produto coeso*, em vez de uma colagem de telas feitas por pessoas diferentes em dias diferentes.
+
+Um exemplo comum: em uma tela você usa um botão azul arredondado com sombra suave para a ação principal; em outra tela do mesmo sistema, a ação principal é um botão retangular verde sem sombra. Isoladamente, nenhum dos dois botões está "errado" — mas juntos, eles quebram a sensação de que o usuário está no mesmo produto.
+
+A solução é definir um pequeno conjunto de padrões (um estilo de botão primário, um estilo de card, uma paleta de cores) e repeti-los sempre que a mesma função aparecer. É exatamente esse princípio que, levado ao extremo, se torna um **design system** — algo que você vai encontrar de forma mais aprofundada em níveis mais avançados da trilha front-end.
+
+<Callout type="tip">
+Se você está construindo uma tela sem repetir nenhum padrão do resto da aplicação, pare e pergunte: "algum componente parecido com esse já existe em outro lugar do sistema?" Na dúvida, reaproveite.
+</Callout>
+
+## Proximidade e Espaçamento
+
+A **Lei da Proximidade**, um dos princípios da Gestalt (área da psicologia que estuda como percebemos padrões visuais), diz que elementos próximos entre si são percebidos como relacionados, e elementos distantes são percebidos como não relacionados — mesmo sem nenhuma linha ou caixa os separando.
+
+Imagine um formulário de cadastro onde o espaço entre o label "Email" e o campo de input abaixo dele é o mesmo espaço entre esse campo e o próximo label ("Senha"). O resultado visual é confuso: não fica claro se "Email" se refere ao campo acima ou abaixo dele.
+
+Agora imagine o mesmo formulário com um espaço pequeno entre cada label e seu campo correspondente, e um espaço maior entre um grupo label+campo e o próximo grupo. De repente a relação fica óbvia, sem precisar de nenhuma explicação — só de espaçamento bem distribuído.
+
+Esse mesmo princípio explica por que **espaçamento em branco** (o chamado *white space*) não é "espaço desperdiçado". Uma tela apertada, sem respiro entre os elementos, cansa visualmente e dificulta encontrar o que se procura. Espaçamento generoso e consistente entre grupos diferentes é o que cria **hierarquia**: o olho entende rapidamente onde uma seção termina e outra começa.
+
+<Callout type="warn">
+Um erro comum de quem está começando é usar valores de espaçamento aleatórios (`8px` aqui, `13px` ali, `21px` em outro lugar). Prefira uma escala consistente — por exemplo, múltiplos de `4px` ou `8px` (4, 8, 12, 16, 24, 32...). Isso automaticamente deixa a interface com mais cara de "sistema" e menos cara de "improviso".
+</Callout>
+
+## Usabilidade: o que torna uma interface fácil de usar
+
+Design bonito e interface usável não são a mesma coisa. Uma tela pode seguir todos os princípios visuais acima e ainda assim ser frustrante de usar, se ela não respeitar alguns fundamentos de **usabilidade**.
+
+### Feedback visual
+
+Toda ação do usuário deveria gerar uma resposta visível. Quando alguém clica em um botão, ele precisa mudar de aparência (mesmo que sutilmente) para confirmar que o clique foi registrado. Quando um formulário é enviado, o usuário precisa ver um indicador de carregamento, uma mensagem de sucesso ou uma mensagem de erro — nunca silêncio total, que deixa a pessoa se perguntando se algo deu errado ou se só precisa esperar mais.
+
+### Previsibilidade
+
+Elementos que se parecem devem se comportar da mesma forma em toda a aplicação. Se um link sublinhado leva para outra página em uma tela, um link sublinhado em outra tela não deveria abrir um modal inesperadamente. Consistência de comportamento é tão importante quanto consistência visual — e é, na prática, a mesma ideia de "repetição" aplicada à interação, não só à aparência.
+
+### Affordance
+
+**Affordance** é a propriedade de um elemento "sugerir" como ele deve ser usado, só de olhar para ele. Um botão com sombra e cantos arredondados parece clicável porque lembra visualmente um botão físico. Um texto sublinhado e em cor diferente do resto parece um link porque seguimos essa convenção há décadas na web.
+
+Quando você remove esses sinais visuais — por exemplo, um botão sem nenhuma diferenciação do fundo, parecendo um texto comum — o usuário perde a affordance e não sabe que aquele elemento é interativo. Isso é um erro comum em interfaces "minimalistas demais", que sacrificam clareza em nome de estética.
+
+<Callout>
+Regra prática: se você removeu um sinal visual de que algo é clicável (cor, sombra, sublinhado, cursor de ponteiro), pergunte-se como o usuário vai *descobrir* que pode interagir com aquele elemento.
+</Callout>
+
+## Figma na perspectiva de um front-end
+
+Você provavelmente não vai criar designs do zero no seu dia a dia como front-end júnior — essa é a função de quem trabalha com design. Mas você vai, com bastante frequência, **abrir arquivos do Figma criados por outra pessoa** para implementar aquilo em código. Saber navegar nesse ambiente é uma habilidade prática valiosa.
+
+### Abrindo um arquivo compartilhado
+
+Quando um designer compartilha um link de um arquivo do Figma com você, normalmente você recebe acesso de **visualização** (ou, em times mais maduros, acesso ao **modo Dev**, uma visão especializada para desenvolvedores). Você não precisa de conta paga para visualizar arquivos compartilhados — apenas uma conta gratuita do Figma.
+
+Ao abrir o arquivo, você vai ver o design organizado em **páginas** (abas no topo, geralmente separando telas por fluxo: "Login", "Dashboard", "Configurações") e, dentro de cada página, **frames** (as telas individuais, geralmente nomeadas de forma clara, como "Home — Desktop" ou "Home — Mobile").
+
+### Inspecionando espaçamento, cores e fontes
+
+O recurso mais importante para você, como front-end, é o **modo de inspeção** (Inspect). Ao clicar em qualquer elemento do design com esse modo ativo, um painel lateral mostra:
+
+- **Espaçamento**: distâncias em pixels entre o elemento selecionado e os elementos ao redor — muitas vezes o Figma já mostra visualmente essas distâncias quando você segura uma tecla modificadora enquanto passa o mouse sobre outro elemento.
+- **Cores**: o valor exato em hexadecimal (`#3B82F6`) ou RGB do preenchimento e da borda, prontos para copiar direto no seu CSS.
+- **Tipografia**: família da fonte, tamanho, peso (`font-weight`) e altura de linha (`line-height`) exatos.
+- **CSS gerado**: em muitos casos, o Figma consegue gerar automaticamente um trecho de CSS aproximado para o elemento selecionado — útil como ponto de partida, mas sempre revise antes de colar direto no seu código.
+
+Para medir a distância entre dois elementos, selecione um deles e segure **Alt** (Windows/Linux) ou **Option (⌥)** (macOS) enquanto passa o mouse sobre outro elemento próximo. O Figma desenha as distâncias em pixels entre os dois.
+
+### O que você não precisa saber (por enquanto)
+
+Criar frames do zero, usar Auto Layout para montar componentes, configurar variantes de componentes ou prototipar interações — tudo isso é trabalho de quem faz design como profissão. Como front-end, seu objetivo com o Figma é **ler** um design existente com precisão, não **criar** um novo. Se um dia você quiser aprofundar nisso por conta própria, é um investimento válido, mas não é pré-requisito para ser um bom front-end.
+
+## Onde buscar inspiração para o seu portfólio
+
+Quando não existe um designer te entregando um layout pronto — seja em um projeto pessoal, seja no seu próprio portfólio — você ainda pode produzir algo com boa aparência, desde que saiba onde procurar referências em vez de inventar tudo do zero.
+
+- **[Dribbble](https://dribbble.com)**: comunidade de designers que publicam trabalhos (muitas vezes conceituais, não sistemas reais). Ótimo para inspiração de paleta de cores, tipografia e composição visual — mas nem tudo que você vê lá é tecnicamente viável ou responsivo, então trate como inspiração, não como especificação pronta.
+- **[Behance](https://www.behance.net)**: parecido com o Dribbble, mas tende a mostrar projetos completos e estudos de caso, incluindo o raciocínio por trás das decisões — útil para entender *por que* um design foi feito daquele jeito, não só *como* ele parece.
+- **Sites de produtos reais e código aberto**: observar como produtos estabelecidos (Linear, Stripe, Vercel, GitHub) resolvem problemas de interface é, muitas vezes, mais valioso do que peças puramente conceituais — porque você está vendo decisões que sobreviveram ao uso real, com dados reais, em diferentes tamanhos de tela.
+- **[Mobbin](https://mobbin.com)**: um catálogo de capturas de tela de aplicativos e sites reais, organizado por padrão de interface (telas de login, onboarding, checkout). Extremamente útil quando você não sabe como resolver um padrão específico e quer ver como produtos reais já resolveram.
+
+<Callout type="tip">
+Ao usar essas fontes como inspiração, não copie pixel a pixel — extraia **princípios** (como aquela tela usa contraste? como ela espaça os elementos?) e aplique com sua própria identidade visual. Isso evita problemas de originalidade e te ajuda a internalizar os princípios em vez de só imitar resultados.
+</Callout>
+
+## Para praticar
+
+Abaixo está o HTML e CSS de um cartão de "resumo financeiro" — parecido com algo que você usaria no dashboard de finanças que está construindo neste curso. O componente funciona, mas tem problemas de contraste, alinhamento, repetição e espaçamento.
+
+```html
+<div class="card">
+  <h3>Saldo do mês</h3>
+  <p class="valor">R$ 2.450,00</p>
+  <div class="linha">
+    <span>Entradas</span>
+    <span>R$ 4.200,00</span>
+  </div>
+  <div class="linha2">
+    <span>Saídas</span>
+    <span>R$ 1.750,00</span>
+  </div>
+  <button>ver detalhes</button>
+</div>
+```
+
+```css
+.card {
+  background: #fafafa;
+  padding: 6px;
+}
+.card h3 {
+  color: #cccccc;
+  font-size: 14px;
+}
+.valor {
+  font-size: 16px;
+  margin: 3px;
+}
+.linha {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+.linha2 {
+  display: flex;
+  margin-top: 14px;
+}
+button {
+  background: #fafafa;
+  border: none;
+  margin-top: 3px;
+}
+```
+
+Sua tarefa: reescreva o CSS aplicando os quatro princípios que você aprendeu neste capítulo. Especificamente:
+
+1. Aumente o **contraste** entre o título e o valor principal (o saldo deveria ser o elemento mais destacado do card).
+2. Corrija o **alinhamento**: as duas linhas ("Entradas" e "Saídas") devem seguir exatamente o mesmo padrão — hoje uma usa `space-between` e a outra não.
+3. Padronize o **espaçamento**, usando uma escala consistente (por exemplo, múltiplos de `4px`).
+4. Dê ao botão uma **affordance** clara de que é clicável.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```css
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.card h3 {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+}
+
+.valor {
+  color: #111827;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+}
+
+.linha,
+.linha2 {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #374151;
+  margin-top: 8px;
+}
+
+button {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-top: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+```
+
+O que mudou, princípio por princípio:
+
+- **Contraste**: o título ("Saldo do mês") agora usa um cinza médio, discreto, enquanto o valor principal usa um tom quase preto e uma fonte bem maior — o olho vai direto para o número que importa.
+- **Alinhamento**: as classes `.linha` e `.linha2` foram unificadas em um único seletor, garantindo que "Entradas" e "Saídas" sigam exatamente o mesmo padrão visual.
+- **Espaçamento**: todos os valores de `margin` e `padding` agora são múltiplos de `8px` (ou `4px` no caso do título), criando uma escala consistente em vez de números aleatórios.
+- **Affordance**: o botão ganhou cor sólida, cantos arredondados, `cursor: pointer` e um estado de `:hover`, deixando claro que é um elemento clicável — e não mais um texto qualquer com o mesmo fundo do card.
+
+</details>
+
+---
+
+Com contraste, alinhamento, repetição e espaçamento no seu radar — além de saber navegar em um arquivo do Figma e onde buscar boas referências — você já tem o suficiente para tomar decisões visuais conscientes no seu próprio código, mesmo sem nenhum designer por perto. Isso encerra o módulo de Noções de Design.
+
+No próximo módulo da trilha complementar, a conversa muda de eixo: em vez de como uma tela deveria parecer, vamos falar sobre como times de desenvolvimento se organizam para transformar requisitos em código de forma previsível — as **Metodologias Ágeis**.

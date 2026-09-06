@@ -1,0 +1,88 @@
+---
+title: Introdução ao React
+description: "Entenda por que frameworks front-end existem, conheça os principais e veja o mapa do que vem por aí no React com TypeScript."
+---
+
+No capítulo anterior, você aprendeu a manipular o DOM diretamente: selecionar elementos com `document.querySelector`, escutar eventos com `addEventListener`, e atualizar a tela manualmente toda vez que algo muda. Funciona — mas você já deve ter sentido a dor. Em uma interface pequena, com um botão e um parágrafo, não tem problema nenhum. Mas imagine um dashboard de finanças pessoais de verdade: uma lista de gastos que cresce a cada novo lançamento, um total que precisa ser recalculado sempre, um formulário com validação, um filtro por categoria, um resumo que muda de cor dependendo do saldo. Se você tentar construir isso manipulando o DOM na mão, rapidamente vai se perder em um emaranhado de `getElementById`, variáveis soltas tentando representar "o estado atual da tela" e funções de atualização espalhadas por todo canto — cada uma responsável por lembrar de atualizar uma parte diferente da interface.
+
+É exatamente esse problema que frameworks front-end como o React resolvem. Neste módulo você vai entender por que eles existem, o que cada um propõe, e vai escrever suas primeiras interfaces reais com **React e TypeScript** — a combinação mais usada no mercado brasileiro hoje.
+
+## O problema: manipular o DOM na mão não escala
+
+Pense em como seria adicionar um gasto ao seu Rastreador do Starter, mas agora numa página web em vez de um terminal. Toda vez que um gasto é adicionado, várias partes da tela precisam mudar ao mesmo tempo: a lista de gastos, o total, o resumo por categoria. Manipulando o DOM manualmente, o código ficaria mais ou menos assim:
+
+```ts
+// Abordagem manual: cada mudança de estado exige lembrar de atualizar a tela em vários lugares
+let gastos: { descricao: string; valor: number }[] = [];
+
+function adicionarGasto(descricao: string, valor: number): void {
+  gastos.push({ descricao, valor });
+
+  // Preciso lembrar de atualizar a lista na tela...
+  const lista = document.querySelector("#lista-gastos")!;
+  lista.innerHTML = gastos
+    .map((g) => `<li>${g.descricao}: R$ ${g.valor.toFixed(2)}</li>`)
+    .join("");
+
+  // ...e também o total. Se eu esquecer essa linha, a tela fica desatualizada
+  // e ninguém vai perceber até um usuário reclamar.
+  const totalElemento = document.querySelector("#total")!;
+  const total = gastos.reduce((acc, g) => acc + g.valor, 0);
+  totalElemento.textContent = `R$ ${total.toFixed(2)}`;
+}
+```
+
+Esse código funciona, mas ele é **imperativo**: você descreve, passo a passo, *como* atualizar a tela. Toda nova funcionalidade (um botão de remover, um filtro, uma edição) significa lembrar de encontrar e atualizar mais um pedaço do DOM manualmente. Em uma tela real, com dezenas de elementos interdependentes, isso vira um campo minado — é fácil esquecer de atualizar algum lugar, e o bug resultante ("a tela mostra dados desatualizados") é difícil de rastrear.
+
+Frameworks front-end resolvem isso mudando a pergunta. Em vez de "como eu atualizo a tela quando o estado muda?", você passa a perguntar apenas "qual é a aparência da tela para este estado?". Essa é a ideia de programação **declarativa**: você descreve o resultado desejado, e o framework se encarrega de descobrir as mudanças necessárias no DOM.
+
+## O que são frameworks front-end
+
+Um **framework front-end** é uma ferramenta que dá estrutura para construir interfaces de forma declarativa, cuidando da sincronização entre **estado** (os dados que mudam ao longo do tempo) e **UI** (o que é exibido na tela) para você. Na prática, isso costuma significar três coisas:
+
+- **Componentização**: a interface é dividida em pedaços independentes e reutilizáveis (um `Botao`, um `CartaoGasto`, uma `ListaDeGastos`), cada um responsável pela própria aparência e comportamento.
+- **Reatividade**: quando o estado de um componente muda, o framework atualiza automaticamente apenas as partes da tela que dependem dele — sem você precisar escrever código de atualização manual.
+- **Renderização declarativa**: você escreve algo como "se `gastos` estiver vazio, mostre esta mensagem; senão, mostre esta lista", e o framework decide como transformar isso em operações reais no DOM.
+
+<Callout type="tip">
+  O termo "framework" e "biblioteca" às vezes são usados quase como sinônimos no
+  ecossistema front-end. Tecnicamente, o React é uma **biblioteca** — ele cuida
+  só da camada de UI, e você escolhe outras ferramentas para rotas, chamadas de
+  API, etc. Angular, por outro lado, é um **framework completo**, com todas
+  essas peças incluídas. Isso não muda o problema que ambos resolvem, mas
+  explica por que a experiência de usar cada um é tão diferente.
+</Callout>
+
+## Panorama dos principais frameworks
+
+Não existe "o melhor framework" de forma absoluta — existem ferramentas com propostas diferentes, cada uma com vantagens e contextos onde brilha mais. Vale conhecer, ao menos superficialmente, os quatro nomes que você mais vai ouvir no mercado:
+
+| Framework | Panorama rápido |
+|---|---|
+| **React** | Mantido pelo Meta (Facebook), o React é uma **biblioteca** focada exclusivamente na camada de UI. Usa JSX (uma sintaxe que mistura HTML e JavaScript/TypeScript) e um modelo de componentes funcionais com **hooks** — funções especiais que adicionam estado e comportamento aos componentes. Tem o maior ecossistema de bibliotecas do mercado e é, hoje, o framework com mais vagas de emprego abertas no Brasil e no mundo. |
+| **Vue** | Um framework **progressivo**: você pode adotá-lo aos poucos, desde um script simples até uma aplicação completa. Sua sintaxe de templates é mais parecida com HTML puro, usando diretivas como `v-if` e `v-for` em vez de JSX. Tem curva de aprendizado suave e uma Composition API (bem parecida com os hooks do React) para organizar lógica reutilizável. |
+| **Angular** | Mantido pelo Google, é um **framework completo**: já vem com roteamento, injeção de dependência, formulários e chamadas HTTP embutidos. Foi construído em TypeScript desde o início, o que o torna extremamente tipado e estruturado — mas também mais verboso e com uma curva de aprendizado mais íngreme. É comum em empresas grandes e sistemas corporativos legados. |
+| **Svelte** | Diferente dos outros três, o Svelte não roda uma biblioteca no navegador em tempo de execução — ele é um **compilador**. Você escreve um código muito próximo de JavaScript/TypeScript puro, e o Svelte o transforma, em tempo de build, em código imperativo altamente otimizado, sem depender de um "virtual DOM". O resultado são bundles menores e ótima performance, mas com uma comunidade e mercado de trabalho ainda menores no Brasil. |
+
+## Por que este curso ensina React
+
+A escolha não é arbitrária. Três razões concretas guiaram essa decisão:
+
+1. **Demanda de mercado.** No Brasil, a esmagadora maioria das vagas de front-end pede React. Aprender React é, hoje, o caminho mais direto para sua primeira oportunidade como desenvolvedor front-end.
+2. **Suporte a TypeScript de primeira classe.** A comunidade React investiu pesado em tipagem — componentes, props, hooks e eventos são tipados com clareza, o que combina perfeitamente com tudo que você já aprendeu no Starter.
+3. **Caminho de crescimento natural.** Este curso é o primeiro de uma trilha (Júnior → Pleno → Sênior) que evolui com **Next.js**, um meta-framework construído sobre React. Aprender React bem agora significa que, no Pleno, você vai aprofundar o mesmo modelo mental, em vez de aprender algo do zero.
+
+Isso não significa que Vue, Angular ou Svelte sejam escolhas ruins — são ótimas ferramentas, e nada impede você de explorá-las mais adiante. Mas para começar sua carreira com o maior número possível de portas abertas, React é a aposta mais segura.
+
+## O mapa deste módulo
+
+Este é o módulo mais extenso do curso, e por um bom motivo: React com TypeScript é a base de praticamente tudo que você vai construir daqui em diante. O fio condutor será um dashboard de finanças pessoais — a versão web do Rastreador de Gastos que você construiu no Starter — que vai crescer, capítulo a capítulo, junto com os conceitos:
+
+- **JSX e Componentes** — a sintaxe do JSX, como criar um componente funcional tipado, props e composição.
+- **Estado e Eventos** — por que uma variável comum não faz a tela reagir, o hook `useState`, e formulários controlados.
+- **Renderização Condicional e Listas** — mostrar ou esconder partes da UI, transformar arrays em elementos com `.map()`, e a importância da prop `key`.
+- **Efeitos Colaterais e Ciclo de Vida** — o hook `useEffect`, buscar dados, persistir informações, e as armadilhas mais comuns.
+- **Hooks Avançados** — `useMemo`, `useCallback`, `useRef` e como criar seus próprios hooks customizados.
+- **Context e Gerenciamento de Estado** — como evitar passar props por vários níveis, a Context API, e uma introdução a Redux e Zustand.
+
+Ao final deste módulo, você vai ter construído os componentes que formam o núcleo do dashboard de finanças que será finalizado no Capítulo 6. Vamos começar pelo primeiro passo de qualquer aplicação React: entender o que é JSX e escrever seu primeiro componente.

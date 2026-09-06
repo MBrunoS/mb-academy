@@ -1,0 +1,175 @@
+---
+title: Bibliotecas e Frameworks CSS
+description: "Entenda por que existem bibliotecas como Bootstrap e Tailwind, como cada uma pensa estilização e quando vale a pena usá-las."
+---
+
+Nos últimos três capítulos, você escreveu CSS "puro", do zero: seletores, box model, Flexbox, Grid, media queries. Isso é fundamental — é o conhecimento que te permite entender **qualquer** CSS que você encontrar, inclusive o gerado por ferramentas. Mas, na prática do mercado, é muito comum que times não escrevam todo o CSS de um projeto do zero: eles usam uma **biblioteca** ou **framework CSS** para acelerar esse trabalho. Neste capítulo você vai entender por que essas ferramentas existem, como as duas mais populares pensam o problema de formas diferentes, e como decidir quando cada abordagem faz sentido.
+
+## Por que frameworks CSS existem
+
+Pense em quantas vezes, em praticamente qualquer site, você vê os mesmos tipos de elemento: um botão com cantos arredondados e um efeito ao passar o mouse, um card com sombra sutil, uma grade de colunas que se reorganiza em telas menores, um menu de navegação responsivo. Escrever o CSS para cada um desses padrões, do zero, em todo projeto novo, é um trabalho repetitivo — e é exatamente esse trabalho repetitivo que frameworks CSS existem para eliminar.
+
+Um framework CSS é, no fundo, um arquivo `.css` (ou um conjunto de ferramentas) já pronto, escrito por outra pessoa ou equipe, oferecendo:
+
+- **Componentes visuais prontos** (botões, cards, modais, formulários) com um visual consistente entre si.
+- **Um sistema de grid/layout** já testado em diferentes tamanhos de tela.
+- **Consistência de design** — cores, espaçamentos e tipografia seguem uma escala predefinida, em vez de decisões improvisadas em cada página.
+- **Velocidade** — você aplica classes prontas em vez de escrever e depurar CSS próprio para cada elemento.
+
+Existem dezenas de frameworks CSS, mas dois representam bem as duas grandes filosofias do mercado: **Bootstrap** (baseado em componentes) e **Tailwind** (baseado em utilitários atômicos).
+
+## Bootstrap: componentes prontos e um grid testado em batalha
+
+O Bootstrap é um dos frameworks CSS mais antigos e usados no mundo. Sua abordagem é: fornecer **componentes de interface inteiros e prontos**, cada um identificado por uma ou mais classes CSS, junto de um sistema de grid de 12 colunas para organizar o layout.
+
+```html
+<button class="btn btn-primary">Adicionar Gasto</button>
+
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">Resumo do Mês</h5>
+    <p class="card-text">Saldo atual: R$ 1.240,00</p>
+  </div>
+</div>
+```
+
+Aqui, `btn` e `btn-primary` já trazem todo o visual do botão (cores, padding, cantos arredondados, estado de `:hover`) — você não escreve nenhum CSS próprio, só aplica as classes certas. O mesmo vale para `card`, `card-body`, `card-title`: são blocos de interface completos, prontos para uso.
+
+O grid do Bootstrap segue a mesma lógica — 12 colunas flexíveis, distribuídas com classes:
+
+```html
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">Alimentação</div>
+    <div class="col-md-4">Transporte</div>
+    <div class="col-md-4">Moradia</div>
+  </div>
+</div>
+```
+
+**Vantagens**: extremamente rápido para prototipar, componentes visuais já testados e consistentes entre si, curva de aprendizado baixa (você aprende os nomes das classes, não precisa dominar CSS profundamente para ter um resultado decente), documentação extensa e comunidade enorme.
+
+**Desvantagens**: sites construídos com Bootstrap "puro" tendem a se parecer uns com os outros, a menos que você invista tempo customizando o tema; sobrescrever o visual padrão de um componente às vezes exige lidar com regras de especificidade mais complexas dentro do próprio framework; e o CSS completo do Bootstrap é relativamente grande, mesmo que você use só uma fração dos componentes (a menos que configure um processo de otimização à parte).
+
+## Tailwind: utilitários atômicos, você monta o design
+
+O Tailwind CSS parte de uma filosofia oposta: em vez de componentes prontos, ele oferece um conjunto enorme de **classes utilitárias**, cada uma controlando **uma única propriedade CSS**. Você compõe o visual final combinando várias dessas classes diretamente no HTML.
+
+```html
+<button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+  Adicionar Gasto
+</button>
+
+<div class="w-72 p-4 border border-gray-300 rounded-lg shadow-sm">
+  <h5 class="text-lg font-semibold">Resumo do Mês</h5>
+  <p class="text-gray-600">Saldo atual: R$ 1.240,00</p>
+</div>
+```
+
+Repare que cada classe mapeia diretamente para algo que você já aprendeu escrevendo CSS puro: `bg-blue-600` é um `background-color`, `p-4` é um `padding` (usando a escala do `rem`), `rounded-lg` é um `border-radius`, `hover:bg-blue-700` é um `:hover`. O Tailwind não te dá um "botão pronto" — ele te dá as peças de CSS organizadas em uma escala consistente (de espaçamento, cor, tamanho), e você monta o componente combinando essas peças.
+
+**Vantagens**: você nunca precisa inventar nomes de classes (`.card-titulo-destaque-v2`) nem alternar entre um arquivo HTML e um arquivo CSS para ajustar um estilo — tudo acontece ali, na própria tag; o design final é totalmente seu, não existe um "visual padrão do Tailwind" reconhecível como existe no Bootstrap; e, em produção, ferramentas do próprio Tailwind eliminam do CSS final qualquer classe que você não usou, gerando um arquivo bem menor do que parece à primeira vista.
+
+**Desvantagens**: o HTML fica visualmente mais "poluído", com várias classes em cada tag; existe uma curva de aprendizado para memorizar os nomes das classes e a escala de valores (`p-4` não é óbvio até você aprender a lógica da escala); e, diferente do Bootstrap, o Tailwind não fornece componentes de interface complexos prontos (um modal, um carrossel) — só os utilitários de estilo, então lógica de componente mais elaborada geralmente vem de outra biblioteca complementar.
+
+<Callout>
+  Aliás, curiosidade: o próprio site da Forja Academy — a plataforma onde você
+  está lendo este conteúdo agora — é construído com **Tailwind**. Da próxima
+  vez que estiver por aqui, abra as DevTools do navegador (`F12`) e inspecione
+  qualquer elemento da página: você vai reconhecer boa parte das classes
+  utilitárias que acabou de aprender.
+</Callout>
+
+## Framework, biblioteca própria ou CSS puro: como decidir
+
+Nenhuma das três abordagens — CSS escrito à mão, Bootstrap ou Tailwind — é "a certa" universalmente. A escolha depende do contexto do projeto:
+
+| Critério | CSS próprio | Bootstrap | Tailwind |
+|---|---|---|---|
+| Velocidade de prototipagem | Baixa | Alta | Média-alta |
+| Controle total do visual | Total | Limitado (sem customização) | Alto |
+| Consistência automática | Depende de disciplina própria | Alta | Média (depende de configuração) |
+| Tamanho do CSS final | Só o que você escreveu | Grande, se não otimizado | Pequeno (classes não usadas são removidas) |
+| Curva de aprendizado | CSS em profundidade | Baixa | Média |
+
+Algumas orientações práticas:
+
+- **Aprendendo ou em um projeto pequeno e pessoal**: escrever CSS à mão, como você fez nos capítulos anteriores, é o melhor investimento — é o que constrói o entendimento que te permite usar *qualquer* framework depois com confiança, em vez de depender cegamente de classes que você não entende.
+- **Um protótipo rápido, um MVP, ou uma equipe pequena sem designer dedicado**: o Bootstrap entrega um resultado profissional e consistente muito rapidamente.
+- **Um produto onde a identidade visual própria importa, ou uma equipe que já domina CSS**: o Tailwind costuma ser a escolha mais popular hoje em dia — inclusive é o que você vai usar mais adiante neste curso, quando o projeto migrar para React.
+
+<Callout type="warn">
+  O maior risco de aprender um framework CSS **antes** de entender CSS puro é
+  ficar dependente das classes prontas sem entender o que elas realmente
+  fazem por baixo dos panos — o que te deixa perdido(a) na primeira vez que
+  precisar de algo que o framework não previu. Como você já passou pelos três
+  capítulos anteriores, está no caminho certo: qualquer framework CSS que você
+  usar de agora em diante vai ser, para você, "só" uma forma mais rápida de
+  escrever o CSS que você já entende.
+</Callout>
+
+## Para praticar
+
+Este exercício é conceitual: como ainda não instalamos nenhum framework, o objetivo é praticar a **leitura** e a **tradução** entre as três abordagens, um exercício importante para reconhecer os padrões quando você encontrar esses frameworks em projetos reais.
+
+**Cenário:** você tem um card de resumo mensal já estilizado com CSS próprio. Sua tarefa é reescrever o mesmo resultado visual usando classes equivalentes de Bootstrap e de Tailwind.
+
+**HTML e CSS de partida:**
+
+```html
+<div class="resumo-card">
+  <h3 class="resumo-titulo">Resumo do Mês</h3>
+  <p class="resumo-valor">R$ 1.240,00</p>
+</div>
+```
+
+```css
+.resumo-card {
+  width: 280px;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #f9fafb;
+}
+.resumo-titulo {
+  font-size: 18px;
+  font-weight: bold;
+}
+.resumo-valor {
+  font-size: 24px;
+  color: #16a34a;
+}
+```
+
+**Requisitos:**
+
+1. Reescreva o HTML usando classes do **Bootstrap** (`card`, `card-body`, `card-title`, `card-text` e uma classe utilitária de cor de texto como `text-success`) que reproduzam o mesmo resultado visual, sem escrever nenhum CSS próprio.
+2. Reescreva o HTML usando classes utilitárias do **Tailwind** (`w-`, `p-`, `border`, `rounded-lg`, `bg-`, `text-` etc.) que reproduzam o mesmo resultado visual.
+3. Escreva um comentário HTML curto ao lado de cada versão explicando, em uma frase, a diferença de abordagem entre elas.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```html
+<!-- Versão Bootstrap: classes de componente prontas, sem CSS próprio -->
+<div class="card" style="width: 280px;">
+  <div class="card-body">
+    <h3 class="card-title">Resumo do Mês</h3>
+    <p class="card-text text-success fs-4">R$ 1.240,00</p>
+  </div>
+</div>
+
+<!-- Versão Tailwind: cada classe controla uma única propriedade CSS -->
+<div class="w-72 p-4 border border-gray-300 rounded-lg bg-gray-50">
+  <h3 class="text-lg font-bold">Resumo do Mês</h3>
+  <p class="text-2xl text-green-600">R$ 1.240,00</p>
+</div>
+```
+
+A versão Bootstrap depende de um "componente" (`card`) já pronto, então boa parte do visual (borda, padding, fundo) vem embutido na própria classe `card`. A versão Tailwind não tem esse conceito de componente — cada pedaço do visual (largura, padding, borda, cor de fundo, cor de texto) é declarado explicitamente por uma classe própria, o que dá mais controle, mas exige escrever mais classes.
+
+</details>
+
+---
+
+Você chegou ao fim do primeiro módulo do curso. Neste ponto, você já sabe estruturar uma página inteira com HTML semântico e acessível, estilizar qualquer elemento com CSS — da cor ao box model — organizar múltiplos elementos em um layout coeso e responsivo com Flexbox e Grid, e agora entende como frameworks como Bootstrap e Tailwind se encaixam nesse quadro geral. Esse é exatamente o conjunto de habilidades necessário para montar, do zero, o esqueleto visual completo do Dashboard de Finanças Pessoais. O que ainda falta é dar vida a essa página: fazer o formulário realmente registrar um gasto, atualizar o saldo na tela e reagir a cliques — e é exatamente aí que o próximo módulo, **JavaScript no Navegador**, começa.

@@ -1,0 +1,591 @@
+---
+title: "Implementando o Dashboard de Finanças"
+description: "Construa passo a passo os tipos, a lógica pura, os componentes e a integração com a API de câmbio do Dashboard de Finanças."
+---
+
+Com o planejamento feito e o ambiente configurado, vamos construir o dashboard camada por camada: primeiro os tipos, depois a lógica pura (fácil de testar), depois os componentes visuais, e por último a integração com a API de câmbio.
+
+<Callout>
+Todo o código abaixo pressupõe que você já criou o projeto com `npm create vite@latest dashboard-financas -- --template react-ts` na página anterior. Se ainda não fez isso, volte ao Planejamento antes de continuar.
+</Callout>
+
+## 1. Os tipos: `src/types.ts`
+
+Assim como o `tipos.ts` do Rastreador de Gastos no Starter, começamos definindo a forma dos dados que o projeto inteiro vai compartilhar. Abra `src/types.ts` (crie o arquivo dentro de `src/`) e escreva:
+
+```ts
+// src/types.ts
+
+export type Categoria =
+  | "alimentação"
+  | "transporte"
+  | "moradia"
+  | "lazer"
+  | "saúde"
+  | "outros";
+
+export type FiltroCategoria = Categoria | "todas";
+
+export interface Gasto {
+  id: string;
+  descricao: string;
+  valor: number;
+  categoria: Categoria;
+  data: string;
+}
+
+export interface TaxasDeCambio {
+  USD: number;
+  EUR: number;
+}
+```
+
+Repare no que mudou e no que se manteve em relação ao CLI do Starter:
+
+- **`Categoria` é o mesmo union type de sempre** — as mesmas seis categorias, porque é o mesmo domínio de problema.
+- **`FiltroCategoria` é novo.** É `Categoria` mais a opção especial `"todas"`, usada só pelo filtro da lista — não faz sentido um gasto real ter a categoria `"todas"`, mas o filtro precisa dessa opção.
+- **`Gasto.id` agora é `string`, não `number`.** No navegador, vamos gerar o identificador com `crypto.randomUUID()` (uma função nativa que já vem no navegador e no Node), que produz um texto único — mais simples do que manter um contador manual como o `proximoId` do Starter.
+- **`TaxasDeCambio` é novo** e modela a resposta da API de câmbio: quanto vale 1 Real em Dólar e em Euro.
+
+## 2. A lógica pura: `src/utils.ts`
+
+Antes de escrever qualquer componente visual, vamos isolar as funções que fazem cálculo e validação — sem depender de React, sem depender do DOM. Isso tem uma razão prática: essas funções são as mais fáceis (e mais importantes) de testar, como você vai ver no próximo capítulo.
+
+Crie `src/utils.ts`:
+
+```ts
+// src/utils.ts
+
+import type { Categoria, FiltroCategoria, Gasto, TaxasDeCambio } from "./types";
+
+export const CATEGORIAS: Categoria[] = [
+  "alimentação",
+  "transporte",
+  "moradia",
+  "lazer",
+  "saúde",
+  "outros",
+];
+
+export function calcularTotal(gastos: Gasto[]): number {
+  return gastos.reduce((total, gasto) => total + gasto.valor, 0);
+}
+
+export function filtrarPorCategoria(
+  gastos: Gasto[],
+  filtro: FiltroCategoria
+): Gasto[] {
+  if (filtro === "todas") {
+    return gastos;
+  }
+  return gastos.filter((gasto) => gasto.categoria === filtro);
+}
+
+export function validarGasto(descricao: string, valor: number): string | null {
+  if (descricao.trim().length === 0) {
+    return "Informe uma descrição para o gasto.";
+  }
+  if (Number.isNaN(valor) || valor <= 0) {
+    return "O valor do gasto deve ser maior que zero.";
+  }
+  return null;
+}
+
+export function converterValor(
+  valorEmReais: number,
+  taxas: TaxasDeCambio | null,
+  moeda: keyof TaxasDeCambio
+): number | null {
+  if (!taxas) {
+    return null;
+  }
+  return valorEmReais * taxas[moeda];
+}
+```
+
+Um ponto que vale destacar: no Starter, `adicionarGasto` usava `throw new Error(...)` para rejeitar um valor inválido, e quem chamava precisava de `try/catch`. Numa interface web, normalmente **não queremos lançar uma exceção** — queremos **mostrar uma mensagem de erro na tela**, ao lado do campo errado. Por isso `validarGasto` tem uma assinatura diferente: em vez de lançar erro, ela **retorna** uma mensagem (`string`) quando algo está errado, ou `null` quando está tudo certo. Quem chama decide o que fazer com essa mensagem — no nosso caso, exibi-la no formulário.
+
+`calcularTotal` e `filtrarPorCategoria` deveriam parecer familiares: são versões, como funções puras, dos métodos `totalGasto` e `filtrarPorCategoria` da classe `RastreadorDeGastos` do Starter. A diferença é a forma: lá eram métodos de uma classe com estado interno (`this.gastos`); aqui são funções que recebem o array como argumento e devolvem um resultado novo, sem guardar nada. Esse estilo — **funções puras que recebem dados e devolvem dados** — combina melhor com o jeito que o React pensa sobre estado e renderização.
+
+## 3. O componente `FormularioDeGasto`
+
+Crie `src/components/FormularioDeGasto.tsx`:
+
+```tsx
+// src/components/FormularioDeGasto.tsx
+
+import { useState, type FormEvent } from "react";
+import type { Categoria, Gasto } from "../types";
+import { CATEGORIAS, validarGasto } from "../utils";
+
+interface FormularioDeGastoProps {
+  aoAdicionar: (gasto: Omit<Gasto, "id" | "data">) => void;
+}
+
+function FormularioDeGasto({ aoAdicionar }: FormularioDeGastoProps) {
+  const [descricao, setDescricao] = useState("");
+  const [valor, setValor] = useState("");
+  const [categoria, setCategoria] = useState<Categoria>("outros");
+  const [erro, setErro] = useState<string | null>(null);
+
+  function handleSubmit(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+
+    const valorNumerico = Number(valor);
+    const mensagemDeErro = validarGasto(descricao, valorNumerico);
+
+    if (mensagemDeErro) {
+      setErro(mensagemDeErro);
+      return;
+    }
+
+    aoAdicionar({
+      descricao: descricao.trim(),
+      valor: valorNumerico,
+      categoria,
+    });
+
+    setDescricao("");
+    setValor("");
+    setCategoria("outros");
+    setErro(null);
+  }
+
+  return (
+    <section className="formulario">
+      <h2>Novo gasto</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="formulario__campo">
+          <label htmlFor="descricao">Descrição</label>
+          <input
+            id="descricao"
+            type="text"
+            value={descricao}
+            onChange={(evento) => setDescricao(evento.target.value)}
+            placeholder="Ex: Almoço no restaurante"
+          />
+        </div>
+
+        <div className="formulario__campo">
+          <label htmlFor="valor">Valor (R$)</label>
+          <input
+            id="valor"
+            type="number"
+            step="0.01"
+            value={valor}
+            onChange={(evento) => setValor(evento.target.value)}
+            placeholder="0,00"
+          />
+        </div>
+
+        <div className="formulario__campo">
+          <label htmlFor="categoria">Categoria</label>
+          <select
+            id="categoria"
+            value={categoria}
+            onChange={(evento) => setCategoria(evento.target.value as Categoria)}
+          >
+            {CATEGORIAS.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {erro && <p className="formulario__erro">{erro}</p>}
+
+        <button type="submit">Adicionar</button>
+      </form>
+    </section>
+  );
+}
+
+export default FormularioDeGasto;
+```
+
+Pontos importantes:
+
+- **Formulário controlado.** Cada campo (`descricao`, `valor`, `categoria`) tem seu próprio estado, e o valor exibido no input vem sempre desse estado (`value={descricao}`) — o React é a fonte da verdade, não o DOM.
+- **`valor` é `string`, não `number`, no estado.** Inputs HTML sempre trabalham com texto. Convertemos para número (`Number(valor)`) só na hora de validar e enviar — um detalhe comum que costuma confundir quem está começando com formulários em React.
+- **`Omit<Gasto, "id" | "data">`** descreve exatamente os dados que o formulário é responsável por coletar: descrição, valor e categoria. O `id` e a `data` são gerados por quem recebe esse gasto (o `App`), não pelo formulário — outra separação de responsabilidades.
+- **`aoAdicionar` é uma prop de função** — o padrão de "levantar o evento" (*lifting state up*): o formulário não sabe (nem precisa saber) onde a lista de gastos vive; ele só avisa "um gasto novo e válido está pronto" através da função recebida via props.
+
+## 4. O componente `ListaDeGastos`
+
+Crie `src/components/ListaDeGastos.tsx`:
+
+```tsx
+// src/components/ListaDeGastos.tsx
+
+import { useState } from "react";
+import type { FiltroCategoria, Gasto } from "../types";
+import { CATEGORIAS, filtrarPorCategoria } from "../utils";
+
+interface ListaDeGastosProps {
+  gastos: Gasto[];
+}
+
+function ListaDeGastos({ gastos }: ListaDeGastosProps) {
+  const [filtro, setFiltro] = useState<FiltroCategoria>("todas");
+
+  const gastosExibidos = filtrarPorCategoria(gastos, filtro);
+
+  return (
+    <section className="lista">
+      <div className="lista__cabecalho">
+        <h2>Gastos registrados</h2>
+        <div className="lista__filtro">
+          <label htmlFor="filtro-categoria">Filtrar por categoria</label>
+          <select
+            id="filtro-categoria"
+            value={filtro}
+            onChange={(evento) =>
+              setFiltro(evento.target.value as FiltroCategoria)
+            }
+          >
+            <option value="todas">Todas as categorias</option>
+            {CATEGORIAS.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {gastosExibidos.length === 0 ? (
+        <p>Nenhum gasto registrado ainda.</p>
+      ) : (
+        <ul className="lista__itens">
+          {gastosExibidos.map((gasto) => (
+            <li key={gasto.id} className="lista__item">
+              <span className="lista__descricao">{gasto.descricao}</span>
+              <span className="lista__categoria">{gasto.categoria}</span>
+              <span className="lista__valor">R$ {gasto.valor.toFixed(2)}</span>
+              <span className="lista__data">{gasto.data}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+export default ListaDeGastos;
+```
+
+Aqui aparece um tipo de estado diferente do estado do formulário: `filtro` é um **estado local**, que só importa para este componente. Nada fora do `ListaDeGastos` precisa saber qual filtro está selecionado — por isso ele não precisa subir para o `App`. Essa é uma decisão de design tão importante quanto saber levantar estado: **nem todo estado precisa ser compartilhado**.
+
+Repare também que `ListaDeGastos` recebe a lista **completa** de gastos via props, e é ela mesma quem calcula `gastosExibidos` usando a função pura `filtrarPorCategoria` — a mesma função que testamos isoladamente e reutilizamos aqui sem duplicar lógica.
+
+## 5. O componente `Resumo`
+
+Crie `src/components/Resumo.tsx`:
+
+```tsx
+// src/components/Resumo.tsx
+
+import type { TaxasDeCambio } from "../types";
+import { converterValor } from "../utils";
+
+interface ResumoProps {
+  total: number;
+  taxas: TaxasDeCambio | null;
+  carregando: boolean;
+  erro: string | null;
+}
+
+function Resumo({ total, taxas, carregando, erro }: ResumoProps) {
+  const totalEmDolar = converterValor(total, taxas, "USD");
+  const totalEmEuro = converterValor(total, taxas, "EUR");
+
+  return (
+    <section className="resumo">
+      <h2>Resumo</h2>
+      <div className="resumo__cartoes">
+        <div className="resumo__cartao">
+          <span className="resumo__rotulo">Total em Reais</span>
+          <strong>R$ {total.toFixed(2)}</strong>
+        </div>
+
+        <div className="resumo__cartao">
+          <span className="resumo__rotulo">Total em Dólar</span>
+          {carregando && <strong>Carregando...</strong>}
+          {!carregando && erro && <strong>Indisponível</strong>}
+          {!carregando && !erro && (
+            <strong>US$ {totalEmDolar?.toFixed(2)}</strong>
+          )}
+        </div>
+
+        <div className="resumo__cartao">
+          <span className="resumo__rotulo">Total em Euro</span>
+          {carregando && <strong>Carregando...</strong>}
+          {!carregando && erro && <strong>Indisponível</strong>}
+          {!carregando && !erro && (
+            <strong>€ {totalEmEuro?.toFixed(2)}</strong>
+          )}
+        </div>
+      </div>
+
+      {erro && <p className="resumo__erro">{erro}</p>}
+    </section>
+  );
+}
+
+export default Resumo;
+```
+
+O `Resumo` não sabe *como* as taxas de câmbio chegam até ele — só sabe que recebe `taxas`, `carregando` e `erro` via props e decide o que renderizar em cada estado. Essa separação (quem busca o dado vs. quem exibe o dado) é o que torna o componente fácil de testar isoladamente: no capítulo de testes, você poderia renderizar `<Resumo taxas={null} carregando={false} erro="qualquer coisa" total={100} />` e verificar que aparece "Indisponível", sem precisar simular uma requisição de rede de verdade.
+
+## 6. Conectando tudo: `src/App.tsx`
+
+Agora vem a parte que une os três componentes: o `App` guarda o estado da lista de gastos, busca as taxas de câmbio ao carregar a página, e passa os dados certos para cada componente filho.
+
+Abra `src/App.tsx` (que já existe, criado pelo Vite) e substitua todo o conteúdo por:
+
+```tsx
+// src/App.tsx
+
+import { useEffect, useState } from "react";
+import "./App.css";
+import type { Gasto, TaxasDeCambio } from "./types";
+import { calcularTotal } from "./utils";
+import FormularioDeGasto from "./components/FormularioDeGasto";
+import ListaDeGastos from "./components/ListaDeGastos";
+import Resumo from "./components/Resumo";
+
+function App() {
+  const [gastos, setGastos] = useState<Gasto[]>([]);
+  const [taxas, setTaxas] = useState<TaxasDeCambio | null>(null);
+  const [carregandoTaxas, setCarregandoTaxas] = useState(true);
+  const [erroTaxas, setErroTaxas] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function buscarTaxas() {
+      try {
+        const resposta = await fetch(
+          "https://api.frankfurter.app/latest?from=BRL&to=USD,EUR"
+        );
+
+        if (!resposta.ok) {
+          throw new Error("A API de câmbio respondeu com um erro.");
+        }
+
+        const dados = await resposta.json();
+        setTaxas(dados.rates);
+      } catch (erro) {
+        console.error(erro);
+        setErroTaxas("Não foi possível carregar as taxas de câmbio agora.");
+      } finally {
+        setCarregandoTaxas(false);
+      }
+    }
+
+    buscarTaxas();
+  }, []);
+
+  function handleAdicionarGasto(novoGasto: Omit<Gasto, "id" | "data">) {
+    const gasto: Gasto = {
+      ...novoGasto,
+      id: crypto.randomUUID(),
+      data: new Date().toLocaleDateString("pt-BR"),
+    };
+
+    setGastos((gastosAtuais) => [gasto, ...gastosAtuais]);
+  }
+
+  const total = calcularTotal(gastos);
+
+  return (
+    <div className="app">
+      <header className="app__header">
+        <h1>Dashboard de Finanças</h1>
+        <p>Registre seus gastos e acompanhe o total em tempo real.</p>
+      </header>
+
+      <main className="app__conteudo">
+        <FormularioDeGasto aoAdicionar={handleAdicionarGasto} />
+        <Resumo
+          total={total}
+          taxas={taxas}
+          carregando={carregandoTaxas}
+          erro={erroTaxas}
+        />
+        <ListaDeGastos gastos={gastos} />
+      </main>
+    </div>
+  );
+}
+
+export default App;
+```
+
+Vamos entender as duas peças novas com calma.
+
+### O `useEffect` que busca as taxas de câmbio
+
+```tsx
+useEffect(() => {
+  async function buscarTaxas() {
+    // ...
+  }
+
+  buscarTaxas();
+}, []);
+```
+
+O array de dependências vazio (`[]`) diz ao React: "rode este efeito **uma única vez**, logo depois da primeira renderização". É exatamente o que queremos — buscar as taxas de câmbio assim que o dashboard carrega, não a cada gasto adicionado.
+
+Dentro do efeito, `buscarTaxas` é uma função `async` separada, chamada logo em seguida. Isso é necessário porque a função passada para `useEffect` não pode ser `async` diretamente — é uma regra do próprio hook, e declarar uma função assíncrona por dentro é o contorno padrão.
+
+O `try/catch/finally` cobre os três estados possíveis: sucesso (`setTaxas`), falha (`setErroTaxas`) e, no `finally`, o fim do carregamento (`setCarregandoTaxas(false)`) — que acontece nos dois casos.
+
+### `handleAdicionarGasto`: completando o que o formulário não sabe
+
+```tsx
+function handleAdicionarGasto(novoGasto: Omit<Gasto, "id" | "data">) {
+  const gasto: Gasto = {
+    ...novoGasto,
+    id: crypto.randomUUID(),
+    data: new Date().toLocaleDateString("pt-BR"),
+  };
+
+  setGastos((gastosAtuais) => [gasto, ...gastosAtuais]);
+}
+```
+
+Lembra que o `FormularioDeGasto` só coleta descrição, valor e categoria? É aqui que o `App` completa o objeto `Gasto` com o que só ele deveria decidir: um `id` único (`crypto.randomUUID()`, uma função nativa do navegador) e a `data` atual, formatada em português com `toLocaleDateString("pt-BR")` — o mesmo formato usado no Starter.
+
+`setGastos((gastosAtuais) => [gasto, ...gastosAtuais])` usa a forma de função do `setState`: em vez de escrever `[gasto, ...gastos]` usando a variável `gastos` de fora, passamos uma função que recebe o estado mais atual e devolve o novo array. Isso evita bugs sutis quando múltiplas atualizações de estado acontecem em sequência — um hábito que vale manter mesmo em casos simples como este. O gasto novo entra **no início** do array, então a lista sempre mostra o mais recente primeiro.
+
+## 7. Um pouco de estilo: `src/App.css`
+
+O foco deste projeto é a lógica, não o visual, mas uma organização mínima ajuda a validar que tudo está funcionando. Substitua o conteúdo de `src/App.css` por algo simples:
+
+```css
+/* src/App.css */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #f5f5f7;
+  color: #1a1a1a;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+.app__header h1 {
+  margin-bottom: 0.25rem;
+}
+
+.app__conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formulario,
+.resumo,
+.lista {
+  background: white;
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.formulario__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.formulario__erro {
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+.resumo__cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.resumo__cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: #f5f5f7;
+  border-radius: 6px;
+}
+
+.lista__cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.lista__itens {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lista__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+```
+
+## Rodando o projeto
+
+Com tudo salvo, inicie o servidor de desenvolvimento:
+
+```bash
+npm run dev
+```
+
+Abra o endereço mostrado no terminal (geralmente `http://localhost:5173`). Você deve conseguir:
+
+1. Ver os três cartões de resumo, com "Carregando..." nos totais em Dólar e Euro por uma fração de segundo, depois substituídos pelos valores convertidos
+2. Preencher o formulário (descrição, valor, categoria) e clicar em "Adicionar"
+3. Ver o gasto novo aparecer no topo da lista, e o total em Reais (e nas outras moedas) atualizar automaticamente
+4. Usar o seletor "Filtrar por categoria" na lista e ver apenas os gastos daquela categoria
+5. Tentar adicionar um gasto com descrição vazia ou valor zero/negativo e ver a mensagem de erro aparecer sem a página recarregar
+
+<Callout type="tip">
+Se os totais em Dólar e Euro ficarem presos em "Indisponível", verifique sua conexão com a internet e o console do navegador (F12) — a Frankfurter API é pública, mas como qualquer serviço externo, pode eventualmente estar fora do ar.
+</Callout>
+
+## Revisando o que você aplicou
+
+| Conceito | Onde aparece |
+|---|---|
+| Union types e interfaces | `Categoria`, `FiltroCategoria`, `Gasto`, `TaxasDeCambio` em `types.ts` |
+| Funções puras e testáveis | `calcularTotal`, `filtrarPorCategoria`, `validarGasto`, `converterValor` em `utils.ts` |
+| Componentes e props | `FormularioDeGasto`, `ListaDeGastos`, `Resumo` recebendo dados e funções via props |
+| Formulário controlado | `FormularioDeGasto`, com `value` e `onChange` em cada campo |
+| Estado local vs. estado elevado | `filtro` (local, em `ListaDeGastos`) vs. `gastos` (elevado, em `App`) |
+| `useEffect` para efeitos colaterais | Busca das taxas de câmbio, executada uma vez ao montar `App` |
+| Consumo de API pública | `fetch` para `https://api.frankfurter.app`, com tratamento de `ok`, erro e carregamento |
+
+Com o dashboard funcionando de ponta a ponta, é hora de garantir que ele continua funcionando mesmo depois que você mexer no código de novo. Vamos escrever os testes na próxima página.
