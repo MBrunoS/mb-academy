@@ -1,0 +1,5 @@
+{
+  "title": "Construindo Páginas Web",
+  "description": "Aprenda a estruturar páginas com HTML semântico e estilizá-las com CSS, da cascata ao layout responsivo.",
+  "pages": ["index", "html-semantics", "css-fundamentals", "css-layout", "css-frameworks"]
+}

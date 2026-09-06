@@ -1,0 +1,5 @@
+{
+  "title": "Consumindo APIs e Autenticação",
+  "description": "Conecte seu front-end a servidores reais: consuma APIs, trate erros de rede e implemente autenticação com segurança.",
+  "pages": ["index", "consuming-apis", "cors-and-security", "authentication"]
+}

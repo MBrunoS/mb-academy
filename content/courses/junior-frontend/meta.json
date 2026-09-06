@@ -1,0 +1,31 @@
+{
+  "title": "Júnior Front-end",
+  "description": "Construa interfaces web reais com React e TypeScript, consuma APIs e publique seus projetos com uma URL real.",
+  "root": true,
+  "pages": [
+    "index",
+    "---Capítulo 1: Construindo Páginas Web---",
+    "web-pages",
+    "---Capítulo 2: JavaScript no Navegador---",
+    "browser-javascript",
+    "---Capítulo 3: React com TypeScript---",
+    "react-fundamentals",
+    "---Capítulo 4: Consumindo APIs e Autenticação---",
+    "apis-and-auth",
+    "---Capítulo 5: Introdução a Testes---",
+    "testing-intro",
+    "---Capítulo 6: Projeto Prático - Dashboard de Finanças---",
+    "project-planning",
+    "project-implementation",
+    "project-testing",
+    "project-deploy",
+    "---Trilha Complementar---",
+    "clean-code-principles",
+    "design-basics",
+    "agile-methodologies",
+    "ai-in-junior-development",
+    "interview-prep",
+    "---Próximos passos---",
+    "what-now"
+  ]
+}
