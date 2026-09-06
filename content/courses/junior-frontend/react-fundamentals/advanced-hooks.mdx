@@ -1,0 +1,373 @@
+---
+title: Hooks Avançados
+description: "Aprenda a otimizar componentes com useMemo e useCallback, acessar o DOM com useRef e criar seus próprios hooks customizados."
+---
+
+Seu dashboard de finanças já guarda estado, reage a eventos, renderiza listas condicionalmente e persiste dados com `useEffect`. Conforme ele cresce — mais gastos, mais componentes, mais cálculos — duas preocupações novas aparecem: **performance** (recalcular coisas caras sem necessidade) e **reutilização** (repetir a mesma lógica em componentes diferentes). É para isso que existem `useMemo`, `useCallback`, `useRef` e os hooks customizados.
+
+## `useMemo`: memorizando valores calculados
+
+Toda vez que um componente renderiza, **todo o código dentro dele roda de novo** — inclusive cálculos que não têm nada a ver com o motivo da renderização. Imagine um painel que calcula o total gasto a partir de uma lista grande, mas também tem um campo de busca:
+
+```tsx
+import { useState } from "react";
+
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+}
+
+function PainelFinanceiro({ gastos }: { gastos: Gasto[] }) {
+  const [busca, setBusca] = useState<string>("");
+
+  // Esse cálculo roda de novo a CADA letra digitada na busca,
+  // mesmo que "gastos" não tenha mudado em nada
+  const total = gastos.reduce((acumulador, gasto) => acumulador + gasto.valor, 0);
+
+  const gastosFiltrados = gastos.filter((g) =>
+    g.descricao.toLowerCase().includes(busca.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input value={busca} onChange={(e) => setBusca(e.target.value)} />
+      <p>Total geral: R$ {total.toFixed(2)}</p>
+      <p>Resultados: {gastosFiltrados.length}</p>
+    </div>
+  );
+}
+```
+
+Digitar uma letra no campo de busca atualiza `busca`, o que causa uma nova renderização — e, junto com ela, o `reduce()` que calcula `total` roda de novo, mesmo que `gastos` não tenha mudado nada. Para uma lista pequena, isso é imperceptível. Para uma lista com milhares de itens, ou um cálculo mais custoso, o impacto começa a aparecer.
+
+`useMemo` resolve isso "memorizando" o resultado de um cálculo, e só recalculando quando uma das dependências realmente muda:
+
+```tsx
+import { useMemo, useState } from "react";
+
+function PainelFinanceiro({ gastos }: { gastos: Gasto[] }) {
+  const [busca, setBusca] = useState<string>("");
+
+  const total = useMemo(() => {
+    return gastos.reduce((acumulador, gasto) => acumulador + gasto.valor, 0);
+  }, [gastos]);
+
+  // ...
+}
+```
+
+Agora, `total` só é recalculado quando `gastos` muda — digitar na busca não dispara o `reduce()` de novo, porque `gastos` continua o mesmo array.
+
+<Callout>
+  `useMemo` não é gratuito: ele também tem um custo (guardar o valor anterior
+  e comparar dependências). Para cálculos simples e baratos — uma soma de
+  poucos itens, uma concatenação de string — o custo do `useMemo` pode ser
+  maior que o próprio cálculo que ele evita. Reserve-o para cálculos
+  genuinamente caros (listas grandes, ordenações, filtros complexos) ou para
+  estabilizar valores passados a componentes otimizados, como veremos a
+  seguir com `useCallback`.
+</Callout>
+
+## `useCallback`: memorizando funções
+
+Funções também são recriadas a cada renderização — e, assim como valores calculados, isso pode ter um custo quando essa função é passada como prop para um componente filho que foi otimizado com `React.memo` (um recurso que evita re-renderizar um componente se suas props não mudaram).
+
+```tsx
+import { memo } from "react";
+
+interface CartaoGastoProps {
+  descricao: string;
+  valor: number;
+  aoRemover: () => void;
+}
+
+// React.memo evita re-renderizar este componente se as props forem iguais
+// às da renderização anterior
+const CartaoGasto = memo(function CartaoGasto({
+  descricao,
+  valor,
+  aoRemover,
+}: CartaoGastoProps) {
+  console.log(`Renderizando cartão: ${descricao}`);
+
+  return (
+    <div className="cartao-gasto">
+      <p>{descricao}</p>
+      <strong>R$ {valor.toFixed(2)}</strong>
+      <button onClick={aoRemover}>Remover</button>
+    </div>
+  );
+});
+```
+
+O problema: se o componente pai recria a função `aoRemover` a cada renderização (uma arrow function nova, mesmo que faça exatamente a mesma coisa), o `React.memo` não ajuda em nada — para o React, uma prop de função "diferente" (uma nova referência) já é motivo suficiente para re-renderizar, mesmo que o comportamento seja idêntico.
+
+```tsx
+function ListaDeGastos({ gastos }: { gastos: Gasto[] }) {
+  function handleRemover(id: number) {
+    console.log("Removendo", id);
+  }
+
+  return (
+    <div>
+      {gastos.map((gasto) => (
+        // Uma nova função é criada aqui a cada renderização de ListaDeGastos,
+        // então o React.memo em CartaoGasto nunca evita a re-renderização
+        <CartaoGasto
+          key={gasto.id}
+          descricao={gasto.descricao}
+          valor={gasto.valor}
+          aoRemover={() => handleRemover(gasto.id)}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+`useCallback` memoriza a própria função, mantendo a mesma referência entre renderizações enquanto suas dependências não mudarem:
+
+```tsx
+import { useCallback, useState } from "react";
+
+function ListaDeGastos({ gastos }: { gastos: Gasto[] }) {
+  const handleRemover = useCallback((id: number) => {
+    console.log("Removendo", id);
+  }, []); // sem dependências: a mesma função em toda renderização
+
+  return (
+    <div>
+      {gastos.map((gasto) => (
+        <CartaoGasto
+          key={gasto.id}
+          descricao={gasto.descricao}
+          valor={gasto.valor}
+          aoRemover={() => handleRemover(gasto.id)}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+<Callout type="warn">
+  Repare que, no exemplo acima, `aoRemover={() => handleRemover(gasto.id)}`
+  ainda cria uma nova arrow function a cada item — o `useCallback` só ajuda
+  de verdade quando a função é passada **diretamente**, sem embrulhá-la em
+  outra função inline. Em casos assim, a otimização completa geralmente
+  exige repensar a prop (por exemplo, passando `id` como prop e deixando o
+  próprio `CartaoGasto` chamar `aoRemover(id)`). O ponto principal aqui é
+  entender o mecanismo — otimizações desse nível de detalhe raramente são
+  necessárias fora de listas realmente grandes.
+</Callout>
+
+## `useRef`: acessando o DOM e guardando valores mutáveis
+
+`useRef` serve para dois propósitos bem diferentes, e vale a pena separá-los.
+
+**1. Acessar um elemento do DOM diretamente.** Às vezes você precisa fazer algo que o React não modela como estado — como colocar o foco em um campo de formulário depois de uma ação:
+
+```tsx
+import React, { useRef } from "react";
+
+function NovoGastoForm({ aoAdicionar }: { aoAdicionar: () => void }) {
+  const inputDescricaoRef = useRef<HTMLInputElement>(null);
+
+  function handleSubmit(evento: React.FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+    aoAdicionar();
+
+    // Depois de adicionar, devolve o foco ao campo de descrição
+    inputDescricaoRef.current?.focus();
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input ref={inputDescricaoRef} type="text" placeholder="Descrição" />
+      <button type="submit">Adicionar</button>
+    </form>
+  );
+}
+```
+
+O atributo `ref` conecta a `ref` criada com `useRef<HTMLInputElement>(null)` ao elemento real do DOM. Depois que o componente renderiza, `inputDescricaoRef.current` passa a apontar para o elemento `<input>` de verdade — daí o `?.focus()`, usando encadeamento opcional porque, antes da primeira renderização, `current` ainda é `null`.
+
+**2. Guardar um valor mutável que não deve disparar re-renderização.** Diferente de `useState`, atualizar `.current` de uma ref **não** provoca uma nova renderização — o que é exatamente o comportamento certo para valores que são apenas "acompanhamento interno", sem relação direta com o que aparece na tela:
+
+```tsx
+import { useRef } from "react";
+
+function ContadorDeRenderizacoes() {
+  const renderizacoes = useRef<number>(0);
+  renderizacoes.current += 1;
+
+  return <p>Este componente já renderizou {renderizacoes.current} vez(es).</p>;
+}
+```
+
+Se `renderizacoes` fosse um `useState`, cada atualização causaria uma nova renderização, que causaria uma nova atualização, e assim por diante — um loop infinito parecido com o que vimos no capítulo anterior sobre `useEffect`. Como `useRef` não dispara re-renderização, ele é seguro para esse tipo de contador interno, ou para guardar coisas como o ID retornado por um `setInterval`, que você vai precisar limpar depois.
+
+<Callout>
+  Regra prática: se um valor precisa aparecer na tela quando muda, use
+  `useState`. Se o valor é só "memória interna" do componente — que você
+  lê ou atualiza, mas nunca renderiza diretamente — `useRef` é a ferramenta
+  certa, e evita re-renderizações desnecessárias.
+</Callout>
+
+## Custom hooks: extraindo lógica reutilizável
+
+No capítulo anterior, você escreveu um `useEffect` que sincronizava o estado `gastos` com o `localStorage`. Se você precisasse dessa mesma lógica de persistência em outro componente — digamos, guardar as preferências de tema do usuário — copiaria e colaria o mesmo código, só trocando o nome da chave e o tipo do valor. **Custom hooks** existem exatamente para evitar essa repetição.
+
+Um custom hook é apenas uma função TypeScript comum que **usa outros hooks por dentro**, seguindo uma convenção: o nome sempre começa com `use`. Essa convenção não é só estética — é o que permite ao React (e ao ESLint) saber que essa função segue as regras dos hooks.
+
+Vamos extrair a lógica de persistência em `localStorage` para um hook genérico e reutilizável:
+
+```tsx
+import { useEffect, useState } from "react";
+
+function useLocalStorage<T>(chave: string, valorInicial: T) {
+  const [valor, setValor] = useState<T>(() => {
+    const salvo = localStorage.getItem(chave);
+    return salvo ? (JSON.parse(salvo) as T) : valorInicial;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(chave, JSON.stringify(valor));
+  }, [chave, valor]);
+
+  return [valor, setValor] as const;
+}
+```
+
+Repare que `useLocalStorage` tem exatamente o mesmo formato de retorno do `useState` nativo — um array com o valor atual e sua função de atualização — o que o torna um substituto direto e bastante intuitivo de usar:
+
+```tsx
+function PainelFinanceiro() {
+  const [gastos, setGastos] = useLocalStorage<Gasto[]>("forja:gastos", []);
+
+  function adicionarGasto(novoGasto: Gasto): void {
+    setGastos((atuais) => [...atuais, novoGasto]);
+  }
+
+  return <p>Gastos salvos: {gastos.length}</p>;
+}
+```
+
+Todo o código de leitura, escrita e sincronização com o `localStorage` agora vive em um único lugar (`useLocalStorage`), reutilizável em qualquer componente que precise persistir qualquer tipo de dado — gastos, preferências, filtros salvos. O `<T>` genérico garante que o tipo do valor guardado seja sempre o correto, inferido a partir de `valorInicial` ou explicitado como fizemos com `useLocalStorage<Gasto[]>(...)`.
+
+<Callout type="tip">
+  Um bom sinal de que uma lógica merece virar um custom hook: você percebe
+  que está prestes a copiar e colar um `useState` + `useEffect` (ou qualquer
+  outra combinação de hooks) de um componente para outro. Nesse momento,
+  extraia para uma função `use*` — o ganho de legibilidade e manutenção
+  costuma valer a pena mesmo que o hook só seja usado em um lugar por
+  enquanto.
+</Callout>
+
+## Para praticar
+
+Vamos criar um segundo custom hook, desta vez específico do domínio do nosso dashboard: um `useGastos` que encapsula todo o estado e a lógica de gastos, para que os componentes fiquem simples e só se preocupem com exibição.
+
+**Cenário:** Vários componentes do dashboard (lista, resumo, formulário) vão precisar acessar e modificar os gastos. Em vez de espalhar essa lógica, vamos concentrá-la em um hook.
+
+**Requisitos:**
+
+1. Crie um hook `useGastos()` que, internamente, usa `useLocalStorage<Gasto[]>("forja:gastos", [])` (o hook criado neste capítulo) para guardar a lista.
+2. O hook deve expor `adicionarGasto(gasto: Omit<Gasto, "id">)`, que gera um novo `id` (por exemplo, com `Date.now()`) e atualiza o estado de forma imutável.
+3. O hook deve expor `removerGasto(id: number)`, que retorna um novo array sem o gasto correspondente (usando `.filter()`).
+4. O hook deve expor `total`, calculado com `useMemo` a partir de `gastos` (some todos os valores).
+5. `useGastos()` deve retornar um objeto com `gastos`, `adicionarGasto`, `removerGasto` e `total`. Use esse hook dentro de um componente `PainelFinanceiro` para exibir o total e a quantidade de gastos.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```tsx
+import { useEffect, useMemo, useState } from "react";
+
+type Categoria =
+  | "alimentação"
+  | "transporte"
+  | "moradia"
+  | "lazer"
+  | "saúde"
+  | "outros";
+
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+  categoria: Categoria;
+}
+
+function useLocalStorage<T>(chave: string, valorInicial: T) {
+  const [valor, setValor] = useState<T>(() => {
+    const salvo = localStorage.getItem(chave);
+    return salvo ? (JSON.parse(salvo) as T) : valorInicial;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(chave, JSON.stringify(valor));
+  }, [chave, valor]);
+
+  return [valor, setValor] as const;
+}
+
+function useGastos() {
+  const [gastos, setGastos] = useLocalStorage<Gasto[]>("forja:gastos", []);
+
+  function adicionarGasto(gasto: Omit<Gasto, "id">): void {
+    const novoGasto: Gasto = { ...gasto, id: Date.now() };
+    setGastos((atuais) => [...atuais, novoGasto]);
+  }
+
+  function removerGasto(id: number): void {
+    setGastos((atuais) => atuais.filter((gasto) => gasto.id !== id));
+  }
+
+  const total = useMemo(() => {
+    return gastos.reduce((acumulador, gasto) => acumulador + gasto.valor, 0);
+  }, [gastos]);
+
+  return { gastos, adicionarGasto, removerGasto, total };
+}
+
+function PainelFinanceiro() {
+  const { gastos, adicionarGasto, total } = useGastos();
+
+  function adicionarGastoDeTeste(): void {
+    adicionarGasto({
+      descricao: "Café da tarde",
+      valor: 12.5,
+      categoria: "alimentação",
+    });
+  }
+
+  return (
+    <div>
+      <p>Total: R$ {total.toFixed(2)}</p>
+      <p>Quantidade de gastos: {gastos.length}</p>
+      <button onClick={adicionarGastoDeTeste}>Adicionar gasto de teste</button>
+    </div>
+  );
+}
+```
+
+Repare como `PainelFinanceiro` ficou simples: ele não sabe nada sobre `localStorage`, cálculo de total ou geração de `id` — toda essa complexidade está isolada dentro de `useGastos`, testável e reutilizável independentemente da UI.
+
+</details>
+
+<Accordions type="single">
+  <Accordion title="Referência rápida: qual hook usar quando?">
+    - **`useState`** — guardar um valor que, quando muda, deve atualizar a tela.
+    - **`useEffect`** — sincronizar o componente com algo fora do React (API, `localStorage`, eventos globais, timers).
+    - **`useMemo`** — evitar recalcular um valor caro em renderizações onde suas dependências não mudaram.
+    - **`useCallback`** — manter a mesma referência de uma função entre renderizações, geralmente para não quebrar a otimização de um componente filho com `React.memo`.
+    - **`useRef`** — acessar um elemento do DOM diretamente, ou guardar um valor mutável que não deve causar re-renderização.
+    - **Custom hook (`use*`)** — extrair e reutilizar qualquer combinação dos hooks acima, quando a mesma lógica aparece (ou está prestes a aparecer) em mais de um componente.
+  </Accordion>
+</Accordions>
+
+---
+
+Com `useMemo`, `useCallback`, `useRef` e a habilidade de criar seus próprios hooks, você já tem o ferramental que a maioria das equipes React usa no dia a dia. Falta uma última peça de arquitetura, que vira essencial assim que o dashboard cresce: como compartilhar dados como `gastos` e `total` entre vários componentes distantes na árvore, sem passar prop por prop através de cada nível. É o assunto do próximo — e último — capítulo deste módulo.
