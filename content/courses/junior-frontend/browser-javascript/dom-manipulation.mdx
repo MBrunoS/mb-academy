@@ -1,0 +1,288 @@
+---
+title: Manipulação do DOM
+description: "Conecte seu TypeScript ao HTML e aprenda a selecionar, ler, escrever, criar e remover elementos da página."
+---
+
+Você já sabe o que é o DOM: a árvore de objetos que o navegador monta a partir do seu HTML. Agora é hora de colocar a mão na massa e usar o TypeScript para conversar com essa árvore — selecionar elementos, ler e trocar seu conteúdo, e criar ou remover pedaços dela em tempo real.
+
+Antes de tudo, porém, seu código precisa **chegar** até o navegador.
+
+## Conectando um arquivo TypeScript a uma página HTML
+
+O navegador não executa arquivos `.ts` diretamente — ele executa JavaScript. Por isso, todo projeto TypeScript de front-end passa por uma etapa de **compilação** (feita pelo `tsc` ou, mais comumente em projetos reais, por uma ferramenta de build como Vite ou Webpack) que transforma seu `.ts` em `.js` antes de ele chegar ao navegador. Você continua **pensando e escrevendo em TypeScript** o tempo todo — só o arquivo final que o navegador roda é que é JavaScript puro.
+
+Para conectar esse arquivo compilado a uma página, usamos a tag `<script>`:
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Meus Gastos</title>
+  </head>
+  <body>
+    <h1>Meus Gastos</h1>
+    <ul id="lista-gastos"></ul>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
+```
+
+Repare em dois detalhes importantes:
+
+- **A posição do `<script>`**: colocá-lo no fim do `<body>` garante que todo o HTML acima dele já foi processado e existe no DOM antes do script rodar. Se você colocasse esse mesmo script no `<head>` sem nenhum cuidado extra, ele tentaria selecionar o `<ul id="lista-gastos">` antes de esse elemento sequer existir — e receberia `null`.
+- **O atributo `defer`**: ele diz ao navegador para baixar o script em paralelo ao carregamento da página, mas só executá-lo depois que todo o HTML terminar de ser processado. É a forma recomendada de carregar scripts hoje em dia, porque permite colocar a tag `<script>` no `<head>` (onde fica mais fácil de encontrar) sem bloquear a renderização da página nem correr o risco de rodar antes da hora.
+
+<Callout type="tip">
+  Em projetos reais, você raramente vai escrever essa tag `<script>` manualmente — ferramentas como Vite injetam e gerenciam isso para você. Mas entender o que acontece por baixo dos panos evita muita dor de cabeça quando algo não carrega na ordem esperada.
+</Callout>
+
+## Selecionando elementos
+
+Para manipular um elemento, primeiro você precisa **selecioná-lo** — pegar uma referência a ele dentro do DOM. O método mais usado hoje é `document.querySelector`, que aceita um seletor CSS (o mesmo tipo de seletor que você já usa em arquivos `.css`) e devolve o primeiro elemento que casar com ele.
+
+```ts
+const titulo = document.querySelector("h1");
+console.log(titulo); // <h1>Meus Gastos</h1>
+```
+
+O problema é que, por padrão, `querySelector` devolve um tipo genérico (`Element | null`), que não sabe nada sobre propriedades específicas de um botão, de um input ou de uma lista. Se você tentar acessar `titulo.value`, por exemplo, o TypeScript vai reclamar — e com razão, porque um `<h1>` não tem propriedade `value`.
+
+É aqui que a tipagem do DOM em TypeScript se mostra útil: `querySelector` é **genérico**, e você pode informar explicitamente qual tipo de elemento espera encontrar:
+
+```ts
+const botao = document.querySelector<HTMLButtonElement>("#btn-adicionar");
+const campoValor = document.querySelector<HTMLInputElement>("#input-valor");
+const lista = document.querySelector<HTMLUListElement>("#lista-gastos");
+```
+
+Agora o TypeScript sabe que `campoValor`, se existir, tem uma propriedade `.value` do tipo `string` (própria de inputs), e que `botao` tem tudo que um `HTMLButtonElement` tem, como `.disabled`.
+
+<Callout type="warn">
+  `querySelector` sempre devolve `T | null`, porque o TypeScript não tem como garantir, em tempo de compilação, que aquele seletor vai encontrar algo no HTML. Isso significa que você **precisa** verificar se o elemento existe antes de usá-lo:
+
+```ts
+const botao = document.querySelector<HTMLButtonElement>("#btn-adicionar");
+
+if (botao) {
+  botao.disabled = true;
+}
+
+// ou, de forma mais compacta, com optional chaining:
+botao?.addEventListener("click", () => console.log("clicado"));
+```
+
+  Ignorar essa checagem é uma das causas mais comuns de erros em tempo de execução no front-end: `Cannot set properties of null`.
+</Callout>
+
+Quando você precisa selecionar **vários** elementos de uma vez (todos os itens de uma lista, por exemplo), use `querySelectorAll`, que devolve uma `NodeListOf<T>` — uma estrutura parecida com um array, que também pode ser percorrida com `forEach`:
+
+```ts
+const itens = document.querySelectorAll<HTMLLIElement>(".item-gasto");
+
+itens.forEach((item) => {
+  console.log(item.textContent);
+});
+```
+
+## Lendo e escrevendo conteúdo
+
+Depois de selecionar um elemento, o próximo passo é ler ou alterar o que está dentro dele. As duas propriedades mais usadas para isso são `textContent` e `innerHTML`.
+
+`textContent` lê ou escreve **apenas texto puro** — qualquer marcação HTML que você atribuir a ele é tratada como texto literal, não como tags:
+
+```ts
+const titulo = document.querySelector<HTMLHeadingElement>("h1");
+
+if (titulo) {
+  titulo.textContent = "Meus Gastos de Setembro";
+}
+```
+
+`innerHTML`, por outro lado, lê ou escreve **HTML de verdade** — qualquer string atribuída a ele é interpretada e renderizada como marcação:
+
+```ts
+const container = document.querySelector<HTMLDivElement>("#resumo");
+
+if (container) {
+  container.innerHTML = "<strong>Total:</strong> R$ 450,00";
+}
+```
+
+Isso parece conveniente, mas esconde um risco sério: se o conteúdo que você insere com `innerHTML` vier de um usuário (o nome de um cliente, a descrição de um gasto digitada em um formulário, um comentário), e você não confiar cegamente nesse texto, ele pode conter tags `<script>` ou atributos maliciosos que executam código arbitrário na página de outras pessoas. Esse tipo de vulnerabilidade se chama **XSS** (Cross-Site Scripting).
+
+```ts
+// NUNCA faça isso com dados que vieram do usuário:
+const descricaoDigitada = '<img src=x onerror="alert(\'hackeado\')">';
+container.innerHTML = descricaoDigitada; // executa o onerror!
+```
+
+<Callout type="warn">
+  Regra prática: use `textContent` sempre que estiver lidando com dados que não são 100% controlados por você (entrada de usuário, resposta de uma API externa). Reserve `innerHTML` para HTML que você mesmo escreveu no código, sabendo exatamente o que contém. Frameworks como React (que você vai ver no próximo capítulo) resolvem boa parte desse problema automaticamente, mas em manipulação manual do DOM a responsabilidade é sua.
+</Callout>
+
+## Criando e removendo elementos
+
+Selecionar elementos que já existem no HTML é útil, mas boa parte do trabalho real em uma aplicação dinâmica é **criar elementos novos em tempo de execução** — como adicionar um novo item a uma lista de gastos sem precisar recarregar a página.
+
+O processo tem três passos: criar o elemento com `document.createElement`, preencher seu conteúdo, e anexá-lo a algum elemento pai com `appendChild`.
+
+```ts
+interface Gasto {
+  descricao: string;
+  valor: number;
+  categoria: string;
+}
+
+function criarItemGasto(gasto: Gasto): HTMLLIElement {
+  const item = document.createElement("li");
+  item.textContent = `${gasto.descricao} — R$ ${gasto.valor.toFixed(2)} (${gasto.categoria})`;
+  return item;
+}
+
+const lista = document.querySelector<HTMLUListElement>("#lista-gastos");
+const novoGasto: Gasto = { descricao: "Mercado", valor: 189.9, categoria: "Alimentação" };
+
+if (lista) {
+  lista.appendChild(criarItemGasto(novoGasto));
+}
+```
+
+Repare que `criarItemGasto` recebe um `Gasto` tipado e devolve um `HTMLLIElement` — o TypeScript garante, em tempo de compilação, que essa função sempre lida com os tipos certos, mesmo estando no meio de código que manipula o DOM.
+
+Para remover um elemento, você tem duas opções. A mais antiga é `removeChild`, chamada a partir do elemento **pai**:
+
+```ts
+if (lista && lista.firstElementChild) {
+  lista.removeChild(lista.firstElementChild);
+}
+```
+
+A mais moderna e direta é o método `remove()`, chamado no próprio elemento que você quer eliminar — sem precisar referenciar o pai:
+
+```ts
+const primeiroItem = document.querySelector<HTMLLIElement>(".item-gasto");
+primeiroItem?.remove();
+```
+
+Na prática, prefira `remove()`: é mais legível e não exige que você tenha uma referência ao elemento pai só para excluir um filho.
+
+## Classes e estilos
+
+Além de conteúdo, muitas vezes você precisa mudar a **aparência** de um elemento em resposta a alguma condição — destacar um gasto acima de um certo valor, por exemplo. A forma recomendada de fazer isso é manipulando **classes CSS**, através da propriedade `classList`:
+
+```ts
+const item = document.querySelector<HTMLLIElement>(".item-gasto");
+
+item?.classList.add("gasto-alto");     // adiciona a classe
+item?.classList.remove("gasto-alto");  // remove a classe
+item?.classList.toggle("gasto-alto");  // adiciona se não tiver, remove se tiver
+item?.classList.contains("gasto-alto"); // true ou false, sem alterar nada
+```
+
+```css
+/* styles.css */
+.gasto-alto {
+  color: #c0392b;
+  font-weight: bold;
+}
+```
+
+Também é possível alterar estilos diretamente pela propriedade `.style`, sem passar por uma classe CSS:
+
+```ts
+if (item) {
+  item.style.color = "red";
+  item.style.fontWeight = "bold";
+}
+```
+
+<Callout>
+  Prefira `classList` a `.style` sempre que possível. Alterar classes mantém a definição visual (cores, fontes, espaçamentos) centralizada no seu arquivo CSS, onde ela pertence — enquanto `.style` espalha regras visuais pelo código TypeScript, dificultando a manutenção. Reserve `.style` para casos em que o valor realmente precisa ser calculado dinamicamente (uma barra de progresso cuja largura depende de um número, por exemplo), e não para estados que já podem ser descritos por uma classe.
+</Callout>
+
+## Para praticar
+
+Você tem a seguinte página HTML, já pronta:
+
+```html
+<body>
+  <ul id="lista-gastos"></ul>
+  <p id="total-gastos"></p>
+</body>
+```
+
+E o seguinte array de gastos em TypeScript:
+
+```ts
+interface Gasto {
+  descricao: string;
+  valor: number;
+  categoria: string;
+}
+
+const gastos: Gasto[] = [
+  { descricao: "Mercado", valor: 189.9, categoria: "Alimentação" },
+  { descricao: "Academia", valor: 99.9, categoria: "Saúde" },
+  { descricao: "Streaming", valor: 39.9, categoria: "Lazer" },
+  { descricao: "Jantar fora", valor: 210.0, categoria: "Alimentação" },
+];
+```
+
+**Requisitos:**
+
+1. Selecione o `<ul id="lista-gastos">` e o `<p id="total-gastos">` com os tipos corretos (`HTMLUListElement` e `HTMLParagraphElement`), verificando que ambos existem antes de continuar.
+2. Para cada gasto no array, crie um `<li>` com o texto no formato `"Descrição — R$ Valor (Categoria)"` e adicione-o à lista.
+3. Se o valor do gasto for maior que `R$ 150`, adicione a classe `"gasto-alto"` a esse `<li>` usando `classList`.
+4. Some o valor de todos os gastos e escreva o total formatado (`toFixed(2)`) dentro do `<p id="total-gastos">`, no formato `"Total: R$ 539.70"`.
+5. Não use `innerHTML` em nenhum momento — apenas `textContent` e criação de elementos.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```ts
+interface Gasto {
+  descricao: string;
+  valor: number;
+  categoria: string;
+}
+
+const gastos: Gasto[] = [
+  { descricao: "Mercado", valor: 189.9, categoria: "Alimentação" },
+  { descricao: "Academia", valor: 99.9, categoria: "Saúde" },
+  { descricao: "Streaming", valor: 39.9, categoria: "Lazer" },
+  { descricao: "Jantar fora", valor: 210.0, categoria: "Alimentação" },
+];
+
+function criarItemGasto(gasto: Gasto): HTMLLIElement {
+  const item = document.createElement("li");
+  item.textContent = `${gasto.descricao} — R$ ${gasto.valor.toFixed(2)} (${gasto.categoria})`;
+
+  if (gasto.valor > 150) {
+    item.classList.add("gasto-alto");
+  }
+
+  return item;
+}
+
+const lista = document.querySelector<HTMLUListElement>("#lista-gastos");
+const totalElemento = document.querySelector<HTMLParagraphElement>("#total-gastos");
+
+if (lista && totalElemento) {
+  let total = 0;
+
+  for (const gasto of gastos) {
+    lista.appendChild(criarItemGasto(gasto));
+    total += gasto.valor;
+  }
+
+  totalElemento.textContent = `Total: R$ ${total.toFixed(2)}`;
+}
+```
+
+</details>
+
+---
+
+Você já sabe selecionar, ler, escrever, criar e remover elementos do DOM — e sabe fazer isso com a mesma segurança de tipos do TypeScript que já usava no terminal. Falta uma peça: até agora, tudo o que você fez roda uma única vez, quando o script carrega. No próximo capítulo, você vai aprender a fazer sua página **reagir** a ações do usuário — cliques, envios de formulário, digitação — através de **eventos**.
