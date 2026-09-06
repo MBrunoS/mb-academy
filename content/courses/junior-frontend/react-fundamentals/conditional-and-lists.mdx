@@ -128,7 +128,7 @@ O `.map()` recebe uma função que transforma cada `gasto` em um elemento JSX (`
 
 ## A prop `key`: por que o React precisa dela
 
-Você deve ter notado o atributo `key={gasto.id}` no exemplo acima. Ele não é opcional — se você omitir, o React exibe um aviso no console (*"Each child in a list should have a unique 'key' prop"*), e por um bom motivo.
+Você deve ter notado o atributo `key={gasto.id}` no exemplo acima. Ele não é opcional — se você omitir, o React exibe um aviso no console dizendo que cada item de uma lista precisa de uma prop `key` única, e por um bom motivo.
 
 Quando uma lista muda (um item é adicionado, removido ou reordenado), o React precisa decidir: quais elementos da tela continuam sendo os mesmos, e quais são novos? Esse processo se chama **reconciliação**, e a prop `key` é a informação que o React usa para parear "o item de antes" com "o item de agora" — sem ela, o React só tem a posição do item na lista como pista, e isso pode enganar.
 

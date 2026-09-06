@@ -1,0 +1,260 @@
+---
+title: Context e Gerenciamento de Estado
+description: "Evite o prop drilling com a Context API e conheça, em nível conceitual, quando bibliotecas como Redux e Zustand fazem sentido."
+---
+
+Seu dashboard de finanças já tem componentes que guardam estado, hooks customizados que encapsulam a lógica de gastos, listas renderizadas dinamicamente e persistência em `localStorage`. Só falta um problema de arquitetura que aparece assim que a árvore de componentes cresce: como fazer dados como `gastos` e `total` chegarem a componentes que estão vários níveis abaixo, sem espalhar props por todo canto?
+
+## O problema do prop drilling
+
+Imagine que o `total` calculado pelo hook `useGastos` (do capítulo anterior) precisa ser exibido em um componente `ResumoTotal`, que fica dentro de um `Cabecalho`, que fica dentro de um `Dashboard`, que fica dentro do componente raiz `App`. Sem nenhuma técnica especial, o único jeito de levar `total` até `ResumoTotal` é passá-lo como prop, nível por nível:
+
+```tsx
+function App() {
+  const { total } = useGastos();
+
+  return <Dashboard total={total} />;
+}
+
+function Dashboard({ total }: { total: number }) {
+  // Dashboard não usa "total" para nada — só repassa adiante
+  return <Cabecalho total={total} />;
+}
+
+function Cabecalho({ total }: { total: number }) {
+  // Cabecalho também não usa "total" — só repassa adiante
+  return <ResumoTotal total={total} />;
+}
+
+function ResumoTotal({ total }: { total: number }) {
+  return <p>Total: R$ {total.toFixed(2)}</p>;
+}
+```
+
+Repare que `Dashboard` e `Cabecalho` recebem a prop `total` só para **repassá-la adiante** — nenhum dos dois usa esse valor diretamente. Esse padrão se chama **prop drilling** ("perfurar" a árvore de componentes com uma prop até o destino final), e ele piora rapidamente conforme a aplicação cresce: toda vez que você adiciona um nível intermediário, precisa lembrar de repassar a prop; toda vez que `ResumoTotal` precisa de mais um dado, você precisa alterar a assinatura de **todos** os componentes no caminho até ele.
+
+## A Context API: criando um contexto tipado
+
+A **Context API** resolve o prop drilling permitindo que um valor seja disponibilizado no topo da árvore e consumido diretamente por qualquer componente descendente — sem precisar passar por props intermediárias. O primeiro passo é criar o contexto com `createContext`, já tipando o formato do valor que ele vai carregar:
+
+```tsx
+import { createContext } from "react";
+
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+}
+
+interface GastosContextValue {
+  gastos: Gasto[];
+  adicionarGasto: (gasto: Omit<Gasto, "id">) => void;
+  removerGasto: (id: number) => void;
+  total: number;
+}
+
+const GastosContext = createContext<GastosContextValue | null>(null);
+```
+
+O tipo é `GastosContextValue | null` — o valor inicial (antes de qualquer `Provider` existir) é `null`, mas o valor real, uma vez fornecido, sempre terá o formato de `GastosContextValue`. Esse padrão (`| null` no `createContext`, com verificação explícita no hook de consumo, que veremos a seguir) é a forma mais segura de tipar contexto em TypeScript, porque evita que você acidentalmente use o contexto fora de onde ele foi de fato fornecido.
+
+## Provider: disponibilizando o contexto
+
+Todo contexto vem acompanhado de um componente `Provider`, responsável por "publicar" o valor para todos os seus descendentes. Vamos criar um `GastosProvider` que reaproveita o hook `useGastos` do capítulo anterior:
+
+```tsx
+import type { ReactNode } from "react";
+
+function GastosProvider({ children }: { children: ReactNode }) {
+  const { gastos, adicionarGasto, removerGasto, total } = useGastos();
+
+  return (
+    <GastosContext.Provider value={{ gastos, adicionarGasto, removerGasto, total }}>
+      {children}
+    </GastosContext.Provider>
+  );
+}
+```
+
+E, no topo da aplicação, envolvemos tudo com esse provider:
+
+```tsx
+function App() {
+  return (
+    <GastosProvider>
+      <Dashboard />
+    </GastosProvider>
+  );
+}
+```
+
+Note que `Dashboard` não recebe mais nenhuma prop relacionada a gastos — ele, `Cabecalho`, e qualquer outro componente no meio do caminho, voltam a ser simples, sem precisar saber que um contexto de gastos existe.
+
+## `useContext`: consumindo o contexto
+
+Qualquer componente dentro do `GastosProvider` pode acessar o valor do contexto diretamente com o hook `useContext`, não importa quantos níveis de profundidade o separam do provider:
+
+```tsx
+import { useContext } from "react";
+
+function ResumoTotal() {
+  const contexto = useContext(GastosContext);
+
+  if (contexto === null) {
+    throw new Error("ResumoTotal precisa estar dentro de um GastosProvider.");
+  }
+
+  return <p>Total: R$ {contexto.total.toFixed(2)}</p>;
+}
+```
+
+`Dashboard` e `Cabecalho` voltam a não ter nenhuma relação com `total` — `ResumoTotal` busca o valor diretamente do contexto, não importa onde ele esteja posicionado na árvore. O prop drilling desapareceu.
+
+## Um hook customizado para consumir o contexto com segurança
+
+Repetir a verificação `if (contexto === null) throw ...` em todo componente que consome `GastosContext` seria repetitivo — e é exatamente o tipo de situação onde um custom hook (do capítulo anterior) se encaixa perfeitamente:
+
+```tsx
+function useGastosContext(): GastosContextValue {
+  const contexto = useContext(GastosContext);
+
+  if (contexto === null) {
+    throw new Error("useGastosContext precisa ser usado dentro de um GastosProvider.");
+  }
+
+  return contexto;
+}
+```
+
+Com isso, qualquer componente consumidor fica mais limpo, e ganha a garantia de tipos de que o valor nunca é `null` (o TypeScript já sabe disso, graças ao tipo de retorno `GastosContextValue`, sem o `| null`):
+
+```tsx
+function ResumoTotal() {
+  const { total } = useGastosContext();
+  return <p>Total: R$ {total.toFixed(2)}</p>;
+}
+```
+
+<Callout type="tip">
+  Esse padrão — contexto tipado com `| null`, mais um hook customizado que
+  verifica e lança um erro — é praticamente um padrão de mercado em código
+  React com TypeScript. Ele transforma um erro silencioso (usar o contexto
+  fora do provider e receber `undefined`/`null` sem aviso) em um erro alto e
+  claro, apontado no exato componente que esqueceu de envolver a árvore com
+  o `Provider` correto.
+</Callout>
+
+## Quando Context não é suficiente
+
+Context resolve muito bem o problema de "esse dado precisa estar disponível em vários lugares da árvore", mas ele não foi desenhado para ser um gerenciador de estado geral de aplicação. Alguns limites valem conhecer desde já:
+
+- **Re-renderização em bloco.** Quando o valor de um contexto muda, **todo componente que consome esse contexto** re-renderiza — mesmo que só precisasse de uma parte específica daquele valor. Em contextos pequenos e que mudam pouco (como o nosso `GastosContext`), isso raramente é um problema perceptível. Em aplicações grandes, com contextos que mudam com muita frequência (por exemplo, a cada tecla digitada em uma busca global), esse comportamento pode gerar lentidão real.
+- **Lógica de estado complexa.** Context é só o "cano" que transporta o valor — ele não ajuda em nada com regras de atualização mais elaboradas, undo/redo, múltiplas fontes de dados assíncronas se combinando, ou depuração de "por que esse estado mudou". Para isso, ferramentas dedicadas de gerenciamento de estado entram em cena.
+
+## Noções sobre Redux e Zustand
+
+Você certamente vai ouvir falar de **Redux** e **Zustand** em qualquer vaga ou projeto React de porte médio para grande. Vale entender, em nível conceitual, o que cada um resolve — a implementação prática fica para o curso Pleno, dentro do módulo "Dominando React".
+
+**Redux** centraliza todo o estado da aplicação em uma única "store" (um objeto). Mudanças de estado acontecem exclusivamente através de **actions** (objetos descrevendo "o que aconteceu") processadas por **reducers** (funções puras que calculam o novo estado a partir do estado atual e da action). Essa rigidez tem um propósito: torna as mudanças de estado **previsíveis e rastreáveis** — ferramentas de devtools do Redux permitem literalmente "voltar no tempo" e ver o estado exato da aplicação em qualquer ação passada. O preço é mais código boilerplate (embora o Redux Toolkit, a forma moderna de usar Redux, tenha reduzido bastante essa fricção).
+
+**Zustand** propõe uma API muito mais enxuta: uma store é basicamente um hook customizado que qualquer componente pode importar e usar diretamente, sem precisar de um `Provider` envolvendo a árvore. Tem muito menos boilerplate que o Redux tradicional, e resolve elegantemente o problema de re-renderização em bloco do Context, porque cada componente pode "selecionar" apenas a fatia do estado que realmente precisa.
+
+Quando cada um faz sentido:
+
+- **Context (o que você aprendeu aqui) é suficiente** para a maioria dos casos de compartilhamento de estado entre componentes — tema visual, dados do usuário autenticado, ou o nosso `GastosContext`.
+- **Redux** compensa em aplicações grandes, com múltiplas equipes, onde previsibilidade, rastreabilidade e ferramentas de depuração avançadas justificam o código adicional.
+- **Zustand** (ou bibliotecas parecidas) é uma ótima escolha intermediária: menos cerimônia que Redux, mais poder e performance que Context puro, para aplicações de porte médio.
+
+<Callout type="warn">
+  Um erro comum de quem está aprendendo React é sair colocando **tudo** em um
+  único Context gigante "para não ter que decidir depois". Isso maximiza
+  exatamente o problema de re-renderização em bloco descrito acima — qualquer
+  mudança em qualquer parte do estado re-renderiza todo mundo que consome
+  aquele contexto. Prefira vários contextos pequenos, cada um por
+  responsabilidade (`GastosContext`, `TemaContext`, `UsuarioContext`), a um
+  único `AppContext` fazendo tudo.
+</Callout>
+
+## Para praticar
+
+Vamos aplicar o padrão completo — contexto tipado, provider e hook de consumo seguro — em uma versão simplificada do nosso `GastosContext`.
+
+**Cenário:** Um componente `ResumoTotal`, em qualquer lugar da árvore, precisa exibir o total de gastos sem receber nenhuma prop.
+
+**Requisitos:**
+
+1. Crie a interface `GastosContextValue` com `gastos: Gasto[]` e `total: number` (versão simplificada, sem as funções de adicionar/remover).
+2. Crie o contexto `GastosContext`, tipado com `createContext<GastosContextValue | null>(null)`.
+3. Crie um componente `GastosProvider` que recebe `children: ReactNode`, guarda internamente um array de gastos de exemplo (fixo, com `useState`), calcula o `total` (pode ser com `useMemo` ou um cálculo direto), e envolve `children` em `<GastosContext.Provider value={...}>`.
+4. Crie um hook `useGastosContext()` que usa `useContext(GastosContext)` e lança um erro se o valor for `null`, garantindo que ele só seja usado dentro do provider.
+5. Crie um componente `ResumoTotal` que usa `useGastosContext()` para exibir o total, sem receber nenhuma prop.
+
+<details>
+  <summary>Clique para ver uma possível solução</summary>
+
+```tsx
+import { createContext, useContext, useMemo, useState } from "react";
+import type { ReactNode } from "react";
+
+interface Gasto {
+  id: number;
+  descricao: string;
+  valor: number;
+}
+
+interface GastosContextValue {
+  gastos: Gasto[];
+  total: number;
+}
+
+const GastosContext = createContext<GastosContextValue | null>(null);
+
+function GastosProvider({ children }: { children: ReactNode }) {
+  const [gastos] = useState<Gasto[]>([
+    { id: 1, descricao: "Almoço no restaurante", valor: 45.5 },
+    { id: 2, descricao: "Passagem de metrô", valor: 4.4 },
+    { id: 3, descricao: "Cinema com amigos", valor: 32.0 },
+  ]);
+
+  const total = useMemo(() => {
+    return gastos.reduce((acumulador, gasto) => acumulador + gasto.valor, 0);
+  }, [gastos]);
+
+  return (
+    <GastosContext.Provider value={{ gastos, total }}>
+      {children}
+    </GastosContext.Provider>
+  );
+}
+
+function useGastosContext(): GastosContextValue {
+  const contexto = useContext(GastosContext);
+
+  if (contexto === null) {
+    throw new Error("useGastosContext precisa ser usado dentro de um GastosProvider.");
+  }
+
+  return contexto;
+}
+
+function ResumoTotal() {
+  const { total } = useGastosContext();
+  return <p>Total: R$ {total.toFixed(2)}</p>;
+}
+
+function App() {
+  return (
+    <GastosProvider>
+      <ResumoTotal />
+    </GastosProvider>
+  );
+}
+```
+
+Note que `ResumoTotal` poderia estar a qualquer profundidade dentro de `GastosProvider` — dentro de um `Dashboard`, um `Cabecalho`, ou qualquer outro componente intermediário — sem que nenhum deles precise saber que `total` existe. É exatamente esse desacoplamento que resolve o prop drilling.
+
+</details>
+
+---
+
+Chegamos ao fim do módulo de React com TypeScript. Você saiu de manipular o DOM na mão para construir componentes declarativos, tipados, reativos a estado e eventos, com listas dinâmicas, efeitos colaterais bem controlados, hooks otimizados, hooks customizados próprios e um contexto compartilhado — tudo isso usando o mesmo tema de finanças pessoais que atravessou cada capítulo. No próximo capítulo, seu dashboard vai finalmente conversar com o mundo real: você vai aprender a consumir APIs de verdade e implementar autenticação. E no Capítulo 6, todo o conhecimento deste módulo se junta em um único projeto: o Dashboard de Finanças Pessoais completo, publicado com uma URL real.

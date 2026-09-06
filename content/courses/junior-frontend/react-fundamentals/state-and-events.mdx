@@ -215,8 +215,8 @@ Repare que o input de valor exige um cuidado extra: todo `input`, mesmo do tipo 
 
 <Callout type="warn">
   Se você definir `value={descricao}` em um input sem também definir
-  `onChange`, o React exibe um aviso no console: *"You provided a `value` prop
-  to a form field without an `onChange` handler"*. Sem o `onChange`, o campo
+  `onChange`, o React exibe um aviso no console dizendo que você criou um
+  campo controlado sem um manipulador de mudança. Sem o `onChange`, o campo
   fica travado no valor do estado e o usuário não consegue digitar nada — o
   par `value` + `onChange` é indissociável em um componente controlado.
 </Callout>
