@@ -44,6 +44,12 @@ export const baseOptions: BaseLayoutProps = {
           description: "Comece com o básico.",
           url: "/courses/starter",
         },
+        {
+          icon: <ComponentIcon />,
+          text: "Júnior Front-end",
+          description: "Construa interfaces web reais com React.",
+          url: "/courses/junior-frontend",
+        },
       ],
     },
   ],

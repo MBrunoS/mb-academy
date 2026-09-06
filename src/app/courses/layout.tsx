@@ -28,6 +28,11 @@ export default function Layout({ children }: { children: ReactNode }) {
             description: "Starter",
             url: "/courses/starter",
           },
+          {
+            title: "Júnior Front-end",
+            description: "Júnior Front-end",
+            url: "/courses/junior-frontend",
+          },
         ],
       }}
     >

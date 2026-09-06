@@ -50,6 +50,37 @@ export default function CoursesPage() {
               </div>
             </div>
 
+            <div className="p-4">
+              <div className="flex items-stretch justify-between gap-4 rounded-xl">
+                <div className="flex flex-[2_2_0px] flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-white text-base font-bold leading-tight">
+                      Júnior Front-end
+                    </p>
+                    <p className="text-[#9db3b9] text-sm font-normal leading-normal">
+                      Construa interfaces web reais com React e TypeScript.
+                      Aprenda HTML, CSS, consumo de APIs, autenticação e
+                      testes, e publique um dashboard de finanças pessoais
+                      com uma URL real.
+                    </p>
+                  </div>
+                  <Link
+                    href="/courses/junior-frontend"
+                    className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-8 px-4 flex-row-reverse bg-[#283539] text-white text-sm font-medium leading-normal w-fit"
+                  >
+                    Saiba Mais
+                  </Link>
+                </div>
+                <div
+                  className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex-1"
+                  style={{
+                    backgroundImage:
+                      'url("https://cdn.usegalileo.ai/sdxl10/5ae3a45f-4c51-4f55-97fb-8e559a6bc83a.png")',
+                  }}
+                />
+              </div>
+            </div>
+
             <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
               Trilhas de Aprendizado
             </h2>
