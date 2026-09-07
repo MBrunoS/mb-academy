@@ -80,7 +80,7 @@ function CourseCard({ course }: { course: CatalogCourse }) {
     <div
       className={`group flex h-full flex-col gap-4 rounded-2xl border p-6 transition-colors ${
         available
-          ? "border-fd-border bg-fd-card hover:border-indigo-500/50"
+          ? "border-fd-border bg-fd-card hover:border-emerald-500/50"
           : "border-dashed border-fd-border bg-fd-card/40"
       }`}
     >
@@ -88,7 +88,7 @@ function CourseCard({ course }: { course: CatalogCourse }) {
         <span
           className={`flex size-10 items-center justify-center rounded-xl text-white ${
             available
-              ? "bg-gradient-to-br from-indigo-500 to-violet-600"
+              ? "bg-gradient-to-br from-emerald-500 to-teal-600"
               : "bg-fd-muted text-fd-muted-foreground"
           }`}
         >
@@ -103,7 +103,7 @@ function CourseCard({ course }: { course: CatalogCourse }) {
         </p>
       </div>
       {available && (
-        <span className="inline-flex items-center gap-1.5 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+        <span className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600 dark:text-emerald-400">
           Saiba mais
           <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
         </span>

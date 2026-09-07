@@ -34,7 +34,7 @@ function Hero() {
         </span>
         <h1 className="text-4xl leading-tight font-black tracking-tight text-fd-foreground md:text-6xl">
           Aprenda a programar do zero ao{" "}
-          <span className="bg-gradient-to-r from-indigo-500 to-violet-600 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-emerald-500 to-teal-600 bg-clip-text text-transparent">
             sênior
           </span>
         </h1>
@@ -69,7 +69,7 @@ function Hero() {
 
 function CodePreview() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-fd-border bg-fd-card shadow-xl shadow-indigo-500/5">
+    <div className="overflow-hidden rounded-2xl border border-fd-border bg-fd-card shadow-xl shadow-emerald-500/5">
       <div className="flex items-center gap-2 border-b border-fd-border px-4 py-3">
         <span className="size-2.5 rounded-full bg-red-400" />
         <span className="size-2.5 rounded-full bg-amber-400" />
@@ -80,7 +80,7 @@ function CodePreview() {
       </div>
       <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-relaxed">
         <code>
-          <span className="text-violet-500 dark:text-violet-400">const</span>{" "}
+          <span className="text-teal-500 dark:text-teal-400">const</span>{" "}
           trilha = [{"\n"}
           {"  "}
           <span className="text-emerald-600 dark:text-emerald-400">
@@ -101,7 +101,7 @@ function CodePreview() {
           <span className="text-emerald-600 dark:text-emerald-400">
             &quot;Sênior&quot;
           </span>
-          ,{"\n"}] <span className="text-violet-500 dark:text-violet-400">as const</span>;
+          ,{"\n"}] <span className="text-teal-500 dark:text-teal-400">as const</span>;
           {"\n\n"}
           trilha.
           <span className="text-sky-600 dark:text-sky-400">forEach</span>
@@ -167,7 +167,7 @@ function Philosophy() {
               key={item.title}
               className="flex flex-col gap-3 rounded-2xl border border-fd-border bg-fd-background p-5"
             >
-              <span className="flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white">
+              <span className="flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
                 <item.icon className="size-4.5" />
               </span>
               <h3 className="font-semibold text-fd-foreground">
@@ -229,7 +229,7 @@ function Roadmap() {
       <div className="mt-8 flex justify-center">
         <Link
           href="/courses"
-          className="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 hover:underline dark:text-indigo-400"
+          className="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 hover:underline dark:text-emerald-400"
         >
           Ver detalhes de cada curso
           <ArrowRight className="size-4" />
@@ -269,17 +269,17 @@ function About() {
 function FinalCta() {
   return (
     <section className="mx-auto w-full max-w-[1200px] px-6 py-20">
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 px-6 py-16 text-center">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-600 px-6 py-16 text-center">
         <h2 className="max-w-[560px] text-3xl font-black tracking-tight text-white md:text-4xl">
           Pronto para escrever sua primeira linha de código?
         </h2>
-        <p className="max-w-[480px] text-indigo-100">
+        <p className="max-w-[480px] text-emerald-50">
           O Starter é gratuito, completo, e não exige nenhuma experiência
           prévia.
         </p>
         <Link
           href="/courses/starter"
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-6 text-sm font-bold text-indigo-700 transition-opacity hover:opacity-90"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-6 text-sm font-bold text-emerald-700 transition-opacity hover:opacity-90"
         >
           Começar agora
           <ArrowRight className="size-4" />
