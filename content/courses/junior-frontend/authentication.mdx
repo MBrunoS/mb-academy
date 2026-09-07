@@ -24,7 +24,7 @@ interface RespostaLogin {
 }
 
 async function login(email: string, senha: string): Promise<string> {
-  const resposta = await fetch("https://api.forja.dev/auth/login", {
+  const resposta = await fetch("https://api.mbacademy.dev/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, senha }),
@@ -175,7 +175,7 @@ Uma vez com o token guardado, o padrão para se identificar em requisições fut
 async function buscarGastos(): Promise<unknown> {
   const token = localStorage.getItem("token");
 
-  const resposta = await fetch("https://api.forja.dev/gastos", {
+  const resposta = await fetch("https://api.mbacademy.dev/gastos", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -199,7 +199,7 @@ Repetir `Authorization: Bearer ${token}` manualmente em toda chamada é repetiti
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://api.forja.dev",
+  baseURL: "https://api.mbacademy.dev",
 });
 
 api.interceptors.request.use((config) => {
@@ -271,7 +271,7 @@ Esse exemplo verifica apenas **se existe um token**, o que já resolve o caso ma
 
 **Requisitos:**
 
-1. Implemente uma função `login(email: string, senha: string): Promise<string>` que faça `POST` para `"https://api.forja.dev/auth/login"` e retorne o token recebido, lançando um erro com a mensagem `"E-mail ou senha incorretos."` especificamente quando o status for `401`.
+1. Implemente uma função `login(email: string, senha: string): Promise<string>` que faça `POST` para `"https://api.mbacademy.dev/auth/login"` e retorne o token recebido, lançando um erro com a mensagem `"E-mail ou senha incorretos."` especificamente quando o status for `401`.
 2. Implemente uma função `estaAutenticado(): boolean` que verifique se existe um token salvo em `localStorage`.
 3. Implemente uma função `logout(): void` que remova o token de `localStorage`.
 4. Implemente uma função `buscarComToken(url: string)` que faça um `GET` para a `url` recebida, anexando o cabeçalho `Authorization: Bearer <token>` (lido de `localStorage`), e lance um erro com a mensagem `"Sessão expirada."` quando o status for `401`.
@@ -286,7 +286,7 @@ interface RespostaLogin {
 }
 
 async function login(email: string, senha: string): Promise<string> {
-  const resposta = await fetch("https://api.forja.dev/auth/login", {
+  const resposta = await fetch("https://api.mbacademy.dev/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, senha }),

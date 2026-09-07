@@ -1,5 +1,0 @@
-{
-  "title": "JavaScript no Navegador",
-  "description": "Entenda como o TypeScript que você já conhece se conecta ao navegador: DOM, eventos e comunicação com servidores.",
-  "pages": ["index", "dom-manipulation", "events", "async-fetch"]
-}

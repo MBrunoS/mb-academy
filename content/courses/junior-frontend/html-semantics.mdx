@@ -3,7 +3,95 @@ title: HTML Semântico e Acessível
 description: "Aprenda a estruturar o conteúdo de uma página com as tags certas, incluindo formulários, e entenda por que a semântica importa para acessibilidade."
 ---
 
-Agora que você já entende o papel do HTML na arquitetura de uma página web, é hora de efetivamente escrever HTML. E a primeira coisa a deixar clara é: HTML não é sobre deixar a página "bonita" — isso é trabalho do CSS, que vem no próximo capítulo. HTML é sobre **descrever o que cada pedaço de conteúdo é**: isto é um título, isto é uma lista, isto é um formulário, isto é um link. O navegador (e, tão importante quanto, ferramentas como leitores de tela) usam essa descrição para decidir como exibir e como navegar pela página.
+No Starter, todo o seu código rodava em um único lugar: o terminal. Você escrevia TypeScript, o Node.js executava, e o resultado aparecia como texto no `console.log`. Era um ambiente previsível — sem telas, sem cliques, sem cores, sem layout. Agora isso muda. A partir deste módulo, seu código vai rodar dentro de um **navegador**, e o resultado não é mais uma linha de texto no terminal: é uma página inteira, visual, com a qual uma pessoa real vai interagir.
+
+Antes de escrever a primeira tag HTML, vale entender o quadro geral: o que exatamente é uma página web, quais linguagens a compõem e o que o navegador faz, de fato, entre o momento em que ele recebe um arquivo e o momento em que você vê algo na tela. Esse entendimento vai te acompanhar durante todo o curso — inclusive quando, mais adiante, você estiver depurando um layout quebrado ou um componente React que não renderiza como esperado.
+
+## As três linguagens da web, e por que elas são separadas
+
+Toda página web "tradicional" é construída com três linguagens, cada uma com uma responsabilidade bem definida:
+
+- **HTML** (HyperText Markup Language) define a **estrutura** e o **conteúdo** da página: quais textos existem, onde estão os títulos, onde estão as imagens, onde existe um formulário. É o esqueleto.
+- **CSS** (Cascading Style Sheets) define a **apresentação**: cores, espaçamentos, tamanhos, posicionamento, fontes. É a aparência.
+- **JavaScript** define o **comportamento**: o que acontece quando alguém clica em um botão, o que acontece depois que os dados chegam de um servidor, o que muda na tela sem a página inteira recarregar. É a interatividade.
+
+Essa separação não é acidental — é um princípio de design chamado **separação de responsabilidades** (*separation of concerns*), e ele existe por um motivo muito prático: cada uma dessas camadas pode mudar **sem quebrar as outras**. Você pode trocar completamente a paleta de cores de um site (CSS) sem tocar em uma linha do texto (HTML) ou da lógica (JavaScript). Pode reescrever a lógica de um formulário (JavaScript) sem mexer no visual. Pode reorganizar o conteúdo (HTML) sem que o site perca o estilo.
+
+Pense em construir uma casa: o HTML é a planta e a alvenaria — paredes, cômodos, portas, onde cada coisa fica. O CSS é a pintura, o piso, a decoração — o que faz a casa parecer acolhedora ou moderna. O JavaScript é a parte elétrica e hidráulica — o que faz interruptores acenderem luzes e torneiras liberarem água. As três são necessárias, mas ninguém pinta a parede antes de erguê-la, e ninguém espera que a fiação elétrica defina onde fica a porta da cozinha.
+
+<Callout>
+  Nem sempre foi assim tão organizado. Nos primórdios da web, era comum misturar
+  tudo: estilos direto nas tags HTML, comportamento em atributos como
+  `onclick`. Funcionava, mas ficava difícil de manter à medida que os sites
+  cresciam. A separação em três camadas é hoje o padrão da indústria — e é
+  assim que você vai aprender desde o início.
+</Callout>
+
+Neste módulo, você vai focar nas duas primeiras camadas: **HTML** (estrutura) e **CSS** (apresentação). A terceira, **JavaScript rodando no navegador**, é o assunto do próximo módulo do curso.
+
+## De um arquivo de texto a pixels na tela
+
+Um arquivo HTML é, no fundo, só **texto puro** — o mesmo tipo de arquivo que um `.ts` ou um `.txt`. Não existe mágica dentro dele. A mágica está no programa que o lê: o **navegador**. Quando você abre uma página, o navegador passa por um processo em várias etapas para transformar aquele texto em algo visível e interativo. Entender essas etapas, mesmo que de forma resumida, ajuda muito a entender *por que* certas coisas acontecem do jeito que acontecem (por que um CSS não carregado deixa a página "feia", por que um script no topo da página pode atrasar o carregamento, etc.).
+
+De forma simplificada, o navegador faz o seguinte:
+
+1. **Recebe o HTML** (baixado da internet ou lido do disco) e começa a **interpretá-lo (parse)**, de cima para baixo.
+2. Enquanto interpreta o HTML, constrói uma estrutura de dados na memória chamada **DOM** (*Document Object Model*) — uma representação em árvore de cada elemento da página.
+3. Ao encontrar um `<link rel="stylesheet">` ou uma tag `<style>`, o navegador interpreta o CSS e constrói uma estrutura parecida, chamada **CSSOM** (*CSS Object Model*).
+4. O navegador combina DOM e CSSOM para calcular exatamente **onde** cada elemento vai ficar e **qual tamanho** vai ter — essa etapa se chama **layout** (ou *reflow*).
+5. Por fim, o navegador **pinta** (*paint*) cada elemento na tela, na ordem e posição calculadas, respeitando cores, bordas, sombras e tudo mais.
+6. Se houver JavaScript, ele é executado e pode **alterar o DOM em tempo real** — o que faz o navegador refazer partes desse processo (recalcular layout, repintar a tela) automaticamente.
+
+Nenhuma dessas etapas exige que você escreva código para "mandar o navegador fazer isso" — ele faz isso sozinho, sempre, para qualquer página. O seu trabalho como desenvolvedor(a) é escrever um HTML e um CSS corretos, e o navegador se encarrega do resto.
+
+<Callout type="tip">
+  Todo navegador moderno tem **ferramentas de desenvolvedor** (DevTools) embutidas,
+  geralmente abertas com `F12` ou `Ctrl+Shift+I` (`Cmd+Option+I` no Mac). Lá você
+  consegue literalmente ver o DOM da página em tempo real, inspecionar o CSS
+  aplicado a cada elemento e ver erros de JavaScript. Você vai usar essa ferramenta
+  o tempo todo a partir de agora — vale abrir agora mesmo e dar uma olhada em
+  qualquer site que você conheça.
+</Callout>
+
+## A árvore DOM: o navegador enxerga estrutura, não texto solto
+
+Um detalhe importante: o navegador não vê o HTML como uma sequência de caracteres — ele o interpreta como uma **hierarquia**, uma árvore de elementos aninhados uns dentro dos outros. Cada tag vira um **nó** dessa árvore, e tags dentro de outras tags viram nós "filhos".
+
+Veja este HTML simples:
+
+```html
+<body>
+  <header>
+    <h1>Meu Painel Financeiro</h1>
+  </header>
+  <main>
+    <p>Saldo atual: R$ 1.240,00</p>
+  </main>
+</body>
+```
+
+O navegador enxerga isso, conceitualmente, como a árvore abaixo:
+
+```text
+body
+├── header
+│   └── h1 ("Meu Painel Financeiro")
+└── main
+    └── p ("Saldo atual: R$ 1.240,00")
+```
+
+Essa árvore é exatamente o que o CSS usa para decidir *onde* aplicar cada estilo (por exemplo, uma regra que diz "todo `p` dentro de `main`") e é exatamente o que o JavaScript manipula quando precisa adicionar, remover ou alterar algo na página em tempo real — assunto que você vai explorar a fundo no próximo módulo. Por ora, o importante é internalizar essa ideia: **HTML bem escrito gera uma árvore bem organizada**, e uma árvore bem organizada é mais fácil de estilizar, de tornar acessível e, futuramente, de manipular com código.
+
+<Callout type="warn">
+  HTML e CSS têm fama de serem "fáceis" porque não exigem lógica complexa como
+  loops ou recursão. Não deixe essa fama te enganar: a dificuldade aqui é outra —
+  está em conhecer um vocabulário grande de tags e propriedades, e em desenvolver
+  o olho para perceber *por que* um layout quebra. É um tipo diferente de
+  raciocínio, não um raciocínio mais simples. Vale praticar cada exemplo digitando
+  o código você mesmo(a), em vez de só ler.
+</Callout>
+
+Com esse quadro geral em mente, é hora de efetivamente escrever HTML. E a primeira coisa a deixar clara é: HTML não é sobre deixar a página "bonita" — isso é trabalho do CSS, que vem no próximo capítulo. HTML é sobre **descrever o que cada pedaço de conteúdo é**: isto é um título, isto é uma lista, isto é um formulário, isto é um link. O navegador (e, tão importante quanto, ferramentas como leitores de tela) usam essa descrição para decidir como exibir e como navegar pela página.
 
 Escrever HTML "que funciona visualmente" é relativamente fácil. Escrever HTML **semântico** — que descreve corretamente o significado de cada parte — é a diferença entre uma página amadora e uma página profissional, acessível e bem indexada por buscadores. É esse padrão que você vai aprender aqui.
 

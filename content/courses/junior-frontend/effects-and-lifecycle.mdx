@@ -189,7 +189,7 @@ Vamos usar `useEffect` para resolver um problema real do nosso dashboard: fazer 
 
 **Requisitos:**
 
-1. Crie um componente `PainelFinanceiro` com estado `gastos: Gasto[]`, inicializado lendo o valor salvo no `localStorage` sob a chave `"forja:gastos"` — use a forma de função no `useState` (`useState(() => ...)`) para ler e fazer `JSON.parse` do valor salvo, ou retornar um array vazio se não houver nada salvo ainda.
+1. Crie um componente `PainelFinanceiro` com estado `gastos: Gasto[]`, inicializado lendo o valor salvo no `localStorage` sob a chave `"mbacademy:gastos"` — use a forma de função no `useState` (`useState(() => ...)`) para ler e fazer `JSON.parse` do valor salvo, ou retornar um array vazio se não houver nada salvo ainda.
 2. Crie um `useEffect` com `gastos` no array de dependências que, toda vez que a lista mudar, salve o array atualizado no `localStorage` com `JSON.stringify`.
 3. Adicione uma função `adicionarGasto` que recebe um `Gasto` e atualiza o estado de forma imutável (sem mutar o array anterior).
 4. Renderize a quantidade de gastos salvos (`gastos.length`) na tela.
@@ -216,7 +216,7 @@ interface Gasto {
   categoria: Categoria;
 }
 
-const CHAVE_LOCAL_STORAGE = "forja:gastos";
+const CHAVE_LOCAL_STORAGE = "mbacademy:gastos";
 
 function PainelFinanceiro() {
   const [gastos, setGastos] = useState<Gasto[]>(() => {
