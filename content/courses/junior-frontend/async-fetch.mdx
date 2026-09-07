@@ -26,14 +26,14 @@ Isso não muda no navegador — é exatamente o mesmo `async/await` que você j�
 
 ```ts
 async function buscarGastos(): Promise<void> {
-  const resposta = await fetch("https://api.forja.dev/gastos");
+  const resposta = await fetch("https://api.mbacademy.dev/gastos");
   const dados = await resposta.json();
   console.log(dados);
 }
 ```
 
 <Callout>
-  A URL `https://api.forja.dev/gastos` é fictícia — usada aqui só para fins didáticos. Mas o código acima é **exatamente** o que você escreveria contra uma API real: o padrão de `fetch` + `.json()` não muda dependendo do servidor do outro lado.
+  A URL `https://api.mbacademy.dev/gastos` é fictícia — usada aqui só para fins didáticos. Mas o código acima é **exatamente** o que você escreveria contra uma API real: o padrão de `fetch` + `.json()` não muda dependendo do servidor do outro lado.
 </Callout>
 
 Repare que precisamos de **dois** `await`: um para esperar a resposta chegar (`fetch`), outro para converter o corpo dessa resposta de texto bruto para um objeto TypeScript utilizável (`.json()`). Isso acontece porque o corpo de uma resposta HTTP não chega instantaneamente pronto — ele também é lido de forma assíncrona, principalmente para respostas grandes.
@@ -51,7 +51,7 @@ interface Gasto {
 }
 
 async function buscarGastos(): Promise<Gasto[]> {
-  const resposta = await fetch("https://api.forja.dev/gastos");
+  const resposta = await fetch("https://api.mbacademy.dev/gastos");
   const dados = (await resposta.json()) as Gasto[];
   return dados;
 }
@@ -66,7 +66,7 @@ async function buscarGastos(): Promise<Gasto[]> {
 Aqui está um dos detalhes mais importantes — e mais surpreendentes para quem está começando — sobre `fetch`: **a Promise que ele devolve só é rejeitada em caso de falha de rede** (sem conexão, DNS não resolvido, servidor inatingível). Se o servidor responder normalmente, mas com um status de erro — como `404 Not Found` ou `500 Internal Server Error` — o `fetch` considera isso uma resposta **bem-sucedida** do ponto de vista da Promise, porque, tecnicamente, uma resposta chegou.
 
 ```ts
-const resposta = await fetch("https://api.forja.dev/gastos/999999");
+const resposta = await fetch("https://api.mbacademy.dev/gastos/999999");
 console.log(resposta.status); // 404
 console.log(resposta.ok);     // false
 // mas nenhum erro foi lançado aqui — o await passou normalmente!
@@ -76,7 +76,7 @@ Por isso, checar `resposta.ok` (um booleano que é `true` para status entre 200 
 
 ```ts
 async function buscarGastos(): Promise<Gasto[]> {
-  const resposta = await fetch("https://api.forja.dev/gastos");
+  const resposta = await fetch("https://api.mbacademy.dev/gastos");
 
   if (!resposta.ok) {
     throw new Error(`Erro ao buscar gastos: ${resposta.status}`);
@@ -110,7 +110,7 @@ interface Gasto {
 }
 
 async function buscarGastos(): Promise<Gasto[]> {
-  const resposta = await fetch("https://api.forja.dev/gastos");
+  const resposta = await fetch("https://api.mbacademy.dev/gastos");
 
   if (!resposta.ok) {
     throw new Error(`Erro ao buscar gastos: ${resposta.status}`);
@@ -184,7 +184,7 @@ Você tem a seguinte página HTML:
 <p id="resultado"></p>
 ```
 
-E uma API fictícia que responde em `https://api.forja.dev/gastos/:id`, devolvendo um JSON no formato:
+E uma API fictícia que responde em `https://api.mbacademy.dev/gastos/:id`, devolvendo um JSON no formato:
 
 ```json
 { "id": 1, "descricao": "Mercado", "valor": 189.9, "categoria": "Alimentação" }
@@ -195,7 +195,7 @@ ou um status `404` caso o ID não exista.
 **Requisitos:**
 
 1. Crie uma `interface Gasto` com os campos `id`, `descricao`, `valor` e `categoria`.
-2. Ao clicar no botão, leia o valor digitado em `#input-id` e faça uma requisição `fetch` para `https://api.forja.dev/gastos/{id}`.
+2. Ao clicar no botão, leia o valor digitado em `#input-id` e faça uma requisição `fetch` para `https://api.mbacademy.dev/gastos/{id}`.
 3. Enquanto a requisição está em andamento, exiba `"Buscando..."` no elemento `#resultado`.
 4. Se a resposta não for `ok`, exiba uma mensagem de erro amigável no `#resultado` (não deixe a exceção "estourar" sem tratamento).
 5. Se a busca der certo, exiba `"Descrição — R$ Valor"` no `#resultado`.
@@ -212,7 +212,7 @@ interface Gasto {
 }
 
 async function buscarGastoPorId(id: number): Promise<Gasto> {
-  const resposta = await fetch(`https://api.forja.dev/gastos/${id}`);
+  const resposta = await fetch(`https://api.mbacademy.dev/gastos/${id}`);
 
   if (!resposta.ok) {
     throw new Error(

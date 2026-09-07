@@ -244,7 +244,7 @@ Repare que `useLocalStorage` tem exatamente o mesmo formato de retorno do `useSt
 
 ```tsx
 function PainelFinanceiro() {
-  const [gastos, setGastos] = useLocalStorage<Gasto[]>("forja:gastos", []);
+  const [gastos, setGastos] = useLocalStorage<Gasto[]>("mbacademy:gastos", []);
 
   function adicionarGasto(novoGasto: Gasto): void {
     setGastos((atuais) => [...atuais, novoGasto]);
@@ -273,7 +273,7 @@ Vamos criar um segundo custom hook, desta vez específico do domínio do nosso d
 
 **Requisitos:**
 
-1. Crie um hook `useGastos()` que, internamente, usa `useLocalStorage<Gasto[]>("forja:gastos", [])` (o hook criado neste capítulo) para guardar a lista.
+1. Crie um hook `useGastos()` que, internamente, usa `useLocalStorage<Gasto[]>("mbacademy:gastos", [])` (o hook criado neste capítulo) para guardar a lista.
 2. O hook deve expor `adicionarGasto(gasto: Omit<Gasto, "id">)`, que gera um novo `id` (por exemplo, com `Date.now()`) e atualiza o estado de forma imutável.
 3. O hook deve expor `removerGasto(id: number)`, que retorna um novo array sem o gasto correspondente (usando `.filter()`).
 4. O hook deve expor `total`, calculado com `useMemo` a partir de `gastos` (some todos os valores).
@@ -314,7 +314,7 @@ function useLocalStorage<T>(chave: string, valorInicial: T) {
 }
 
 function useGastos() {
-  const [gastos, setGastos] = useLocalStorage<Gasto[]>("forja:gastos", []);
+  const [gastos, setGastos] = useLocalStorage<Gasto[]>("mbacademy:gastos", []);
 
   function adicionarGasto(gasto: Omit<Gasto, "id">): void {
     const novoGasto: Gasto = { ...gasto, id: Date.now() };
