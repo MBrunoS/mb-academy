@@ -30,7 +30,7 @@ function Hero() {
       <div className="flex flex-1 flex-col items-start gap-6 text-left">
         <span className="inline-flex items-center gap-2 rounded-full border border-fd-border bg-fd-card px-3 py-1 text-xs font-medium text-fd-muted-foreground">
           <span className="size-1.5 rounded-full bg-emerald-500" />
-          Iniciativa pessoal &middot; conteúdo 100% gratuito
+          Conteúdo 100% gratuito
         </span>
         <h1 className="text-4xl leading-tight font-black tracking-tight text-fd-foreground md:text-6xl">
           Aprenda a programar do zero ao{" "}
@@ -39,10 +39,10 @@ function Hero() {
           </span>
         </h1>
         <p className="max-w-[520px] text-base leading-relaxed text-fd-muted-foreground md:text-lg">
-          MB Academy é uma trilha de programação em português, escrita por um
-          único dev: TypeScript desde a primeira aula, projeto prático
-          crescendo capítulo a capítulo, e IA tratada como parte do processo
-          de aprender — não como atalho.
+          MB Academy é uma trilha de programação em português: TypeScript
+          desde a primeira aula, projeto prático crescendo capítulo a
+          capítulo, e IA tratada como parte do processo de aprender — não
+          como atalho.
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Link
@@ -126,7 +126,7 @@ const philosophyItems = [
     icon: Braces,
     title: "TypeScript desde o primeiro dia",
     description:
-      "Sem regressão para JavaScript puro. Você aprende TS no Starter e aprofunda o sistema de tipos em cada nível seguinte.",
+      "Você aprende TS no Starter e aprofunda o sistema de tipos em cada nível seguinte.",
   },
   {
     icon: RefreshCw,
