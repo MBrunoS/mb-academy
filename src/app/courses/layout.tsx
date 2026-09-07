@@ -11,7 +11,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       links={[
         {
           type: "icon",
-          url: "https://github.com/MBrunoS/forja-academy",
+          url: "https://github.com/MBrunoS/mb-academy",
           text: "Github",
           icon: (
             <svg role="img" viewBox="0 0 24 24" fill="currentColor">

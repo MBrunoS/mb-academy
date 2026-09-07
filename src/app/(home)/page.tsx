@@ -253,7 +253,7 @@ function About() {
           site são abertos no GitHub.
         </p>
         <Link
-          href="https://github.com/MBrunoS/forja-academy"
+          href="https://github.com/MBrunoS/mb-academy"
           target="_blank"
           rel="noopener noreferrer"
           className="mt-2 inline-flex w-fit items-center gap-2 rounded-xl border border-fd-border bg-fd-background px-4 py-2 text-sm font-bold text-fd-foreground transition-colors hover:bg-fd-accent"

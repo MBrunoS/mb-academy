@@ -18,7 +18,7 @@ export function SiteFooter() {
             Cursos
           </Link>
           <Link
-            href="https://github.com/MBrunoS/forja-academy"
+            href="https://github.com/MBrunoS/mb-academy"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-fd-foreground"
