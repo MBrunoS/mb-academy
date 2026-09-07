@@ -1,4 +1,4 @@
-# Planejamento de Cursos — Forja Academy
+# Planejamento de Cursos — MB Academy
 
 > Documento de especificação em alto nível. Serve como referência para manter coesão entre cursos desenvolvidos em momentos diferentes. Atualizar sempre que decisões estruturais mudarem.
 
@@ -6,7 +6,7 @@
 
 ## 1. Visão e Filosofia da Plataforma
 
-**Forja Academy** é uma plataforma de ensino de programação em português, focada em uma progressão clara e coesa do zero até o nível sênior.
+**MB Academy** é uma plataforma de ensino de programação em português, focada em uma progressão clara e coesa do zero até o nível sênior.
 
 ### Princípios que guiam todas as decisões de conteúdo
 
