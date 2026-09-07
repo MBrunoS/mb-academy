@@ -17,14 +17,6 @@ export function SiteFooter() {
           <Link href="/courses" className="hover:text-fd-foreground">
             Cursos
           </Link>
-          <Link
-            href="https://github.com/MBrunoS/mb-academy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-fd-foreground"
-          >
-            GitHub
-          </Link>
           <span>&copy; {year} MB Academy</span>
         </div>
       </div>

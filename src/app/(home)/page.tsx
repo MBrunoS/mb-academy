@@ -2,7 +2,6 @@ import Link from "next/link";
 import {
   ArrowRight,
   Braces,
-  Github,
   Layers,
   RefreshCw,
   Sparkles,
@@ -17,7 +16,6 @@ export default function HomePage() {
       <Hero />
       <Philosophy />
       <Roadmap />
-      <About />
       <FinalCta />
       <SiteFooter />
     </main>
@@ -233,33 +231,6 @@ function Roadmap() {
         >
           Ver detalhes de cada curso
           <ArrowRight className="size-4" />
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-function About() {
-  return (
-    <section className="border-t border-fd-border bg-fd-card/40">
-      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-6 py-20">
-        <h2 className="text-3xl font-bold tracking-tight text-fd-foreground md:text-4xl">
-          Um projeto pessoal, não uma escola
-        </h2>
-        <p className="max-w-[720px] text-fd-muted-foreground">
-          Não há investidores, equipe de marketing ou vagas de emprego para
-          vender aqui — só o curso que eu gostaria de ter tido quando comecei
-          a programar. O plano completo de cada trilha e o código-fonte deste
-          site são abertos no GitHub.
-        </p>
-        <Link
-          href="https://github.com/MBrunoS/mb-academy"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-flex w-fit items-center gap-2 rounded-xl border border-fd-border bg-fd-background px-4 py-2 text-sm font-bold text-fd-foreground transition-colors hover:bg-fd-accent"
-        >
-          <Github className="size-4" />
-          Ver no GitHub
         </Link>
       </div>
     </section>
