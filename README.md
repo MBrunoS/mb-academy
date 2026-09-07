@@ -1,7 +1,7 @@
-# forja-academy
+# MB Academy
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+Plataforma de cursos de programação em português, do zero ao sênior — uma
+iniciativa pessoal construída com Next.js e [Fumadocs](https://fumadocs.vercel.app).
 
 Run development server:
 
@@ -25,8 +25,9 @@ resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 - [Fumadocs](https://fumadocs.vercel.app) - learn about Fumadocs
 
-## TODO
+## Estrutura
 
-- [ ] Update home page (app/(home)/page.tsx)
-- [ ] Add courses page (app/(home)/courses/page.tsx)
-- [ ] Add content for starter course
+- `src/app/(home)` — landing page e catálogo de cursos
+- `src/app/courses` — páginas de conteúdo (Fumadocs)
+- `content/courses` — conteúdo MDX de cada curso
+- `docs/planejamento.md` — planejamento das trilhas e cursos

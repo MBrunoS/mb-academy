@@ -1,207 +1,290 @@
-import { BrainCircuit, Code, ScrollText } from "lucide-react";
 import Link from "next/link";
+import {
+  ArrowRight,
+  Braces,
+  Github,
+  Layers,
+  RefreshCw,
+  Sparkles,
+} from "lucide-react";
+import { SiteFooter } from "@/components/site-footer";
+import { StatusBadge } from "@/components/status-badge";
+import { coursesCatalog, levelOrder } from "@/lib/courses-catalog";
 
 export default function HomePage() {
-  const year = new Date().getFullYear();
   return (
-    <div className="min-h-screen">
-      <div className="flex flex-col min-h-screen">
-        <div className="flex flex-1 flex-col">
-          <div className="px-40 flex flex-1 justify-center py-5">
-            <div className="flex flex-col max-w-[960px] flex-1">
-              <div className="@container">
-                <div className="@[480px]:p-4">
-                  <div className="flex min-h-[90vh] flex-col gap-6 @[480px]:gap-8 @[480px]:rounded-xl items-center justify-center p-4">
-                    <div className="flex flex-col gap-2 text-center">
-                      <h1 className="text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-6xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em] mb-10">
-                        Forge o seu futuro na programação
-                      </h1>
-                      <h2 className="text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
-                        Desenvolva suas habilidades com nossos cursos de
-                        programação, projetados para iniciantes a especialistas.
-                        Domine a arte da programação com a Forja Academy.
-                      </h2>
-                    </div>
-                    <Link
-                      href="/courses"
-                      className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-amber-500 text-[#111618] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
-                    >
-                      Explore Nossos Cursos
-                    </Link>
-                  </div>
-                </div>
+    <main className="flex flex-1 flex-col">
+      <Hero />
+      <Philosophy />
+      <Roadmap />
+      <About />
+      <FinalCta />
+      <SiteFooter />
+    </main>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="mx-auto flex w-full max-w-[1200px] flex-col items-center gap-12 px-6 pt-16 pb-20 md:flex-row md:pt-24 md:pb-28">
+      <div className="flex flex-1 flex-col items-start gap-6 text-left">
+        <span className="inline-flex items-center gap-2 rounded-full border border-fd-border bg-fd-card px-3 py-1 text-xs font-medium text-fd-muted-foreground">
+          <span className="size-1.5 rounded-full bg-emerald-500" />
+          Iniciativa pessoal &middot; conteúdo 100% gratuito
+        </span>
+        <h1 className="text-4xl leading-tight font-black tracking-tight text-fd-foreground md:text-6xl">
+          Aprenda a programar do zero ao{" "}
+          <span className="bg-gradient-to-r from-indigo-500 to-violet-600 bg-clip-text text-transparent">
+            sênior
+          </span>
+        </h1>
+        <p className="max-w-[520px] text-base leading-relaxed text-fd-muted-foreground md:text-lg">
+          MB Academy é uma trilha de programação em português, escrita por um
+          único dev: TypeScript desde a primeira aula, projeto prático
+          crescendo capítulo a capítulo, e IA tratada como parte do processo
+          de aprender — não como atalho.
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/courses/starter"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-fd-primary px-5 text-sm font-bold text-fd-primary-foreground transition-opacity hover:opacity-90"
+          >
+            Começar pelo Starter
+            <ArrowRight className="size-4" />
+          </Link>
+          <Link
+            href="/courses"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-fd-border bg-fd-card px-5 text-sm font-bold text-fd-foreground transition-colors hover:bg-fd-accent"
+          >
+            Ver todas as trilhas
+          </Link>
+        </div>
+      </div>
+      <div className="w-full flex-1 md:max-w-[440px]">
+        <CodePreview />
+      </div>
+    </section>
+  );
+}
+
+function CodePreview() {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-fd-border bg-fd-card shadow-xl shadow-indigo-500/5">
+      <div className="flex items-center gap-2 border-b border-fd-border px-4 py-3">
+        <span className="size-2.5 rounded-full bg-red-400" />
+        <span className="size-2.5 rounded-full bg-amber-400" />
+        <span className="size-2.5 rounded-full bg-emerald-400" />
+        <span className="ml-2 font-mono text-xs text-fd-muted-foreground">
+          trilha.ts
+        </span>
+      </div>
+      <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-relaxed">
+        <code>
+          <span className="text-violet-500 dark:text-violet-400">const</span>{" "}
+          trilha = [{"\n"}
+          {"  "}
+          <span className="text-emerald-600 dark:text-emerald-400">
+            &quot;Starter&quot;
+          </span>
+          ,{"\n"}
+          {"  "}
+          <span className="text-emerald-600 dark:text-emerald-400">
+            &quot;Júnior&quot;
+          </span>
+          ,{"\n"}
+          {"  "}
+          <span className="text-emerald-600 dark:text-emerald-400">
+            &quot;Pleno&quot;
+          </span>
+          ,{"\n"}
+          {"  "}
+          <span className="text-emerald-600 dark:text-emerald-400">
+            &quot;Sênior&quot;
+          </span>
+          ,{"\n"}] <span className="text-violet-500 dark:text-violet-400">as const</span>;
+          {"\n\n"}
+          trilha.
+          <span className="text-sky-600 dark:text-sky-400">forEach</span>
+          {"("}nivel {"=>"} {"{"}
+          {"\n"}
+          {"  "}
+          <span className="text-sky-600 dark:text-sky-400">console.log</span>
+          {"("}
+          <span className="text-emerald-600 dark:text-emerald-400">
+            {"`-> ${nivel}`"}
+          </span>
+          {")"};{"\n"}
+          {"}"});
+        </code>
+      </pre>
+    </div>
+  );
+}
+
+const philosophyItems = [
+  {
+    icon: Braces,
+    title: "TypeScript desde o primeiro dia",
+    description:
+      "Sem regressão para JavaScript puro. Você aprende TS no Starter e aprofunda o sistema de tipos em cada nível seguinte.",
+  },
+  {
+    icon: RefreshCw,
+    title: "Currículo em espiral",
+    description:
+      "Os temas voltam com mais profundidade a cada nível — testes, por exemplo, aparecem no Júnior, no Pleno e no Sênior, cada vez mais avançados.",
+  },
+  {
+    icon: Layers,
+    title: "Projeto incremental por capítulo",
+    description:
+      "Nada de conceitos isolados: cada capítulo adiciona uma camada real ao projeto em construção, com checkpoints de código entre eles.",
+  },
+  {
+    icon: Sparkles,
+    title: "IA como fio condutor",
+    description:
+      "IA aparece em todos os níveis — de ferramenta de aprendizado no Starter a arquitetura de workflows avançados no Sênior.",
+  },
+];
+
+function Philosophy() {
+  return (
+    <section className="border-t border-fd-border bg-fd-card/40">
+      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-10 px-6 py-20">
+        <div className="flex flex-col gap-3">
+          <h2 className="text-3xl font-bold tracking-tight text-fd-foreground md:text-4xl">
+            Como a MB Academy é diferente
+          </h2>
+          <p className="max-w-[640px] text-fd-muted-foreground">
+            Cada decisão de conteúdo segue os mesmos princípios, do primeiro
+            ao último curso da trilha.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {philosophyItems.map((item) => (
+            <div
+              key={item.title}
+              className="flex flex-col gap-3 rounded-2xl border border-fd-border bg-fd-background p-5"
+            >
+              <span className="flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white">
+                <item.icon className="size-4.5" />
+              </span>
+              <h3 className="font-semibold text-fd-foreground">
+                {item.title}
+              </h3>
+              <p className="text-sm leading-relaxed text-fd-muted-foreground">
+                {item.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Roadmap() {
+  return (
+    <section className="mx-auto w-full max-w-[1200px] px-6 py-20">
+      <div className="flex flex-col gap-3">
+        <h2 className="text-3xl font-bold tracking-tight text-fd-foreground md:text-4xl">
+          A trilha completa
+        </h2>
+        <p className="max-w-[640px] text-fd-muted-foreground">
+          Do zero ao sênior, com trilhas espelhadas de front-end e back-end a
+          partir do Júnior. Alguns níveis ainda estão em construção.
+        </p>
+      </div>
+      <div className="mt-10 flex flex-col gap-4">
+        {levelOrder.map((level) => {
+          const courses = coursesCatalog.filter((c) => c.level === level);
+          return (
+            <div
+              key={level}
+              className="flex flex-col gap-3 rounded-2xl border border-fd-border p-5 sm:flex-row sm:items-center sm:gap-6"
+            >
+              <div className="sm:w-36 sm:shrink-0">
+                <span className="text-sm font-bold tracking-wide text-fd-muted-foreground uppercase">
+                  {level}
+                </span>
               </div>
-              <div className="pb-56 flex flex-col gap-4">
-                <h2 className="text-center text-5xl font-bold">A Plataforma</h2>
-                <div className="text-center justify-start text-stone-500 dark:text-stone-400 text-lg leading-loose tracking-tight">
-                  A DevTrail é uma plataforma de mentoria em desenvolvimento
-                  front-end que oferece trilhas de aprendizado para
-                  desenvolvedores em diferentes níveis de experiência. Nossa
-                  missão é impulsionar sua carreira em desenvolvimento front-end
-                  com uma abordagem centrada no aluno. Estamos aqui para guiá-lo
-                  em cada passo da sua jornada de aprendizado.
-                </div>
-              </div>
-              <div className="flex flex-col gap-10 px-4 py-10 @container">
-                <div className="flex flex-col gap-4">
-                  <h2 className="tracking-light text-[32px] font-bold leading-tight @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]">
-                    Por que escolher a Forja Academy?
-                  </h2>
-                  <p className="text-base font-normal leading-normal max-w-[720px] text-stone-500 dark:text-stone-400">
-                    Nossos cursos oferecem um enfoque imersivo e prático no
-                    desenvolvimento, garantindo que você adquira as habilidades
-                    necessárias para ter sucesso no cenário tecnológico de hoje.
-                  </p>
-                </div>
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-0">
-                  <div className="flex flex-1 gap-3 rounded-2xl border border-stone-400 dark:border-stone-600 bg-stone-200 dark:bg-stone-800 p-4 flex-col">
-                    <ScrollText />
-                    <div className="flex flex-col gap-1">
-                      <h2 className="text-base font-bold leading-tight">
-                        Currículo Abrangente
-                      </h2>
-                      <p className="text-sm font-normal leading-normal">
-                        Desde o básico até o avançado, cobrindo todos os
-                        aspectos essenciais da programação.
-                      </p>
-                    </div>
+              <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+                {courses.map((course) => (
+                  <div
+                    key={course.slug}
+                    className="flex items-center justify-between gap-3 rounded-xl bg-fd-card px-4 py-3"
+                  >
+                    <span className="text-sm font-medium text-fd-foreground">
+                      {course.title}
+                    </span>
+                    <StatusBadge status={course.status} />
                   </div>
-                  <div className="flex flex-1 gap-3 rounded-2xl border border-stone-400 dark:border-stone-600 bg-stone-200 dark:bg-stone-800 p-4 flex-col">
-                    <Code />
-                    <div className="flex flex-col gap-1">
-                      <h2 className="text-base font-bold leading-tight">
-                        Projetos Práticos
-                      </h2>
-                      <p className="text-sm font-normal leading-normal">
-                        Aplique seu conhecimento por meio de uma série de
-                        projetos, construindo um portfólio robusto.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-1 gap-3 rounded-2xl border border-stone-400 dark:border-stone-600 bg-stone-200 dark:bg-stone-800 p-4 flex-col">
-                    <BrainCircuit />
-                    <div className="flex flex-col gap-1">
-                      <h2 className="text-base font-bold leading-tight">
-                        Aprendizado Flexível
-                      </h2>
-                      <p className="text-sm font-normal leading-normal">
-                        Estude no seu ritmo com nossa plataforma online
-                        flexível, acessível a qualquer momento e em qualquer
-                        lugar.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="@container">
-                <div className="flex flex-col justify-end gap-6 px-4 py-10 @[480px]:gap-8 @[480px]:px-10 @[480px]:py-20">
-                  <div className="flex flex-col gap-2 text-center">
-                    <h1 className="tracking-light text-[32px] font-bold leading-tight @[480px]:text-4xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]">
-                      Está pronto para construir seu futuro?
-                    </h1>
-                    <p className="text-base font-normal leading-normal">
-                      Embarque em uma jornada transformadora com nossos cursos
-                      de desenvolvimento web.
-                    </p>
-                  </div>
-                  <div className="flex flex-1 justify-center">
-                    <div className="flex justify-center">
-                      <Link
-                        href="/courses"
-                        className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-amber-500 text-[#111618] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] grow"
-                      >
-                        Explore Nossos Cursos
-                      </Link>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
-          </div>
-        </div>
-        <footer className="flex justify-center">
-          <div className="flex max-w-[960px] flex-1 flex-col">
-            <footer className="flex flex-col gap-6 px-5 py-10 text-center @container">
-              <div className="flex flex-wrap items-center justify-center gap-6 @[480px]:flex-row @[480px]:justify-around">
-                <Link
-                  href="#"
-                  className="text-base font-normal leading-normal min-w-40"
-                >
-                  Contact Us
-                </Link>
-                <Link
-                  href="#"
-                  className="text-base font-normal leading-normal min-w-40"
-                >
-                  Privacy Policy
-                </Link>
-                <Link
-                  href="#"
-                  className="text-base font-normal leading-normal min-w-40"
-                >
-                  Terms of Service
-                </Link>
-              </div>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Link href="#">
-                  <div
-                    data-icon="TwitterLogo"
-                    data-size="24px"
-                    data-weight="regular"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24px"
-                      height="24px"
-                      fill="currentColor"
-                      viewBox="0 0 256 256"
-                    >
-                      <path d="M247.39,68.94A8,8,0,0,0,240,64H209.57A48.66,48.66,0,0,0,168.1,40a46.91,46.91,0,0,0-33.75,13.7A47.9,47.9,0,0,0,120,88v6.09C79.74,83.47,46.81,50.72,46.46,50.37a8,8,0,0,0-13.65,4.92c-4.31,47.79,9.57,79.77,22,98.18a110.93,110.93,0,0,0,21.88,24.2c-15.23,17.53-39.21,26.74-39.47,26.84a8,8,0,0,0-3.85,11.93c.75,1.12,3.75,5.05,11.08,8.72C53.51,229.7,65.48,232,80,232c70.67,0,129.72-54.42,135.75-124.44l29.91-29.9A8,8,0,0,0,247.39,68.94Zm-45,29.41a8,8,0,0,0-2.32,5.14C196,166.58,143.28,216,80,216c-10.56,0-18-1.4-23.22-3.08,11.51-6.25,27.56-17,37.88-32.48A8,8,0,0,0,92,169.08c-.47-.27-43.91-26.34-44-96,16,13,45.25,33.17,78.67,38.79A8,8,0,0,0,136,104V88a32,32,0,0,1,9.6-22.92A30.94,30.94,0,0,1,167.9,56c12.66.16,24.49,7.88,29.44,19.21A8,8,0,0,0,204.67,80h16Z" />
-                    </svg>
-                  </div>
-                </Link>
-                <Link href="#">
-                  <div
-                    data-icon="LinkedinLogo"
-                    data-size="24px"
-                    data-weight="regular"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24px"
-                      height="24px"
-                      fill="currentColor"
-                      viewBox="0 0 256 256"
-                    >
-                      <path d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z" />
-                    </svg>
-                  </div>
-                </Link>
-                <Link href="#">
-                  <div
-                    data-icon="InstagramLogo"
-                    data-size="24px"
-                    data-weight="regular"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24px"
-                      height="24px"
-                      fill="currentColor"
-                      viewBox="0 0 256 256"
-                    >
-                      <path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z" />
-                    </svg>
-                  </div>
-                </Link>
-              </div>
-              <p className="text-base font-normal leading-normal">
-                © {year} Forja Academy. Todos os direitos reservados.
-              </p>
-            </footer>
-          </div>
-        </footer>
+          );
+        })}
       </div>
-    </div>
+      <div className="mt-8 flex justify-center">
+        <Link
+          href="/courses"
+          className="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 hover:underline dark:text-indigo-400"
+        >
+          Ver detalhes de cada curso
+          <ArrowRight className="size-4" />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function About() {
+  return (
+    <section className="border-t border-fd-border bg-fd-card/40">
+      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-6 py-20">
+        <h2 className="text-3xl font-bold tracking-tight text-fd-foreground md:text-4xl">
+          Um projeto pessoal, não uma escola
+        </h2>
+        <p className="max-w-[720px] text-fd-muted-foreground">
+          Não há investidores, equipe de marketing ou vagas de emprego para
+          vender aqui — só o curso que eu gostaria de ter tido quando comecei
+          a programar. O plano completo de cada trilha e o código-fonte deste
+          site são abertos no GitHub.
+        </p>
+        <Link
+          href="https://github.com/MBrunoS/forja-academy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex w-fit items-center gap-2 rounded-xl border border-fd-border bg-fd-background px-4 py-2 text-sm font-bold text-fd-foreground transition-colors hover:bg-fd-accent"
+        >
+          <Github className="size-4" />
+          Ver no GitHub
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function FinalCta() {
+  return (
+    <section className="mx-auto w-full max-w-[1200px] px-6 py-20">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 px-6 py-16 text-center">
+        <h2 className="max-w-[560px] text-3xl font-black tracking-tight text-white md:text-4xl">
+          Pronto para escrever sua primeira linha de código?
+        </h2>
+        <p className="max-w-[480px] text-indigo-100">
+          O Starter é gratuito, completo, e não exige nenhuma experiência
+          prévia.
+        </p>
+        <Link
+          href="/courses/starter"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-6 text-sm font-bold text-indigo-700 transition-opacity hover:opacity-90"
+        >
+          Começar agora
+          <ArrowRight className="size-4" />
+        </Link>
+      </div>
+    </section>
   );
 }
