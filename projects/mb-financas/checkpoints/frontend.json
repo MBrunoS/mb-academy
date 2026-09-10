@@ -1,0 +1,11 @@
+{
+  "repository": "junior-frontend-financas",
+  "releases": [
+    { "sprint": 1, "materials": "sprint-1-materials", "outcome": "Dashboard estático, responsivo e acessível" },
+    { "sprint": 2, "materials": "sprint-2-materials", "outcome": "CRUD em memória com DOM e TypeScript" },
+    { "sprint": 3, "materials": "sprint-3-materials", "outcome": "Aplicação reconstruída em React" },
+    { "sprint": 4, "materials": "sprint-4-materials", "outcome": "Autenticação e integração HTTP" },
+    { "sprint": 5, "materials": "sprint-5-materials", "outcome": "Testes automatizados dos fluxos críticos" },
+    { "sprint": 6, "materials": "sprint-6-materials", "outcome": "Aplicação auditada e publicada" }
+  ]
+}

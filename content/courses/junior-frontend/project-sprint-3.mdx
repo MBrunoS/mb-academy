@@ -1,0 +1,44 @@
+---
+title: "Sprint 3: Reconstrução em React"
+description: "Migre o produto para componentes React tipados sem perder as regras e os estados já implementados."
+---
+
+> **Materiais:** [abra o repositório](https://github.com/MBrunoS/junior-frontend-financas) ou [baixe o pacote da Sprint 3](https://github.com/MBrunoS/junior-frontend-financas/releases/tag/sprint-3-materials). Preserve sua versão anterior em uma tag própria antes da migração.
+
+Nesta sprint você reconstruirá a aplicação com React. Preserve a versão anterior em uma tag Git: ela será sua prova concreta de por que renderização declarativa e componentes existem.
+
+## Arquitetura esperada
+
+Organize o código por responsabilidade:
+
+```text
+src/
+  components/
+  features/transactions/
+    TransactionForm.tsx
+    TransactionList.tsx
+    filters.ts
+    rules.ts
+    types.ts
+  pages/DashboardPage.tsx
+  App.tsx
+```
+
+`DashboardPage` mantém o estado compartilhado. Formulário, filtros, resumo e lista recebem dados por props e comunicam intenções por callbacks. Não introduza Redux, Zustand ou uma abstração genérica de formulário.
+
+## Entrega
+
+- Migrar o CRUD completo e os filtros da Sprint 2.
+- Modelar o modo do formulário como `create | edit` e garantir que cancelar restaure o estado inicial.
+- Criar componentes para `SummaryCards`, `TransactionForm`, `TransactionFilters`, `TransactionList` e `Pagination`.
+- Criar um hook `useTransactions` somente depois que o comportamento funcionar dentro da página.
+- Persistir temporariamente no `localStorage` por meio de um adapter, não diretamente nos componentes.
+- Adicionar uma página de login visual e uma rota protegida simulada, preparando a integração real.
+
+## Critérios de qualidade
+
+Não duplique o tipo `Transaction`. Não guarde totais derivados em `useState`; calcule-os a partir das transações. Use `key={transaction.id}`, atualizações imutáveis e HTML semântico. Um erro em um item não deve desmontar a página inteira.
+
+Revise com React DevTools quais componentes renderizam ao digitar. Otimize apenas se você conseguir explicar o problema observado; `useMemo` e `useCallback` não são critérios de conclusão.
+
+Consulte a aplicação de referência somente depois de tentar a migração. Ela mostra uma possível divisão de componentes, não a única organização aceitável.

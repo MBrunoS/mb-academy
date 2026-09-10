@@ -1,0 +1,11 @@
+{
+  "repository": "junior-backend-financas",
+  "releases": [
+    { "sprint": 1, "materials": "sprint-1-materials", "outcome": "CRUD NestJS em memória" },
+    { "sprint": 2, "materials": "sprint-2-materials", "outcome": "PostgreSQL, Prisma, migrations e seed" },
+    { "sprint": 3, "materials": "sprint-3-materials", "outcome": "JWT e isolamento por usuário" },
+    { "sprint": 4, "materials": "sprint-4-materials", "outcome": "Filtros, paginação, resumo e Swagger" },
+    { "sprint": 5, "materials": "sprint-5-materials", "outcome": "Testes unitários, integração, e2e e contrato" },
+    { "sprint": 6, "materials": "sprint-6-materials", "outcome": "Integração com cliente real e deploy" }
+  ]
+}

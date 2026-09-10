@@ -1,0 +1,49 @@
+---
+title: "Sprint 2: Comportamento com DOM e TypeScript"
+description: "Implemente o primeiro CRUD em memória e aprenda a separar estado, regra e renderização antes do React."
+---
+
+> **Materiais:** [abra o repositório](https://github.com/MBrunoS/junior-frontend-financas) ou [baixe o pacote da Sprint 2](https://github.com/MBrunoS/junior-frontend-financas/releases/tag/sprint-2-materials). Continue no repositório que você criou na sprint anterior.
+
+Agora o HTML deixa de ser uma fotografia. Nesta sprint você implementará uma versão funcional com DOM e TypeScript. Ela será descartada quando chegarmos ao React, mas não é trabalho perdido: comparar as duas versões mostra exatamente o problema que um framework resolve.
+
+## História de usuário
+
+> Como pessoa usuária, quero cadastrar, editar, remover e filtrar transações e ver os totais atualizados sem recarregar a página.
+
+## Modelo inicial
+
+Use os nomes definidos pelo contrato do projeto:
+
+```ts
+type TransactionType = "income" | "expense";
+
+interface Transaction {
+  id: string;
+  type: TransactionType;
+  description: string;
+  amountInCents: number;
+  category: string;
+  occurredAt: string;
+}
+```
+
+Mantenha `amountInCents` como inteiro. Converta o texto digitado apenas na fronteira do formulário e formate centavos somente ao renderizar.
+
+## Entrega
+
+- Separe `state.ts`, `rules.ts`, `render.ts` e `main.ts`.
+- Implemente criar, iniciar edição, confirmar edição e remover com confirmação.
+- Recalcule receitas, despesas e saldo depois de cada alteração.
+- Combine filtros de tipo, categoria e intervalo de datas.
+- Use delegação de eventos na lista, com o `id` em `data-transaction-id`.
+- Mostre erros de validação perto dos campos e mova o foco para o primeiro inválido.
+- Persista o array no `localStorage`, tratando conteúdo ausente ou corrompido.
+
+## Casos que precisam funcionar
+
+Descrição vazia, valor zero, valor negativo e data ausente não podem ser salvos. Remover uma transação filtrada deve removê-la do estado original, não apenas da lista visível. Uma edição cancelada não pode alterar os dados. Se nenhum item corresponder aos filtros, mostre estado vazio sem apagar o formulário.
+
+Extraia e teste manualmente as funções puras `calculateSummary`, `filterTransactions`, `parseAmountToCents` e `formatCents`. Não faça requisições ainda: o objetivo desta sprint é entender o ciclo estado → regra → renderização.
+
+Se você começou por esta etapa, use o enunciado da Sprint 1 para reconstruir primeiro a interface estática. O histórico das sprints deve permanecer no seu próprio repositório.

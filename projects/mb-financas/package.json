@@ -1,0 +1,9 @@
+{
+  "name": "@mb-academy/mb-financas-kit",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "reference:api": "node reference-api/server.mjs",
+    "contract:test": "node --test contract-tests/api.test.mjs"
+  }
+}

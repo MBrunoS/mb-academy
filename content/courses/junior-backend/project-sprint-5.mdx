@@ -1,0 +1,39 @@
+---
+title: "Sprint 5: Testes da API"
+description: "Teste regras isoladas, persistência real, fronteira HTTP e conformidade com o contrato."
+---
+
+> **Materiais:** [abra o repositório](https://github.com/MBrunoS/junior-backend-financas) ou [baixe o pacote da Sprint 5](https://github.com/MBrunoS/junior-backend-financas/releases/tag/sprint-5-materials). A suíte externa está em `kit/contract-tests/`.
+
+Use Jest e Supertest em três camadas. Cada uma responde uma pergunta diferente.
+
+## Testes unitários
+
+Services usam repositórios em memória para cobrir criação, edição, ausência, filtros e autorização sem banco ou rede. Mocks devem representar portas do seu sistema, não detalhes internos do Prisma.
+
+## Testes de integração
+
+Rode os repositórios contra um PostgreSQL exclusivo para testes. Aplique migrations antes da suíte e limpe tabelas entre casos. Cubra unicidade de e-mail, persistência de centavos, intervalos de data, paginação e agregações.
+
+## Testes e2e e de contrato
+
+Suba a aplicação completa e cubra cadastro → login → CRUD → resumo. Depois, com a API rodando, execute do kit:
+
+```bash
+API_BASE_URL=http://localhost:3000 pnpm contract:test
+```
+
+A suíte externa é deliberadamente caixa-preta: ela prova que outro cliente consegue usar sua API sem importar módulos internos.
+
+## Cenários obrigatórios
+
+- e-mail duplicado e credenciais inválidas;
+- token ausente, expirado e adulterado;
+- validação por campo;
+- isolamento completo entre duas contas;
+- filtros combinados e paginação limite;
+- resumo sobre mais itens do que cabem em uma página;
+- atualização parcial e remoção idempotente conforme o contrato;
+- banco indisponível convertido em resposta segura.
+
+Não use o banco de desenvolvimento e não faça os testes dependerem da ordem de execução. A entrega final da sprint exige testes unitários, integração, e2e e contrato verdes.

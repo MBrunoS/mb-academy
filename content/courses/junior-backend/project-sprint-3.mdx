@@ -1,0 +1,26 @@
+---
+title: "Sprint 3: Autenticação e Isolamento"
+description: "Adicione identidade à API e prove que cada pessoa acessa somente os próprios dados."
+---
+
+> **Materiais:** [abra o repositório](https://github.com/MBrunoS/junior-backend-financas) ou [baixe o pacote da Sprint 3](https://github.com/MBrunoS/junior-backend-financas/releases/tag/sprint-3-materials). O contrato e os testes permanecem os mesmos.
+
+Implemente `POST /auth/register`, `POST /auth/login` e `GET /me`. Armazene hash de senha com salt usando uma biblioteca apropriada e assine JWTs de curta duração com segredo vindo do ambiente.
+
+## Regras obrigatórias
+
+- Normalizar e-mail para comparação e rejeitar duplicatas com `409 EMAIL_ALREADY_EXISTS`.
+- Nunca retornar senha, hash ou segredo.
+- Rejeitar credenciais inválidas com uma mensagem única, sem revelar se o e-mail existe.
+- Extrair a identidade do token em um guard e passá-la explicitamente ao serviço.
+- Vincular toda criação de transação ao usuário autenticado.
+- Aplicar `userId` em todas as consultas, atualizações e remoções.
+- Retornar `404` quando o recurso não existe ou pertence a outra conta.
+
+Não implemente autorização apenas filtrando a listagem: `GET`, `PATCH` e `DELETE /transactions/:id` também precisam combinar `id` e `userId` na consulta.
+
+## Verificação
+
+Crie duas contas. Com a conta A, crie uma transação. Com a B, tente listar, buscar, alterar e remover esse identificador. Nenhuma operação pode revelar ou modificar o recurso. Depois expire ou adultere um token e confirme `401` no formato compartilhado.
+
+O `.env.example` documenta `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `PORT` e origens permitidas, mas não contém valores de produção.

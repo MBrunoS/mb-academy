@@ -1,0 +1,40 @@
+---
+title: "Sprint 1: API NestJS em Memória"
+description: "Modele a fronteira HTTP e o fluxo controller-service-repository antes de introduzir banco de dados."
+---
+
+> **Materiais:** [abra o repositório](https://github.com/MBrunoS/junior-backend-financas) ou [baixe o pacote da Sprint 1](https://github.com/MBrunoS/junior-backend-financas/releases/tag/sprint-1-materials). Comece por `student-starter/`.
+
+## História de usuário
+
+> Como cliente da API, quero verificar sua saúde e manipular transações por HTTP, para integrar sem conhecer detalhes da implementação.
+
+Crie um projeto NestJS com configuração estrita de TypeScript. Implemente `GET /health` e o CRUD de `/transactions` usando um repositório em memória. Nesta sprint, use um identificador fixo de usuário dentro do serviço; autenticação real entra depois.
+
+## Arquitetura esperada
+
+```text
+src/
+  health/
+  transactions/
+    dto/
+    domain/
+    transactions.controller.ts
+    transactions.service.ts
+    transactions.repository.ts
+    in-memory-transactions.repository.ts
+```
+
+Controllers traduzem HTTP. Services aplicam regras. O repositório guarda e recupera dados. Defina uma interface de repositório para que a próxima sprint troque memória por Prisma sem reescrever controllers.
+
+## Critérios de aceite
+
+- `GET /health` responde `200` com `{ "status": "ok" }`.
+- Criar responde `201`; buscar e editar respondem `200`; remover responde `204`.
+- Identificadores usam UUID.
+- `amountInCents` aceita somente inteiro positivo.
+- Datas e enums seguem o OpenAPI.
+- Recurso ausente responde `404` no formato comum de erro.
+- DTO não aceita propriedades desconhecidas.
+
+Explore todas as rotas com o arquivo `.http` do kit ou cliente equivalente. O starter contém somente o scaffold e o health check; construa o restante antes de comparar o comportamento com `kit/reference-api/`.

@@ -1,0 +1,41 @@
+---
+title: "Sprint 1: Interface do MB Finanças"
+description: "Transforme os fundamentos de HTML e CSS na primeira entrega acessível e responsiva do projeto do curso."
+---
+
+> **Materiais:** [abra o repositório](https://github.com/MBrunoS/junior-frontend-financas) ou [baixe o pacote da Sprint 1](https://github.com/MBrunoS/junior-frontend-financas/releases/tag/sprint-1-materials). Comece por `student-starter/`.
+
+Você não vai esperar o fim do curso para começar o projeto. Nesta sprint, o **MB Finanças** ainda não tem comportamento, mas já deve comunicar claramente o produto que estamos construindo. O objetivo é entregar uma interface navegável e resistente a diferentes tamanhos de tela — não um desenho perfeito.
+
+## História de usuário
+
+> Como pessoa que organiza sua vida financeira, quero visualizar meu saldo, minhas receitas e despesas e encontrar o formulário de uma nova transação, para entender rapidamente como usar o produto.
+
+## Entrega
+
+Crie um projeto Vite com o template `vanilla-ts`. Modele a tela com dados fixos contendo:
+
+1. cabeçalho com nome do produto, identificação da pessoa e ação de sair;
+2. três cartões: receitas, despesas e saldo;
+3. formulário com tipo, descrição, valor, categoria e data;
+4. filtros por tipo, categoria e período;
+5. lista ou tabela com pelo menos quatro transações;
+6. navegação de páginas desabilitada, apenas para antecipar a interface futura.
+
+Use `header`, `main`, `section`, `form` e títulos em ordem coerente. Todo campo precisa de `label`; valores não podem depender apenas de cor; foco de teclado deve estar visível. Em telas estreitas, cartões e formulário passam a ocupar uma coluna, sem rolagem horizontal.
+
+## Contrato visual mínimo
+
+- Receitas usam o sinal `+`; despesas usam `−`.
+- Valores são exibidos como Real brasileiro com `Intl.NumberFormat`.
+- A lista deve ter alternativas visíveis para “carregando”, “sem resultados” e “erro”. Nesta sprint, altere manualmente o HTML para revisar cada uma.
+- Não use biblioteca de componentes. Bootstrap ou Tailwind podem ser explorados em uma branch separada, mas a entrega principal deve demonstrar CSS próprio.
+
+## Verificação
+
+- Navegue por toda a página usando apenas `Tab` e `Shift+Tab`.
+- Teste aproximadamente em 360 px, 768 px e acima de 1024 px.
+- Rode o validador de HTML e corrija atributos duplicados, elementos sem rótulo e hierarquia de títulos.
+- Registre no README uma captura desktop, uma mobile e três decisões de acessibilidade.
+
+O diretório `student-starter/` contém apenas o scaffold. A referência integrada fica separada para consulta posterior. Faça seu commit antes de avançar: a próxima sprint acrescentará comportamento a esta mesma tela.

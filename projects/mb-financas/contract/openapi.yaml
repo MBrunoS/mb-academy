@@ -1,0 +1,341 @@
+openapi: 3.1.0
+info:
+  title: MB Finanças API
+  version: 1.0.0
+  description: Contrato compartilhado pelos projetos Júnior Front-end e Back-end.
+servers:
+  - url: http://localhost:3333
+    description: API de referência local
+tags:
+  - name: Health
+  - name: Auth
+  - name: Transactions
+  - name: Summary
+paths:
+  /health:
+    get:
+      tags: [Health]
+      operationId: healthCheck
+      responses:
+        "200":
+          description: API disponível
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: { type: string, const: ok }
+  /auth/register:
+    post:
+      tags: [Auth]
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RegisterInput" }
+      responses:
+        "201":
+          description: Conta criada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "409": { $ref: "#/components/responses/ConflictError" }
+  /auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoginInput" }
+      responses:
+        "200":
+          description: Sessão iniciada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+  /me:
+    get:
+      tags: [Auth]
+      operationId: getCurrentUser
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Usuário autenticado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+  /transactions:
+    get:
+      tags: [Transactions]
+      operationId: listTransactions
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/Limit" }
+        - { $ref: "#/components/parameters/TypeFilter" }
+        - { $ref: "#/components/parameters/CategoryFilter" }
+        - { $ref: "#/components/parameters/FromFilter" }
+        - { $ref: "#/components/parameters/ToFilter" }
+      responses:
+        "200":
+          description: Página de transações do usuário
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TransactionPage" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+    post:
+      tags: [Transactions]
+      operationId: createTransaction
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TransactionInput" }
+      responses:
+        "201":
+          description: Transação criada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Transaction" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+  /transactions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      tags: [Transactions]
+      operationId: getTransaction
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Transação encontrada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Transaction" }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+    patch:
+      tags: [Transactions]
+      operationId: updateTransaction
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TransactionPatch" }
+      responses:
+        "200":
+          description: Transação atualizada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Transaction" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+    delete:
+      tags: [Transactions]
+      operationId: deleteTransaction
+      security: [{ bearerAuth: [] }]
+      responses:
+        "204": { description: Transação removida }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+  /summary:
+    get:
+      tags: [Summary]
+      operationId: getSummary
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/FromFilter" }
+        - { $ref: "#/components/parameters/ToFilter" }
+      responses:
+        "200":
+          description: Totais do período
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Summary" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+    TypeFilter:
+      name: type
+      in: query
+      schema: { $ref: "#/components/schemas/TransactionType" }
+    CategoryFilter:
+      name: category
+      in: query
+      schema: { $ref: "#/components/schemas/Category" }
+    FromFilter:
+      name: from
+      in: query
+      schema: { type: string, format: date }
+    ToFilter:
+      name: to
+      in: query
+      schema: { type: string, format: date }
+  schemas:
+    TransactionType:
+      type: string
+      enum: [income, expense]
+    Category:
+      type: string
+      enum: [salary, freelance, food, housing, transport, health, leisure, education, other]
+    User:
+      type: object
+      additionalProperties: false
+      required: [id, name, email]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        email: { type: string, format: email }
+    RegisterInput:
+      type: object
+      additionalProperties: false
+      required: [name, email, password]
+      properties:
+        name: { type: string, minLength: 2, maxLength: 80 }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8, maxLength: 72 }
+    LoginInput:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 1 }
+    AuthResponse:
+      type: object
+      additionalProperties: false
+      required: [user, accessToken]
+      properties:
+        user: { $ref: "#/components/schemas/User" }
+        accessToken: { type: string }
+    TransactionInput:
+      type: object
+      additionalProperties: false
+      required: [type, description, amountInCents, category, occurredAt]
+      properties:
+        type: { $ref: "#/components/schemas/TransactionType" }
+        description: { type: string, minLength: 1, maxLength: 120 }
+        amountInCents: { type: integer, minimum: 1 }
+        category: { $ref: "#/components/schemas/Category" }
+        occurredAt: { type: string, format: date }
+    TransactionPatch:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        type: { $ref: "#/components/schemas/TransactionType" }
+        description: { type: string, minLength: 1, maxLength: 120 }
+        amountInCents: { type: integer, minimum: 1 }
+        category: { $ref: "#/components/schemas/Category" }
+        occurredAt: { type: string, format: date }
+    Transaction:
+      type: object
+      additionalProperties: false
+      required: [id, type, description, amountInCents, category, occurredAt, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        type: { $ref: "#/components/schemas/TransactionType" }
+        description: { type: string, minLength: 1, maxLength: 120 }
+        amountInCents: { type: integer, minimum: 1 }
+        category: { $ref: "#/components/schemas/Category" }
+        occurredAt: { type: string, format: date }
+        createdAt: { type: string, format: date-time }
+    PaginationMeta:
+      type: object
+      additionalProperties: false
+      required: [page, limit, total, totalPages]
+      properties:
+        page: { type: integer }
+        limit: { type: integer }
+        total: { type: integer }
+        totalPages: { type: integer }
+    TransactionPage:
+      type: object
+      additionalProperties: false
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Transaction" }
+        meta: { $ref: "#/components/schemas/PaginationMeta" }
+    CategoryTotal:
+      type: object
+      additionalProperties: false
+      required: [category, amountInCents]
+      properties:
+        category: { $ref: "#/components/schemas/Category" }
+        amountInCents: { type: integer }
+    Summary:
+      type: object
+      additionalProperties: false
+      required: [incomeInCents, expenseInCents, balanceInCents, byCategory]
+      properties:
+        incomeInCents: { type: integer }
+        expenseInCents: { type: integer }
+        balanceInCents: { type: integer }
+        byCategory:
+          type: array
+          items: { $ref: "#/components/schemas/CategoryTotal" }
+    Error:
+      type: object
+      additionalProperties: false
+      required: [statusCode, code, message]
+      properties:
+        statusCode: { type: integer }
+        code: { type: string }
+        message: { type: string }
+        fieldErrors:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+  responses:
+    ValidationError:
+      description: Dados inválidos
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    UnauthorizedError:
+      description: Autenticação ausente ou inválida
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ConflictError:
+      description: Recurso já existente
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFoundError:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }

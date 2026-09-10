@@ -1,0 +1,30 @@
+{
+  "user": {
+    "name": "Ana Souza",
+    "email": "ana@mbacademy.dev",
+    "password": "senha123"
+  },
+  "transactions": [
+    {
+      "type": "income",
+      "description": "Salário",
+      "amountInCents": 500000,
+      "category": "salary",
+      "occurredAt": "2026-09-05"
+    },
+    {
+      "type": "expense",
+      "description": "Aluguel",
+      "amountInCents": 145000,
+      "category": "housing",
+      "occurredAt": "2026-09-06"
+    },
+    {
+      "type": "expense",
+      "description": "Supermercado",
+      "amountInCents": 38990,
+      "category": "food",
+      "occurredAt": "2026-09-08"
+    }
+  ]
+}

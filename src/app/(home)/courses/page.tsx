@@ -75,6 +75,7 @@ function LevelSection({ level }: { level: CatalogCourse["level"] }) {
 function CourseCard({ course }: { course: CatalogCourse }) {
   const Icon = trackIcon[course.track];
   const available = course.status === "available";
+  const href = course.href ?? course.previewHref;
 
   const content = (
     <div
@@ -102,21 +103,21 @@ function CourseCard({ course }: { course: CatalogCourse }) {
           {course.description}
         </p>
       </div>
-      {available && (
+      {href && (
         <span className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600 dark:text-emerald-400">
-          Saiba mais
+          {available ? "Saiba mais" : "Ver projeto em preparação"}
           <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
         </span>
       )}
     </div>
   );
 
-  if (!available || !course.href) {
+  if (!href) {
     return content;
   }
 
   return (
-    <Link href={course.href} className="block h-full">
+    <Link href={href} className="block h-full">
       {content}
     </Link>
   );

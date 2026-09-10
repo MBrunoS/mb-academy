@@ -1,0 +1,36 @@
+---
+title: "Sprint 5: Rede de Segurança"
+description: "Cubra regras, componentes e fluxos de integração sem transformar os testes em cópias da implementação."
+---
+
+> **Materiais:** [abra o repositório](https://github.com/MBrunoS/junior-frontend-financas) ou [baixe o pacote da Sprint 5](https://github.com/MBrunoS/junior-frontend-financas/releases/tag/sprint-5-materials). Os testes devem ser adicionados ao seu projeto acumulado.
+
+O projeto agora tem estado, autenticação e rede. Isso aumenta o número de maneiras pelas quais ele pode quebrar. Nesta sprint você construirá uma rede de segurança proporcional ao risco.
+
+## Estratégia
+
+Use Vitest, Testing Library, `user-event` e MSW. Separe os testes em três grupos:
+
+1. **Regras puras:** conversão entre Reais e centavos, filtros e validações.
+2. **Componentes:** formulário acessível, erros por campo, edição e confirmação de remoção.
+3. **Fluxos:** login, carregamento do dashboard, criação, resposta `401` e falha de rede.
+
+Teste o comportamento que a pessoa observa. Prefira consultas por papel, rótulo e texto. Não selecione classes CSS nem teste que `setState` foi chamado.
+
+## Cenários obrigatórios
+
+- valor `129,90` é enviado como `12990` e exibido novamente como `R$ 129,90`;
+- formulário inválido mantém os valores e anuncia o erro;
+- lista vazia não é confundida com carregamento;
+- uma criação bem-sucedida atualiza lista e resumo;
+- uma criação que falha preserva o formulário e permite tentar novamente;
+- `401` encerra a sessão e leva ao login;
+- filtros viram query parameters, incluindo página reiniciada em `1`;
+- edição cancelada não chama a API;
+- remoção cancelada não chama a API.
+
+## Aceite
+
+Rode testes sem a API real. Depois faça uma verificação manual curta contra a API de referência. Isso separa falhas do front de falhas de integração e mantém a suíte rápida e determinística.
+
+Registre no README o que ficou fora dos testes e por quê. Cobertura percentual é uma observação, não uma meta isolada. Modele os handlers do MSW a partir do OpenAPI e compare o fluxo final com a API de referência.

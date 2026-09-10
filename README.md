@@ -31,3 +31,14 @@ resources:
 - `src/app/courses` — páginas de conteúdo (Fumadocs)
 - `content/courses` — conteúdo MDX de cada curso
 - `docs/planejamento.md` — planejamento das trilhas e cursos
+- `projects/mb-financas` — contrato, referências locais, testes de contrato e manifestos de checkpoints dos projetos Júnior
+
+## Kit de integração Júnior
+
+```bash
+cd projects/mb-financas
+pnpm reference:api
+pnpm contract:test
+```
+
+Consulte o README do kit para executar o cliente React de referência e apontar os projetos das duas trilhas para implementações diferentes do mesmo contrato.

@@ -1,0 +1,56 @@
+---
+title: "Materiais do Projeto"
+description: "Baixe o starter back-end e valide sua API com o contrato e os clientes oficiais."
+---
+
+Os materiais do projeto vivem em um repositório público independente:
+
+- [Abrir o repositório Júnior Back-end](https://github.com/MBrunoS/junior-backend-financas)
+- [Baixar a versão mais recente](https://github.com/MBrunoS/junior-backend-financas/releases/latest)
+- [Consultar os pacotes das seis sprints](https://github.com/MBrunoS/junior-backend-financas/releases)
+
+## Iniciando o projeto
+
+```bash
+git clone https://github.com/MBrunoS/junior-backend-financas.git
+cd junior-backend-financas/student-starter
+pnpm install
+pnpm dev
+```
+
+O repositório contém:
+
+- `student-starter/`: NestJS mínimo com health check;
+- `sprints/`: especificação e critérios das seis entregas;
+- `kit/contract/`: contrato OpenAPI e coleção HTTP;
+- `kit/contract-tests/`: suíte externa de conformidade;
+- `kit/reference-web/`: cliente React que valida sua API;
+- `kit/reference-api/`: comportamento executável para comparação.
+
+Copie `student-starter/` para um repositório da sua conta. As tags `sprint-N-materials` congelam o pacote de materiais de cada etapa, mas a implementação NestJS deve ser construída por você. A solução completa será publicada com as aulas da trilha; a API de referência do kit já permite validar o comportamento esperado sem inventar respostas.
+
+Para consultar, por exemplo, os materiais da Sprint 3:
+
+```bash
+git fetch --tags
+git switch --detach sprint-3-materials
+```
+
+## Validando sem um aluno Front-end
+
+Com sua API na porta 3000, execute a suíte externa:
+
+```bash
+cd kit
+API_BASE_URL=http://localhost:3000 pnpm contract:test
+```
+
+Depois execute o cliente React oficial:
+
+```bash
+cd kit/reference-web
+pnpm install
+VITE_API_URL=http://localhost:3000 pnpm dev
+```
+
+Se algum comando falhar, abra uma issue no repositório informando sprint, versão do Node, banco utilizado e saída completa do terminal.

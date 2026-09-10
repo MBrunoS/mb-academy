@@ -44,7 +44,7 @@ Tudo o que você vai praticar a seguir — métodos, status codes, autenticaçã
 
 Praticamente todo produto digital real depende de dados que vêm de fora: contas de usuário, catálogos de produtos, cotações, previsão do tempo, histórico de pedidos. Sem consumir APIs, você fica limitado a interfaces estáticas — bonitas, talvez, mas sem nenhuma conexão com o mundo real.
 
-Este capítulo é a ponte entre "eu sei construir telas" e "eu construo produtos que refletem dados reais". E não por acaso: é exatamente o que falta para você evoluir o **Rastreador de Gastos** — que já foi um CLI em TypeScript no Starter — até o **dashboard de finanças pessoais** que vai fechar este curso, consumindo uma API pública de verdade e publicado com uma URL real.
+Este capítulo é a ponte entre "eu sei construir telas" e "eu construo produtos que refletem dados reais". E não por acaso: é exatamente o que falta para evoluir o **Rastreador de Gastos** do Starter até o **MB Finanças**. Os exemplos usam um domínio fictício para isolar cada conceito; na Sprint 4 você aplicará o conjunto completo contra a API local definida pelo contrato oficial.
 
 ## De fetch isolado a um componente completo
 
@@ -124,7 +124,7 @@ interface NovoGasto {
 }
 
 async function criarGasto(gasto: NovoGasto) {
-  const resposta = await fetch("https://api.mbacademy.dev/gastos", {
+  const resposta = await fetch("https://api.exemplo.dev/gastos", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -161,7 +161,7 @@ Como as faixas têm significados diferentes, muitas vezes vale a pena reagir de 
 
 ```ts
 async function buscarGasto(id: number) {
-  const resposta = await fetch(`https://api.mbacademy.dev/gastos/${id}`);
+  const resposta = await fetch(`https://api.exemplo.dev/gastos/${id}`);
 
   if (resposta.status === 404) {
     throw new Error("Gasto não encontrado.");
@@ -202,7 +202,7 @@ Compare os dois, buscando a lista de gastos:
 
 ```ts
 async function buscarGastos() {
-  const resposta = await fetch("https://api.mbacademy.dev/gastos");
+  const resposta = await fetch("https://api.exemplo.dev/gastos");
 
   if (!resposta.ok) {
     throw new Error(`Erro HTTP: ${resposta.status}`);
@@ -218,7 +218,7 @@ async function buscarGastos() {
 import axios from "axios";
 
 async function buscarGastos() {
-  const resposta = await axios.get("https://api.mbacademy.dev/gastos");
+  const resposta = await axios.get("https://api.exemplo.dev/gastos");
   return resposta.data;
   // Se o servidor responder 4xx ou 5xx, o axios já lança
   // uma exceção sozinho — não é preciso checar o status manualmente.
@@ -232,7 +232,7 @@ Um dos usos mais práticos do axios é criar uma **instância configurada uma ú
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://api.mbacademy.dev",
+  baseURL: "https://api.exemplo.dev",
 });
 
 // Roda antes de toda requisição feita com "api"
@@ -329,7 +329,7 @@ interface Gasto {
 }
 
 function ListaDeGastos() {
-  const estado = useApi<Gasto[]>("https://api.mbacademy.dev/gastos");
+  const estado = useApi<Gasto[]>("https://api.exemplo.dev/gastos");
 
   switch (estado.status) {
     case "idle":
@@ -365,7 +365,7 @@ Note que, dentro de `case "success"`, o TypeScript já sabe que `estado.dados` e
 
 1. Crie uma interface `Gasto` com os campos `id: number`, `descricao: string`, `valor: number` e `categoria: string`.
 2. Implemente (ou reaproveite) um hook `useApi<T>(url: string)` que retorne um valor do tipo `EstadoRequisicao<T>`, com os quatro casos `idle`, `loading`, `success` e `error`, como visto neste capítulo.
-3. Crie um componente `ResumoDeGastos` que use `useApi<Gasto[]>` para buscar os dados de `"https://api.mbacademy.dev/gastos"`.
+3. Crie um componente `ResumoDeGastos` que use `useApi<Gasto[]>` para buscar os dados de `"https://api.exemplo.dev/gastos"`.
 4. No estado `"loading"`, exiba a mensagem `"Carregando gastos..."`.
 5. No estado `"error"`, exiba a mensagem de erro recebida, precedida de `"Erro: "`.
 6. No estado `"success"`, exiba o **total gasto** (soma de todos os valores, usando `reduce`) e a **quantidade de gastos** encontrados.
@@ -422,7 +422,7 @@ function useApi<T>(url: string): EstadoRequisicao<T> {
 }
 
 function ResumoDeGastos() {
-  const estado = useApi<Gasto[]>("https://api.mbacademy.dev/gastos");
+  const estado = useApi<Gasto[]>("https://api.exemplo.dev/gastos");
 
   switch (estado.status) {
     case "idle":

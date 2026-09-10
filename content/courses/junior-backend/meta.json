@@ -1,0 +1,16 @@
+{
+  "title": "Júnior Back-end — Projeto",
+  "description": "Construa a API do MB Finanças em NestJS, PostgreSQL e Prisma seguindo um contrato compartilhado.",
+  "root": true,
+  "pages": [
+    "index",
+    "project-materials",
+    "project-contract",
+    "project-sprint-1",
+    "project-sprint-2",
+    "project-sprint-3",
+    "project-sprint-4",
+    "project-sprint-5",
+    "project-sprint-6"
+  ]
+}

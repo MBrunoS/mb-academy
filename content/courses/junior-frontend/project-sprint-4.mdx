@@ -1,0 +1,46 @@
+---
+title: "Sprint 4: API e Autenticação"
+description: "Troque a persistência local pelo contrato HTTP compartilhado e lide com o ciclo completo de uma aplicação conectada."
+---
+
+> **Materiais:** [abra o repositório](https://github.com/MBrunoS/junior-frontend-financas) ou [baixe o pacote da Sprint 4](https://github.com/MBrunoS/junior-frontend-financas/releases/tag/sprint-4-materials). O kit já inclui a API local e o contrato.
+
+Este é o ponto em que o projeto front-end encontra o projeto back-end. Você não precisa esperar outro aluno: o kit do **MB Finanças** inclui uma API de referência local compatível com o mesmo `openapi.yaml` que será implementado na trilha back-end.
+
+## Preparação
+
+Inicie a API de referência com `pnpm reference:api` dentro do kit. Confirme `GET http://localhost:3333/health` e entre com `ana@mbacademy.dev` / `senha123`. Leia no OpenAPI as operações antes de escrever cada chamada.
+
+Crie uma única fronteira HTTP:
+
+```text
+src/api/
+  client.ts
+  auth.ts
+  transactions.ts
+```
+
+`client.ts` conhece `VITE_API_URL`, JSON, cabeçalhos e o formato de erro. Componentes não chamam `fetch` diretamente.
+
+## Entrega
+
+- Implementar cadastro e login, mantendo o token em memória durante a sessão.
+- Proteger o dashboard e limpar a sessão ao receber `401`.
+- Trocar o adapter local por `GET`, `POST`, `PATCH` e `DELETE /transactions`.
+- Enviar filtros e paginação como query parameters.
+- Consumir `/summary`; o front não deve recalcular totais de uma página parcial.
+- Exibir carregamento inicial, atualização em andamento, vazio, erro recuperável e confirmação de remoção.
+- Impedir submissões duplicadas e conservar os dados do formulário quando a rede falhar.
+- Configurar CORS apenas no servidor; nunca tente “resolver CORS” adicionando cabeçalhos na requisição do navegador.
+
+## Integração substituível
+
+Comece com MSW para cenários rápidos e testes. Depois execute a mesma interface contra a API HTTP local. A troca deve exigir apenas:
+
+```bash
+VITE_API_URL=http://localhost:3333 pnpm dev
+```
+
+Se sua aplicação só funciona com um formato diferente do OpenAPI, o código está integrado à implementação errada. Corrija o adapter ou reporte uma inconsistência no contrato; não crie campos alternativos silenciosos.
+
+Antes de consultar `reference-solution/`, demonstre cadastro, login inválido, CRUD, filtro, paginação, sessão expirada e erro de rede usando os critérios da sprint.

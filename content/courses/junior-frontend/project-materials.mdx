@@ -1,0 +1,50 @@
+---
+title: "Materiais do Projeto"
+description: "Baixe o starter, consulte os enunciados e execute o kit de integração do MB Finanças."
+---
+
+O projeto possui um repositório público próprio, separado da plataforma e pronto para você criar seu histórico de portfólio:
+
+- [Abrir o repositório Júnior Front-end](https://github.com/MBrunoS/junior-frontend-financas)
+- [Baixar a versão mais recente](https://github.com/MBrunoS/junior-frontend-financas/releases/latest)
+- [Consultar os pacotes das seis sprints](https://github.com/MBrunoS/junior-frontend-financas/releases)
+
+## Começando a Sprint 1
+
+```bash
+git clone https://github.com/MBrunoS/junior-frontend-financas.git
+cd junior-frontend-financas/student-starter
+pnpm install
+pnpm dev
+```
+
+O repositório contém quatro áreas:
+
+- `student-starter/`: scaffold mínimo para o seu próprio desenvolvimento;
+- `sprints/`: enunciados e critérios de aceite versionados;
+- `kit/`: contrato OpenAPI, fixtures, API local e testes de contrato;
+- `reference-solution/`: cliente React integrado para consulta posterior.
+
+Copie `student-starter/` para um repositório da sua conta e faça seus commits nele. As tags `sprint-N-materials` são pacotes imutáveis dos materiais publicados para cada etapa; elas não substituem o seu histórico nem fingem ser uma solução que ainda não foi ensinada.
+
+Para baixar, por exemplo, o pacote da Sprint 4 pela linha de comando:
+
+```bash
+git fetch --tags
+git switch --detach sprint-4-materials
+```
+
+Você também pode usar o arquivo `.zip` da release sem instalar Git. Volte ao branch `main` para receber correções posteriores dos materiais.
+
+## Kit de integração
+
+Em outro terminal:
+
+```bash
+cd kit
+pnpm reference:api
+```
+
+A API abre em `http://localhost:3333`. Use `ana@mbacademy.dev` e `senha123`. Nenhum serviço hospedado é necessário para concluir o curso.
+
+Se um link ou comando desta página não funcionar, registre uma issue no repositório de materiais indicando sprint, sistema operacional, versão do Node e saída completa do terminal.

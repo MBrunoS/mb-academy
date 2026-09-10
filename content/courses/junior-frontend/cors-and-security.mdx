@@ -7,11 +7,11 @@ Você já sabe fazer requisições, tratar status codes e modelar o estado de um
 
 ## O que é CORS e por que ele existe
 
-Os navegadores seguem uma regra de segurança chamada **política de mesma origem** (*same-origin policy*): por padrão, uma página só pode fazer requisições **livremente** para o mesmo domínio, protocolo e porta de onde ela foi carregada. Uma página servida em `http://localhost:3000` é uma **origem** diferente de `https://api.mbacademy.dev`, mesmo que ambas estejam rodando na sua própria máquina.
+Os navegadores seguem uma regra de segurança chamada **política de mesma origem** (*same-origin policy*): por padrão, uma página só pode fazer requisições **livremente** para o mesmo domínio, protocolo e porta de onde ela foi carregada. Uma página servida em `http://localhost:3000` é uma **origem** diferente de `https://api.exemplo.dev`, mesmo que ambas estejam rodando na sua própria máquina.
 
 Sem essa regra, qualquer site malicioso poderia usar o seu navegador — já autenticado em outros serviços — para fazer requisições silenciosas em seu nome para bancos, redes sociais, e-mails, e ler as respostas. A política de mesma origem existe para impedir exatamente isso.
 
-O problema é que, no desenvolvimento web moderno, é **normalíssimo** que o front-end (rodando em `localhost:3000`, ou em `app.mbacademy.dev`) precise conversar com um back-end em outra origem (`api.mbacademy.dev`, ou uma API pública de terceiros). É aí que entra o **CORS** (*Cross-Origin Resource Sharing*) — um mecanismo que permite ao **servidor** dizer explicitamente, através de cabeçalhos HTTP, quais origens têm permissão de ler suas respostas.
+O problema é que, no desenvolvimento web moderno, é **normalíssimo** que o front-end (rodando em `localhost:5173`) precise conversar com um back-end em outra origem (`localhost:3333`, ou uma API pública de terceiros). É aí que entra o **CORS** (*Cross-Origin Resource Sharing*) — um mecanismo que permite ao **servidor** dizer explicitamente, através de cabeçalhos HTTP, quais origens têm permissão de ler suas respostas.
 
 Um servidor que aceita requisições de qualquer origem responde com um cabeçalho como este:
 
@@ -176,7 +176,7 @@ function DescricaoDoGasto({ descricao }: { descricao: string }) {
 
 // No front-end:
 async function buscarRelatorioFinanceiro(usuarioId: string) {
-  const resposta = await fetch(`https://api.mbacademy.dev/relatorios/${usuarioId}`);
+  const resposta = await fetch(`https://api.exemplo.dev/relatorios/${usuarioId}`);
   return resposta.json();
 }
 

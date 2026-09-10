@@ -1,0 +1,29 @@
+---
+title: "Sprint 2: PostgreSQL e Prisma"
+description: "Substitua o armazenamento temporário por migrations reproduzíveis e persistência relacional."
+---
+
+> **Materiais:** [abra o repositório](https://github.com/MBrunoS/junior-backend-financas) ou [baixe o pacote da Sprint 2](https://github.com/MBrunoS/junior-backend-financas/releases/tag/sprint-2-materials). Continue no repositório que você criou na sprint anterior.
+
+Nesta sprint a API passa a sobreviver a reinícios. Use PostgreSQL e Prisma sem alterar o contrato HTTP nem os controllers.
+
+## Modelo relacional
+
+Crie `users` e `transactions`. A transação contém chave estrangeira obrigatória para usuário, `type`, `description`, `amount_in_cents`, `category`, `occurred_at` e timestamps. Use inteiro para dinheiro, data para ocorrência e data/hora para auditoria. Adicione índices para `user_id`, `(user_id, occurred_at)` e `(user_id, category)`.
+
+O seed cria `ana@mbacademy.dev` e pelo menos três transações previsíveis. Credenciais de demonstração podem existir no seed de desenvolvimento, nunca no ambiente de produção.
+
+## Entrega
+
+- Subir PostgreSQL localmente com Compose.
+- Criar migration inicial versionada; não usar `db push` como fluxo principal.
+- Implementar `PrismaTransactionsRepository` conforme a interface da Sprint 1.
+- Selecionar a implementação por módulo/configuração, mantendo a memória disponível para testes unitários.
+- Criar seed idempotente para desenvolvimento.
+- Tratar indisponibilidade do banco sem expor stack trace ou consulta SQL.
+
+## Verificação
+
+Crie dados, reinicie API e banco e confirme a persistência. Rode a migration em um banco vazio. Execute o seed duas vezes sem duplicar a conta. Inspecione que valores em centavos e datas voltam sem conversões inesperadas.
+
+O checkpoint inicial preserva a API em memória verde. A solução desta sprint deve produzir as mesmas respostas HTTP: trocar infraestrutura não é motivo para quebrar clientes.

@@ -1,0 +1,36 @@
+---
+title: "Sprint 6: Cliente Real e Deploy"
+description: "Conecte o front-end de referência, ajuste a fronteira de produção e publique uma API demonstrável."
+---
+
+> **Materiais:** [abra o repositório](https://github.com/MBrunoS/junior-backend-financas) ou [baixe o pacote da Sprint 6](https://github.com/MBrunoS/junior-backend-financas/releases/tag/sprint-6-materials). O cliente oficial está em `kit/reference-web/`.
+
+Agora sua API será consumida por código que você não controla. Inicie o cliente React do kit apontando para ela:
+
+```bash
+cd reference-web
+pnpm install
+VITE_API_URL=http://localhost:3000 pnpm dev
+```
+
+Faça login, liste, crie, edite e remova. Use filtros e confira o resumo. Se o cliente exigir uma adaptação, compare a requisição e a resposta com o OpenAPI antes de decidir qual lado corrigir.
+
+## Preparação para produção
+
+- Validar todas as variáveis de ambiente ao iniciar.
+- Executar migrations como etapa explícita do deploy.
+- Configurar origem do front por ambiente.
+- Disponibilizar `/health` sem autenticação.
+- Manter Swagger acessível para avaliação, sem expor segredos.
+- Criar conta/dados de demonstração por seed controlado ou documentar o cadastro.
+- Confirmar que logs não contêm senha, token nem corpo sensível.
+
+## README de portfólio
+
+Documente arquitetura, modelo relacional, contrato, setup local, migrations, seed, testes e URL publicada. Inclua exemplos `curl` de cadastro, login e criação de transação, além de decisões e limitações.
+
+## Portão final
+
+O projeto está concluído quando lint, build, testes internos e suíte externa passam; o Swagger corresponde ao contrato; o cliente oficial funciona mudando somente `VITE_API_URL`; duas contas permanecem isoladas; e o deploy sobrevive a reinício sem perder dados.
+
+Como desafio opcional, conecte o projeto de um aluno Front-end. O objetivo da atividade é diagnosticar CORS, configuração e contrato como aconteceria entre duas pessoas de um time — não alterar a API para um cliente específico.

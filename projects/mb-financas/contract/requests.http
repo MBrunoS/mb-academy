@@ -1,0 +1,67 @@
+@baseUrl = http://localhost:3333
+@token = substitua-pelo-access-token
+@transactionId = substitua-pelo-id
+
+### Saúde
+GET {{baseUrl}}/health
+
+### Cadastro
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Maria Lima",
+  "email": "maria@example.com",
+  "password": "senha-segura"
+}
+
+### Login da conta de demonstração
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ana@mbacademy.dev",
+  "password": "senha123"
+}
+
+### Usuário atual
+GET {{baseUrl}}/me
+Authorization: Bearer {{token}}
+
+### Criar transação
+POST {{baseUrl}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "expense",
+  "description": "Curso de TypeScript",
+  "amountInCents": 12990,
+  "category": "education",
+  "occurredAt": "2026-09-09"
+}
+
+### Listar com filtros e paginação
+GET {{baseUrl}}/transactions?type=expense&page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Buscar uma transação
+GET {{baseUrl}}/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
+
+### Editar parcialmente
+PATCH {{baseUrl}}/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amountInCents": 14990
+}
+
+### Resumo do período
+GET {{baseUrl}}/summary?from=2026-09-01&to=2026-09-30
+Authorization: Bearer {{token}}
+
+### Remover
+DELETE {{baseUrl}}/transactions/{{transactionId}}
+Authorization: Bearer {{token}}

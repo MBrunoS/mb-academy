@@ -1,0 +1,24 @@
+---
+title: "O Contrato Compartilhado"
+description: "Entenda a fronteira que permite ao front e ao back evoluírem sem depender da implementação um do outro."
+---
+
+O arquivo `contract/openapi.yaml` do kit MB Finanças é a fonte de verdade. Ele define rotas, métodos, autenticação, parâmetros, corpos, respostas e erros. Código e documentação que discordam do contrato são defeitos de integração.
+
+## Decisões que já estão tomadas
+
+- Recursos e campos da API usam inglês; textos para a pessoa usuária permanecem em português.
+- Dinheiro trafega como centavos inteiros em `amountInCents`.
+- Datas de transação usam `YYYY-MM-DD`; `createdAt` usa data/hora ISO.
+- A autenticação usa `Authorization: Bearer <token>`.
+- Transações pertencentes a outra conta respondem `404`, evitando revelar sua existência.
+- Listas usam `{ data, meta: { page, limit, total, totalPages } }`.
+- Erros usam `{ statusCode, code, message, fieldErrors? }`.
+
+## Dados centrais
+
+`User` tem `id`, `name` e `email`. A senha nunca aparece em respostas. `Transaction` tem `id`, `type`, `description`, `amountInCents`, `category`, `occurredAt` e `createdAt`; a associação ao usuário é interna.
+
+Antes de implementar uma rota, abra sua operação no contrato. Depois execute a coleção HTTP. Ao final, rode a suíte externa com `API_BASE_URL`. Essa ordem ajuda a distinguir um erro de regra de negócio de uma incompatibilidade de protocolo.
+
+O contrato pode receber correções durante o desenvolvimento, mas mudanças incompatíveis exigem nova versão. Não adicione aliases silenciosos como `valor` e `amountInCents` ao mesmo tempo apenas para fazer um cliente divergente funcionar.

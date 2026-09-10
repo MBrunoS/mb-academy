@@ -8,6 +8,7 @@ export interface CatalogCourse {
   description: string;
   status: "available" | "soon";
   href?: string;
+  previewHref?: string;
 }
 
 /**
@@ -31,7 +32,7 @@ export const coursesCatalog: CatalogCourse[] = [
     level: "Júnior",
     track: "frontend",
     description:
-      "HTML, CSS, React com TypeScript, consumo de APIs e deploy — publique um dashboard com URL real.",
+      "HTML, CSS e React com TypeScript em um produto incremental — integre uma API real, teste e publique o MB Finanças.",
     status: "available",
     href: "/courses/junior-frontend",
   },
@@ -41,8 +42,9 @@ export const coursesCatalog: CatalogCourse[] = [
     level: "Júnior",
     track: "backend",
     description:
-      "Servidores, NestJS com TypeScript, PostgreSQL e autenticação — o par back-end do Júnior Front-end.",
+      "NestJS, PostgreSQL, autenticação e testes de contrato — construa a API consumida pelo projeto Front-end.",
     status: "soon",
+    previewHref: "/courses/junior-backend",
   },
   {
     slug: "pleno-frontend",

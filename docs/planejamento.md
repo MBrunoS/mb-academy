@@ -14,7 +14,9 @@
 
 - **Currículo em espiral.** Os temas não são ensinados uma vez e abandonados. Cada nível revisita temas anteriores com maior profundidade: testes aparecem no Júnior (introdução), no Pleno (TDD, testes de integração) e no Sênior (qualidade em escala, CI/CD, load testing). Isso consolida conhecimento e evita "conteúdo orfão".
 
-- **Projeto incremental por capítulo.** O aluno não aprende conceitos isolados e aplica no final. Cada capítulo adiciona uma camada ao projeto em construção. Checkpoints de código inicial são fornecidos por capítulo para que um bloqueio num capítulo anterior não impeça o progresso.
+- **Projeto incremental por capítulo.** O aluno não aprende conceitos isolados e aplica no final. Cada capítulo termina com uma sprint do mesmo produto. Toda sprint possui história de usuário, critérios de aceite, testes, verificação manual, starter e uma release imutável de materiais. Soluções progressivas só são publicadas quando a respectiva aula estiver completa e validada.
+
+- **Integração por contrato, não por dependência.** Front-end e back-end compartilham OpenAPI, fixtures e cenários de conformidade. Cada trilha recebe localmente uma implementação oficial da contraparte; assim, os projetos integram sistemas reais sem exigir que o aluno curse as duas trilhas ou espere outra pessoa.
 
 - **Trilha dupla: obrigatória (≈75%) + opcional (≈25%).** A trilha **obrigatória** é o núcleo técnico que o aluno precisa dominar. A trilha **opcional** (também chamada *complementar*) cobre design, soft skills, metodologias, preparação para entrevistas e aprofundamentos de IA — conteúdo que forma o desenvolvedor completo, não apenas o programador. "Opcional" significa que não bloqueia a progressão de nível, não que seja descartável. Cada curso rotula seus módulos como **Obrigatório** ou **Opcional**.
 
@@ -118,7 +120,20 @@ Legenda:
 
 > **Pré-requisito:** Starter completo.
 
-> **Projeto incremental:** Dashboard web de finanças pessoais em React, evoluindo o tema do Starter para a web. Consome uma API pública. Ao final, é publicado no Vercel com URL real.
+> **Projeto incremental:** **MB Finanças Web**, evolução do CLI do Starter para um cliente React completo. O projeto cresce em seis sprints, consome uma API local compatível com o contrato compartilhado e pode ser publicado em modo demonstração ou integrado.
+
+### Sprints do projeto
+
+| Sprint | Entrega |
+|---|---|
+| 1 — Interface | Dashboard semântico, responsivo e acessível com dados fixos |
+| 2 — Navegador | CRUD em memória com DOM, TypeScript, filtros e `localStorage` |
+| 3 — React | Reconstrução em componentes, estado, hooks e rotas simuladas |
+| 4 — Integração | Cadastro/login, JWT, CRUD, paginação e resumo via API |
+| 5 — Qualidade | Regras, componentes e fluxos testados com Vitest, Testing Library e MSW |
+| 6 — Entrega | Auditoria, dois modos de execução, README e deploy |
+
+O escopo obrigatório inclui receitas e despesas, CRUD completo, dados por usuário, filtros, paginação, resumo financeiro e estados de interface. Conversão de moedas deixa de ser o eixo do projeto e vira extensão opcional.
 
 ### Obrigatório
 
@@ -149,7 +164,26 @@ Legenda:
 
 > **Pré-requisito:** Starter completo.
 
-> **Projeto incremental:** API REST de finanças pessoais em NestJS + PostgreSQL, espelhando o tema do projeto front-end. Ao final, é publicada no Railway com URL real e documentação Swagger.
+> **Projeto incremental:** **MB Finanças API**, implementação NestJS/PostgreSQL do contrato consumido pelo front. Testes de contrato e um cliente React local permitem concluir e demonstrar o projeto sem cursar Front-end.
+
+### Sprints do projeto
+
+| Sprint | Entrega |
+|---|---|
+| 1 — HTTP | NestJS, health check e CRUD por repositório em memória |
+| 2 — Persistência | PostgreSQL, Prisma, migrations, índices e seed |
+| 3 — Identidade | Cadastro/login, JWT, hash de senha e isolamento por usuário |
+| 4 — Contrato | Filtros, paginação, resumo, erros, CORS e Swagger |
+| 5 — Qualidade | Testes unitários, integração, e2e e suíte externa de contrato |
+| 6 — Entrega | Integração com front oficial local, README e deploy |
+
+### Contrato comum dos projetos Júnior
+
+- Dinheiro usa centavos inteiros (`amountInCents`); datas de transação usam `YYYY-MM-DD`.
+- O núcleo é `/auth/register`, `/auth/login`, `/me`, CRUD em `/transactions`, `/summary` e `/health`.
+- Autenticação usa JWT de acesso; refresh token, OAuth e papéis ficam fora do obrigatório.
+- Paginação responde `{ data, meta }`; erros respondem `{ statusCode, code, message, fieldErrors? }`.
+- Cada aluno mantém um repositório de portfólio por trilha. A integração entre projetos próprios é um desafio final opcional.
 
 ### Obrigatório
 
@@ -338,8 +372,8 @@ Cada curso deve seguir este padrão:
 ```
 Starter        → Rastreador de Gastos (CLI, TypeScript puro)
                │
-Júnior Front   → Dashboard web do Rastreador (React, consome API pública)
-Júnior Back    → API REST do Rastreador (NestJS, PostgreSQL)
+Júnior Front   → MB Finanças Web (React, mocks + API por contrato)
+Júnior Back    → MB Finanças API (NestJS + PostgreSQL + contrato)
                │
 Pleno Front    → Dashboard avançado (Next.js, auth, design system, testes)
 Pleno Back     → API avançada (NestJS, cache Redis, mensageria, testes)
@@ -356,10 +390,12 @@ O aluno carrega o *mesmo produto* ao longo de toda a plataforma, vendo-o crescer
 
 ### Pronto ✅
 - **Starter** — completo, com todos os módulos, projeto do Rastreador de Gastos, Capítulo 7 de IA, tratamento de erros, módulos, async/await, debugging, recursão opcional.
+- **Júnior Front-end — projeto** — seis sprints, integração por contrato, auditoria e deploy reestruturados. As aulas teóricas permanecem disponíveis.
+- **Kit MB Finanças** — OpenAPI, fixtures, API e front locais de referência, coleção HTTP, suíte de contrato e manifestos de checkpoints.
 
 ### A construir (ordem sugerida)
-1. **Júnior Front-end** — maior impacto imediato, público mais amplo, feedback visual motiva mais rápido
-2. **Júnior Back-end** — espelho do front, aproveita o TypeScript já ensinado, NestJS como progressão natural do OOP do Starter
+1. **Júnior Back-end — aulas teóricas** — o projeto e suas seis sprints já estão especificados; falta escrever a progressão conceitual de HTTP, NestJS, PostgreSQL, autenticação e testes
+2. **Repositórios distribuíveis dos projetos Júnior** — extrair os materiais do kit, produzir os snapshots de código e publicar as tags `start`/`solution` descritas nos manifestos
 3. **Módulos compartilhados do Pleno** (TypeScript avançado, JS aprofundado, Git, Algoritmos, Docker, IA aplicada) — escritos uma vez, reutilizados nas duas trilhas Pleno
 4. **Pleno Front-end** e **Pleno Back-end** — em paralelo ou sequencialmente, reaproveitando os módulos compartilhados
 5. **Módulos compartilhados do Sênior** (System Design, Segurança fundamentos, Observabilidade, Comunicação Efetiva)
@@ -367,7 +403,7 @@ O aluno carrega o *mesmo produto* ao longo de toda a plataforma, vendo-o crescer
 
 ### Decisões abertas (a resolver antes de cada curso)
 - Como os **módulos do núcleo compartilhado** são entregues na plataforma: como um curso separado que ambas as trilhas apontam, ou como seções duplicadas dentro de cada curso
-- Qual projeto incremental específico para cada nível (o arco do Rastreador é sugestão, não obrigação)
+- Qual projeto incremental específico para os níveis ainda não escritos (Starter e Júnior já adotam o arco MB Finanças)
 - Se os módulos complementares compartilháveis (Metodologias Ágeis, Preparação para Entrevistas) são cursos próprios ou duplicados
 - Estratégia de avaliação/certificação (se houver)
 - Modelo de acesso (gratuito, pago, freemium)

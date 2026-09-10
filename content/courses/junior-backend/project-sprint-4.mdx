@@ -1,0 +1,35 @@
+---
+title: "Sprint 4: API Completa e Documentada"
+description: "Implemente filtros, paginação, resumo, erros consistentes, CORS e Swagger."
+---
+
+> **Materiais:** [abra o repositório](https://github.com/MBrunoS/junior-backend-financas) ou [baixe o pacote da Sprint 4](https://github.com/MBrunoS/junior-backend-financas/releases/tag/sprint-4-materials). Use o OpenAPI como fonte de verdade.
+
+Esta sprint completa o contrato usado pelo front-end. Trate query parameters como entrada não confiável e valide-os antes de construir consultas.
+
+## Listagem
+
+`GET /transactions` aceita `page`, `limit`, `type`, `category`, `from` e `to`. Todos os filtros se combinam com `AND` e sempre incluem o usuário autenticado. Ordene por `occurredAt` decrescente e use `createdAt` como desempate estável.
+
+Faça a consulta da página e a contagem total sob os mesmos filtros. `limit` fica entre 1 e 100; página começa em 1. Intervalos com `from > to` respondem `400`.
+
+## Resumo
+
+`GET /summary` recebe o mesmo período e calcula, no banco:
+
+- `incomeInCents`;
+- `expenseInCents`;
+- `balanceInCents`;
+- despesas agrupadas por categoria.
+
+Não derive o resumo apenas dos itens da página atual.
+
+## Fronteira profissional
+
+- Ative CORS por lista explícita de origens vinda do ambiente.
+- Gere Swagger a partir dos DTOs e compare o documento resultante ao OpenAPI oficial.
+- Converta validação, conflito e ausência em códigos estáveis.
+- Registre método, rota, status, duração e request id, sem senha ou token.
+- Não devolva mensagens internas do Prisma.
+
+Execute a coleção HTTP completa e abra o Swagger em uma instalação limpa. Compare com a API de referência somente depois que a suíte de contrato indicar quais comportamentos ainda divergem.
