@@ -181,6 +181,50 @@ async function buscarGasto(id: number) {
 
 Essa mensagem diferenciada é o que permite que sua interface mostre "Esse gasto não existe mais" em vez de um genérico "Ocorreu um erro" — uma diferença pequena no código, mas grande na experiência de quem usa o produto.
 
+## Validando o formato da resposta com Zod
+
+Status HTTP conta uma parte da história: mesmo quando `resposta.ok` é `true`, nada garante que o **corpo** da resposta tem o formato que sua `interface` promete. Um `as Gasto[]` (como você viu no módulo anterior) é só uma afirmação para o compilador — se o servidor renomear um campo ou mudar um tipo, o TypeScript não vai reclamar, e o erro só aparece em produção, geralmente longe do código que causou.
+
+O **Zod** resolve isso validando o formato **em tempo de execução**, a partir de um `schema` que você declara uma vez:
+
+```ts
+import { z } from "zod";
+
+const gastoSchema = z.object({
+  id: z.number(),
+  descricao: z.string(),
+  valor: z.number(),
+  categoria: z.string(),
+});
+
+const gastosSchema = z.array(gastoSchema);
+```
+
+Em vez de um `as`, você chama `.parse()` (ou `.safeParse()`) sobre o dado recebido. Se o formato não bater, o Zod lança um erro descrevendo exatamente qual campo está errado — em vez de deixar um dado inválido circular silenciosamente pela sua aplicação:
+
+```ts
+async function buscarGastos(): Promise<Gasto[]> {
+  const resposta = await fetch("https://api.exemplo.dev/gastos");
+
+  if (!resposta.ok) {
+    throw new Error(`Erro ao buscar gastos: ${resposta.status}`);
+  }
+
+  const dados = await resposta.json();
+  return gastosSchema.parse(dados); // lança erro se o formato não bater
+}
+```
+
+Como um bônus prático, o Zod também consegue **inferir** o tipo TypeScript a partir do schema, então você nem precisa manter a `interface` e o `schema` sincronizados manualmente:
+
+```ts
+type Gasto = z.infer<typeof gastoSchema>;
+```
+
+<Callout type="tip">
+  Você não precisa validar toda resposta de toda API com Zod — para um projeto pequeno ou uma API que você mesmo controla, um `as` costuma ser suficiente. Reserve a validação em tempo de execução para fronteiras mais críticas: dados de APIs externas, ou o contrato entre front-end e back-end de um projeto real, como o MB Finanças no capítulo de entrega do projeto.
+</Callout>
+
 ## axios: uma alternativa ao fetch nativo
 
 `fetch` é nativo do navegador e resolve bem a maioria dos casos, mas o mercado usa muito uma biblioteca chamada **axios**, que resolve alguns incômodos comuns:
@@ -447,4 +491,56 @@ function ResumoDeGastos() {
 
 ---
 
-Com isso, você já sabe buscar dados, tratar erros por faixa de status, escolher entre `fetch` e `axios`, e modelar o estado de uma requisição de forma robusta. Mas em algum momento — geralmente sem aviso prévio — você vai tentar consumir uma API de outro domínio e ver o console do navegador cheio de mensagens vermelhas sobre CORS. É exatamente esse mistério que vamos desvendar a seguir.
+## Simulando uma API com MSW
+
+Até aqui, todo exemplo dependeu de um servidor de verdade rodando em algum lugar. Mas nem sempre você tem (ou quer depender de) uma API real disponível — durante o desenvolvimento de uma tela antes do back-end estar pronto, ou para rodar testes automatizados sem depender de rede. O **MSW** (*Mock Service Worker*) resolve isso interceptando as chamadas de `fetch` ou `axios` no nível da rede e respondendo com dados falsos, sem que o componente saiba a diferença.
+
+Depois de instalar (`npm install msw --save-dev`), você declara **handlers**: funções que descrevem como cada rota deveria responder, usando a mesma URL e o mesmo método que a API real usaria.
+
+```ts
+// src/mocks/handlers.ts
+import { http, HttpResponse } from "msw";
+
+export const handlers = [
+  http.get("/gastos", () => {
+    return HttpResponse.json([
+      { id: 1, descricao: "Mercado", valor: 189.9, categoria: "Alimentação" },
+    ]);
+  }),
+
+  http.post("/gastos", async ({ request }) => {
+    const novoGasto = await request.json();
+    return HttpResponse.json({ id: 2, ...novoGasto }, { status: 201 });
+  }),
+];
+```
+
+Para usar os handlers em testes com Vitest, você sobe um servidor MSW antes da suíte e desliga depois — normalmente em um arquivo de setup compartilhado:
+
+```ts
+// src/mocks/server.ts
+import { setupServer } from "msw/node";
+import { handlers } from "./handlers";
+
+export const server = setupServer(...handlers);
+```
+
+```ts
+// src/setupTests.ts (referenciado na config do Vitest)
+import { beforeAll, afterEach, afterAll } from "vitest";
+import { server } from "./mocks/server";
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
+
+Com isso, qualquer `fetch("/gastos")` disparado durante um teste é interceptado pelo handler correspondente — o componente sendo testado nunca sabe que não existe uma API de verdade do outro lado. O mesmo mecanismo também funciona rodando a aplicação inteira no navegador (útil para demonstrar um projeto sem precisar hospedar um back-end), mudando apenas a forma de inicialização (`setupWorker` em vez de `setupServer`) — mas o formato dos handlers é exatamente o mesmo.
+
+<Callout type="tip">
+  MSW não substitui testar contra uma API real — ele existe para isolar o front-end durante o desenvolvimento e os testes, com respostas rápidas e previsíveis. No projeto do curso, você vai usar exatamente esse padrão: handlers MSW para testes e demonstração, e a mesma aplicação rodando contra a API local de referência para validar a integração de verdade.
+</Callout>
+
+---
+
+Com isso, você já sabe buscar dados, tratar erros por faixa de status, escolher entre `fetch` e `axios`, modelar o estado de uma requisição de forma robusta, e simular uma API inteira com MSW quando não há (ou não convém depender de) um servidor real. Mas em algum momento — geralmente sem aviso prévio — você vai tentar consumir uma API de outro domínio e ver o console do navegador cheio de mensagens vermelhas sobre CORS. É exatamente esse mistério que vamos desvendar a seguir.
